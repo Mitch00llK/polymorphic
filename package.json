@@ -1,0 +1,43 @@
+{
+  "name": "polymorphic",
+  "version": "1.0.0",
+  "description": "The lightweight, adaptable page builder for WordPress",
+  "main": "index.js",
+  "scripts": {
+    "dev": "wp-scripts start",
+    "build": "wp-scripts build",
+    "build:dev": "wp-scripts build --mode=development",
+    "lint": "npm run lint:js && npm run lint:css",
+    "lint:js": "wp-scripts lint-js src/",
+    "lint:css": "wp-scripts lint-style src/**/*.css",
+    "lint:fix": "wp-scripts lint-js src/ --fix && wp-scripts lint-style src/**/*.css --fix",
+    "test": "wp-scripts test-unit-js",
+    "test:watch": "wp-scripts test-unit-js --watch",
+    "format": "wp-scripts format",
+    "packages-update": "wp-scripts packages-update"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/polymorphic.git"
+  },
+  "author": "Your Company",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@wordpress/scripts": "^28.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
+    "@dnd-kit/sortable": "^8.0.0",
+    "@dnd-kit/utilities": "^3.2.0",
+    "@wordpress/api-fetch": "^7.0.0",
+    "@wordpress/components": "^28.0.0",
+    "@wordpress/element": "^6.0.0",
+    "@wordpress/i18n": "^5.0.0",
+    "lucide-react": "^0.300.0",
+    "nanoid": "^5.0.0",
+    "zustand": "^4.5.0"
+  }
+}

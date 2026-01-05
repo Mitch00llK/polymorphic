@@ -1,0 +1,188 @@
+/**
+ * Builder Base Styles
+ *
+ * @package Polymorphic
+ * @since   1.0.0
+ */
+
+/* Reset for builder context */
+#polymorphic-builder-root {
+    font-family: var(--polymorphic-font-family);
+    font-size: var(--polymorphic-font-size-sm);
+    color: var(--polymorphic-color-gray-800);
+    line-height: var(--polymorphic-line-height-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#polymorphic-builder-root *,
+#polymorphic-builder-root *::before,
+#polymorphic-builder-root *::after {
+    box-sizing: border-box;
+}
+
+/* Hide WordPress admin bar in builder */
+.polymorphic-builder-active #wpadminbar {
+    display: none;
+}
+
+/* Loading state */
+.polymorphic-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: var(--polymorphic-spacing-4);
+}
+
+.polymorphic-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--polymorphic-color-gray-200);
+    border-top-color: var(--polymorphic-color-primary);
+    border-radius: 50%;
+    animation: polymorphic-spin 0.8s linear infinite;
+}
+
+@keyframes polymorphic-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Button base styles */
+.polymorphic-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--polymorphic-spacing-2);
+    padding: var(--polymorphic-spacing-2) var(--polymorphic-spacing-4);
+    font-family: inherit;
+    font-size: var(--polymorphic-font-size-sm);
+    font-weight: var(--polymorphic-font-weight-medium);
+    line-height: 1;
+    text-decoration: none;
+    border-radius: var(--polymorphic-border-radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.polymorphic-button:focus-visible {
+    outline: 2px solid var(--polymorphic-color-primary);
+    outline-offset: 2px;
+}
+
+.polymorphic-button--primary {
+    background-color: var(--polymorphic-color-primary);
+    color: var(--polymorphic-color-white);
+}
+
+.polymorphic-button--primary:hover {
+    background-color: var(--polymorphic-color-primary-hover);
+}
+
+.polymorphic-button--secondary {
+    background-color: var(--polymorphic-color-white);
+    color: var(--polymorphic-color-gray-700);
+    border-color: var(--polymorphic-border-color);
+}
+
+.polymorphic-button--secondary:hover {
+    background-color: var(--polymorphic-color-gray-50);
+    border-color: var(--polymorphic-border-color-strong);
+}
+
+.polymorphic-button--ghost {
+    background-color: transparent;
+    color: var(--polymorphic-color-gray-600);
+}
+
+.polymorphic-button--ghost:hover {
+    background-color: var(--polymorphic-color-gray-100);
+    color: var(--polymorphic-color-gray-800);
+}
+
+/* Input base styles */
+.polymorphic-input {
+    display: block;
+    width: 100%;
+    padding: var(--polymorphic-spacing-2) var(--polymorphic-spacing-3);
+    font-family: inherit;
+    font-size: var(--polymorphic-font-size-sm);
+    line-height: var(--polymorphic-line-height-normal);
+    color: var(--polymorphic-color-gray-800);
+    background-color: var(--polymorphic-color-white);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    transition: border-color var(--polymorphic-transition-fast),
+        box-shadow var(--polymorphic-transition-fast);
+}
+
+.polymorphic-input:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+    box-shadow: 0 0 0 3px var(--polymorphic-color-primary-light);
+}
+
+.polymorphic-input::placeholder {
+    color: var(--polymorphic-color-gray-400);
+}
+
+/* Panel styles */
+.polymorphic-panel {
+    background-color: var(--polymorphic-color-white);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-lg);
+    box-shadow: var(--polymorphic-shadow-sm);
+}
+
+.polymorphic-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--polymorphic-spacing-3) var(--polymorphic-spacing-4);
+    border-bottom: 1px solid var(--polymorphic-border-color);
+}
+
+.polymorphic-panel__title {
+    font-size: var(--polymorphic-font-size-sm);
+    font-weight: var(--polymorphic-font-weight-semibold);
+    color: var(--polymorphic-color-gray-900);
+    margin: 0;
+}
+
+.polymorphic-panel__content {
+    padding: var(--polymorphic-spacing-4);
+}
+
+/* Label styles */
+.polymorphic-label {
+    display: block;
+    font-size: var(--polymorphic-font-size-xs);
+    font-weight: var(--polymorphic-font-weight-medium);
+    color: var(--polymorphic-color-gray-600);
+    margin-bottom: var(--polymorphic-spacing-1);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Scrollbar styles */
+.polymorphic-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.polymorphic-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.polymorphic-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--polymorphic-color-gray-300);
+    border-radius: 4px;
+}
+
+.polymorphic-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--polymorphic-color-gray-400);
+}
