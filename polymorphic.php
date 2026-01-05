@@ -87,17 +87,18 @@ if ( file_exists( POLYMORPHIC_PATH . 'vendor/autoload.php' ) ) {
     require_once POLYMORPHIC_PATH . 'vendor/autoload.php';
 } else {
     // Fallback: manually require core classes if composer autoload missing.
-    require_once POLYMORPHIC_PATH . 'includes/Core/class-activator.php';
-    require_once POLYMORPHIC_PATH . 'includes/Core/class-deactivator.php';
-    require_once POLYMORPHIC_PATH . 'includes/Core/class-plugin.php';
-    require_once POLYMORPHIC_PATH . 'includes/Components/class-component-registry.php';
-    require_once POLYMORPHIC_PATH . 'includes/Components/class-component-base.php';
+    require_once POLYMORPHIC_PATH . 'includes/Core/Activator/class-activator.php';
+    require_once POLYMORPHIC_PATH . 'includes/Core/Deactivator/class-deactivator.php';
+    require_once POLYMORPHIC_PATH . 'includes/Core/Plugin/class-plugin.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/ComponentRegistry/class-component-registry.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/ComponentBase/class-component-base.php';
     require_once POLYMORPHIC_PATH . 'includes/Components/Heading/class-heading.php';
-    require_once POLYMORPHIC_PATH . 'includes/Admin/class-admin-menu.php';
-    require_once POLYMORPHIC_PATH . 'includes/Admin/class-assets.php';
-    require_once POLYMORPHIC_PATH . 'includes/Frontend/class-renderer.php';
-    require_once POLYMORPHIC_PATH . 'includes/Cache/class-transient-cache.php';
-    require_once POLYMORPHIC_PATH . 'includes/Helpers/class-sanitizer.php';
+    require_once POLYMORPHIC_PATH . 'includes/Admin/AdminMenu/class-admin-menu.php';
+    require_once POLYMORPHIC_PATH . 'includes/Admin/Assets/class-assets.php';
+    require_once POLYMORPHIC_PATH . 'includes/Admin/EditorIntegration/class-editor-integration.php';
+    require_once POLYMORPHIC_PATH . 'includes/Frontend/Renderer/class-renderer.php';
+    require_once POLYMORPHIC_PATH . 'includes/Cache/TransientCache/class-transient-cache.php';
+    require_once POLYMORPHIC_PATH . 'includes/Helpers/Sanitizer/class-sanitizer.php';
 }
 
 /**
