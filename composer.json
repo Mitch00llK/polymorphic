@@ -20,9 +20,9 @@
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
     },
     "autoload": {
-        "psr-4": {
-            "Polymorphic\\": "includes/"
-        }
+        "classmap": [
+            "includes/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

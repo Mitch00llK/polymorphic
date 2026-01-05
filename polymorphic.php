@@ -3,19 +3,19 @@
  * Polymorphic - The Adaptable Page Builder
  *
  * @package           Polymorphic
- * @author            Your Company
- * @copyright         2026 Your Company
+ * @author            Polymorphic inc.
+ * @copyright         2026 Polymorphic inc.
  * @license           GPL-2.0-or-later
  *
  * @wordpress-plugin
- * Plugin Name:       Polymorphic
+ * Plugin Name:       Polymorphic - The Adaptable Page Builder  
  * Plugin URI:        https://polymorphic.dev
  * Description:       The lightweight, adaptable page builder for WordPress. Build beautiful pages with a modern drag-and-drop interface.
  * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      8.0
- * Author:            Your Company
- * Author URI:        https://yourcompany.com
+ * Author:            Polymorphic inc.
+ * Author URI:        https://polymorphic.dev
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       polymorphic
