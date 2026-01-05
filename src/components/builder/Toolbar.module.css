@@ -1,0 +1,128 @@
+/**
+ * Toolbar styles
+ */
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--polymorphic-toolbar-height);
+    padding: 0 var(--polymorphic-spacing-4);
+    background-color: var(--polymorphic-color-white);
+    border-bottom: 1px solid var(--polymorphic-border-color);
+}
+
+.left,
+.center,
+.right {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-4);
+}
+
+.left {
+    flex: 1;
+}
+
+.right {
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logoText {
+    font-size: var(--polymorphic-font-size-lg);
+    font-weight: var(--polymorphic-font-weight-bold);
+    background: linear-gradient(135deg, var(--polymorphic-color-primary), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.breakpoints {
+    display: flex;
+    background-color: var(--polymorphic-color-gray-100);
+    border-radius: var(--polymorphic-border-radius-md);
+    padding: var(--polymorphic-spacing-1);
+}
+
+.breakpointButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: var(--polymorphic-border-radius-sm);
+    color: var(--polymorphic-color-gray-500);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.breakpointButton:hover {
+    color: var(--polymorphic-color-gray-700);
+}
+
+.breakpointButton.isActive {
+    background-color: var(--polymorphic-color-white);
+    color: var(--polymorphic-color-primary);
+    box-shadow: var(--polymorphic-shadow-sm);
+}
+
+.history {
+    display: flex;
+    gap: var(--polymorphic-spacing-1);
+}
+
+.iconButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--polymorphic-border-radius-md);
+    color: var(--polymorphic-color-gray-600);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.iconButton:hover:not(:disabled) {
+    background-color: var(--polymorphic-color-gray-100);
+    color: var(--polymorphic-color-gray-800);
+}
+
+.iconButton:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.saveButton {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-2);
+    padding: var(--polymorphic-spacing-2) var(--polymorphic-spacing-4);
+    background-color: var(--polymorphic-color-primary);
+    color: var(--polymorphic-color-white);
+    border: none;
+    border-radius: var(--polymorphic-border-radius-md);
+    font-size: var(--polymorphic-font-size-sm);
+    font-weight: var(--polymorphic-font-weight-medium);
+    cursor: pointer;
+    transition: background-color var(--polymorphic-transition-fast);
+}
+
+.saveButton:hover:not(:disabled) {
+    background-color: var(--polymorphic-color-primary-hover);
+}
+
+.saveButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

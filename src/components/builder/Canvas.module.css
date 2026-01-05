@@ -1,0 +1,79 @@
+/**
+ * Canvas styles
+ */
+
+.canvas {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    background-color: var(--polymorphic-color-gray-100);
+    padding: var(--polymorphic-spacing-6);
+}
+
+.viewport {
+    flex: 1;
+    background-color: var(--polymorphic-color-white);
+    border-radius: var(--polymorphic-border-radius-lg);
+    box-shadow: var(--polymorphic-shadow-lg);
+    min-height: 600px;
+    overflow: auto;
+}
+
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+    color: var(--polymorphic-color-gray-400);
+    text-align: center;
+    padding: var(--polymorphic-spacing-8);
+}
+
+.emptyIcon {
+    font-size: 48px;
+    margin-bottom: var(--polymorphic-spacing-4);
+}
+
+.emptyTitle {
+    font-size: var(--polymorphic-font-size-xl);
+    font-weight: var(--polymorphic-font-weight-semibold);
+    color: var(--polymorphic-color-gray-600);
+    margin: 0 0 var(--polymorphic-spacing-2);
+}
+
+.emptyText {
+    font-size: var(--polymorphic-font-size-sm);
+    margin: 0;
+}
+
+.componentList {
+    padding: var(--polymorphic-spacing-4);
+}
+
+.componentWrapper {
+    position: relative;
+    margin-bottom: var(--polymorphic-spacing-2);
+    border: 2px solid transparent;
+    border-radius: var(--polymorphic-border-radius-md);
+    transition: border-color var(--polymorphic-transition-fast);
+    cursor: pointer;
+}
+
+.componentWrapper:hover {
+    border-color: var(--polymorphic-color-gray-300);
+}
+
+.componentWrapper.isSelected {
+    border-color: var(--polymorphic-color-primary);
+}
+
+.componentPlaceholder {
+    padding: var(--polymorphic-spacing-4);
+    background-color: var(--polymorphic-color-gray-50);
+    border-radius: var(--polymorphic-border-radius-sm);
+    font-size: var(--polymorphic-font-size-xs);
+    color: var(--polymorphic-color-gray-500);
+}

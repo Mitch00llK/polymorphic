@@ -1,0 +1,127 @@
+/**
+ * Toolbar Component
+ *
+ * @package Polymorphic
+ * @since   1.0.0
+ */
+
+import React from 'react';
+import { Undo2, Redo2, Monitor, Tablet, Smartphone, Save } from 'lucide-react';
+
+import { useBuilderStore } from '../../store/builderStore';
+import { saveBuilderData } from '../../utils/api';
+import type { Breakpoint } from '../../types/components';
+
+import styles from './Toolbar.module.css';
+
+/**
+ * Top toolbar with save, undo/redo, and responsive controls.
+ */
+export const Toolbar: React.FC = () => {
+    const {
+        components,
+        currentBreakpoint,
+        setBreakpoint,
+        canUndo,
+        canRedo,
+        undo,
+        redo,
+        isDirty,
+        isSaving,
+        setSaving,
+        setDirty,
+    } = useBuilderStore();
+
+    const { postId } = window.polymorphicSettings;
+
+    const handleSave = async () => {
+        if (isSaving) return;
+
+        setSaving(true);
+        try {
+            await saveBuilderData(postId, {
+                version: '1.0.0',
+                components,
+                customCss: '',
+                customJs: '',
+                settings: {
+                    pageBackground: '#ffffff',
+                    contentWidth: '1200px',
+                    bodyFont: 'Inter, sans-serif',
+                    headingFont: 'Inter, sans-serif',
+                },
+                created: new Date().toISOString(),
+                modified: new Date().toISOString(),
+            });
+            setDirty(false);
+        } catch (error) {
+            console.error('[Polymorphic] Save failed:', error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const breakpoints: { key: Breakpoint; icon: React.ReactNode; label: string }[] = [
+        { key: 'desktop', icon: <Monitor size={18} />, label: 'Desktop' },
+        { key: 'tablet', icon: <Tablet size={18} />, label: 'Tablet' },
+        { key: 'mobile', icon: <Smartphone size={18} />, label: 'Mobile' },
+    ];
+
+    return (
+        <header className={styles.toolbar}>
+            <div className={styles.left}>
+                <div className={styles.logo}>
+                    <span className={styles.logoText}>Polymorphic</span>
+                </div>
+            </div>
+
+            <div className={styles.center}>
+                <div className={styles.breakpoints}>
+                    {breakpoints.map(({ key, icon, label }) => (
+                        <button
+                            key={key}
+                            className={`${styles.breakpointButton} ${currentBreakpoint === key ? styles.isActive : ''
+                                }`}
+                            onClick={() => setBreakpoint(key)}
+                            title={label}
+                        >
+                            {icon}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className={styles.right}>
+                <div className={styles.history}>
+                    <button
+                        className={styles.iconButton}
+                        onClick={undo}
+                        disabled={!canUndo()}
+                        title="Undo"
+                    >
+                        <Undo2 size={18} />
+                    </button>
+                    <button
+                        className={styles.iconButton}
+                        onClick={redo}
+                        disabled={!canRedo()}
+                        title="Redo"
+                    >
+                        <Redo2 size={18} />
+                    </button>
+                </div>
+
+                <button
+                    className={styles.saveButton}
+                    onClick={handleSave}
+                    disabled={isSaving || !isDirty}
+                >
+                    <Save size={16} />
+                    <span>{isSaving ? 'Saving...' : 'Save'}</span>
+                </button>
+            </div>
+        </header>
+    );
+};
+
+export default Toolbar;

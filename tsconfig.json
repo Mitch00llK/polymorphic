@@ -44,8 +44,7 @@
             ]
         },
         "types": [
-            "node",
-            "@wordpress/scripts/config"
+            "node"
         ]
     },
     "include": [
