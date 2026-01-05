@@ -10,6 +10,7 @@ namespace Polymorphic\Core;
 
 use Polymorphic\Admin\Admin_Menu;
 use Polymorphic\Admin\Assets;
+use Polymorphic\Admin\Editor_Integration;
 use Polymorphic\Api\Rest_Controller;
 use Polymorphic\Components\Component_Registry;
 use Polymorphic\Frontend\Renderer;
@@ -95,6 +96,10 @@ final class Plugin {
         // Admin assets.
         $assets = new Assets();
         $assets->init();
+
+        // Editor integration (meta box, row actions).
+        $editor_integration = new Editor_Integration();
+        $editor_integration->init();
     }
 
     /**

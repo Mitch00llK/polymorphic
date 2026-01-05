@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Undo2, Redo2, Monitor, Tablet, Smartphone, Save } from 'lucide-react';
+import { ArrowLeft, Undo2, Redo2, Monitor, Tablet, Smartphone, Save, ExternalLink } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
 import { saveBuilderData } from '../../utils/api';
@@ -32,7 +32,7 @@ export const Toolbar: React.FC = () => {
         setDirty,
     } = useBuilderStore();
 
-    const { postId } = window.polymorphicSettings;
+    const { postId, postTitle, editorUrl, previewUrl } = window.polymorphicSettings;
 
     const handleSave = async () => {
         if (isSaving) return;
@@ -61,6 +61,16 @@ export const Toolbar: React.FC = () => {
         }
     };
 
+    const handleBack = () => {
+        if (isDirty) {
+            const confirmed = window.confirm(
+                'You have unsaved changes. Are you sure you want to leave?'
+            );
+            if (!confirmed) return;
+        }
+        window.location.href = editorUrl;
+    };
+
     const breakpoints: { key: Breakpoint; icon: React.ReactNode; label: string }[] = [
         { key: 'desktop', icon: <Monitor size={18} />, label: 'Desktop' },
         { key: 'tablet', icon: <Tablet size={18} />, label: 'Tablet' },
@@ -70,8 +80,18 @@ export const Toolbar: React.FC = () => {
     return (
         <header className={styles.toolbar}>
             <div className={styles.left}>
+                <button
+                    className={styles.backButton}
+                    onClick={handleBack}
+                    title="Back to Editor"
+                >
+                    <ArrowLeft size={18} />
+                </button>
                 <div className={styles.logo}>
                     <span className={styles.logoText}>Polymorphic</span>
+                    {postTitle && (
+                        <span className={styles.pageTitle}>— {postTitle}</span>
+                    )}
                 </div>
             </div>
 
