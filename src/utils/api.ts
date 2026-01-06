@@ -211,3 +211,263 @@ export const renderPreview = async (
 
     return response.data;
 };
+
+// ============================================================================
+// AUTO-SAVE & REVISIONS
+// ============================================================================
+
+/**
+ * Revision data structure.
+ */
+interface Revision {
+    id: number;
+    date: string;
+    author: string;
+    authorName: string;
+}
+
+/**
+ * Auto-save builder data (creates revision, doesn't publish).
+ *
+ * @param postId - Post ID.
+ * @param data   - Builder data.
+ * @returns Revision info.
+ */
+export const autoSaveBuilderData = async (
+    postId: number,
+    data: Partial<BuilderData>
+): Promise<{ revisionId: number; savedAt: string }> => {
+    const components = data.components || [];
+    const { minified: generatedCss, classMap } = generateStyles(components);
+
+    const response = await apiFetch<
+        ApiResponse<{ revision_id: number; saved_at: string }>
+    >({
+        path: `${API_BASE}/posts/${postId}/autosave`,
+        method: 'POST',
+        data: {
+            data: { ...data, generatedCss, classMap: Object.fromEntries(classMap) },
+        },
+    });
+
+    return {
+        revisionId: response.data.revision_id,
+        savedAt: response.data.saved_at,
+    };
+};
+
+/**
+ * Get revision history for a post.
+ *
+ * @param postId - Post ID.
+ * @returns List of revisions.
+ */
+export const getRevisions = async (postId: number): Promise<Revision[]> => {
+    const response = await apiFetch<ApiResponse<Revision[]>>({
+        path: `${API_BASE}/posts/${postId}/revisions`,
+        method: 'GET',
+    });
+
+    return response.data;
+};
+
+/**
+ * Restore a specific revision.
+ *
+ * @param postId     - Post ID.
+ * @param revisionId - Revision ID to restore.
+ * @returns Restored builder data.
+ */
+export const restoreRevision = async (
+    postId: number,
+    revisionId: number
+): Promise<LoadResponse> => {
+    const response = await apiFetch<ApiResponse<LoadResponse>>({
+        path: `${API_BASE}/posts/${postId}/revisions/${revisionId}/restore`,
+        method: 'POST',
+    });
+
+    return response.data;
+};
+
+// ============================================================================
+// GLOBAL BLOCKS
+// ============================================================================
+
+/**
+ * Global block data structure.
+ */
+interface GlobalBlock {
+    id: number;
+    name: string;
+    component: ComponentData;
+    created: string;
+    modified: string;
+    usageCount: number;
+}
+
+/**
+ * Save a component as a global reusable block.
+ *
+ * @param component - Component data to save.
+ * @param name      - Name for the global block.
+ * @returns Created global block.
+ */
+export const saveAsGlobalBlock = async (
+    component: ComponentData,
+    name: string
+): Promise<GlobalBlock> => {
+    const response = await apiFetch<ApiResponse<GlobalBlock>>({
+        path: `${API_BASE}/global-blocks`,
+        method: 'POST',
+        data: { component, name },
+    });
+
+    return response.data;
+};
+
+/**
+ * Get all global blocks.
+ *
+ * @returns List of global blocks.
+ */
+export const getGlobalBlocks = async (): Promise<GlobalBlock[]> => {
+    const response = await apiFetch<ApiResponse<GlobalBlock[]>>({
+        path: `${API_BASE}/global-blocks`,
+        method: 'GET',
+    });
+
+    return response.data;
+};
+
+/**
+ * Update a global block (propagates to all usages).
+ *
+ * @param blockId   - Global block ID.
+ * @param component - Updated component data.
+ * @returns Updated global block.
+ */
+export const updateGlobalBlock = async (
+    blockId: number,
+    component: Partial<ComponentData>
+): Promise<GlobalBlock> => {
+    const response = await apiFetch<ApiResponse<GlobalBlock>>({
+        path: `${API_BASE}/global-blocks/${blockId}`,
+        method: 'PUT',
+        data: { component },
+    });
+
+    return response.data;
+};
+
+/**
+ * Delete a global block.
+ *
+ * @param blockId - Global block ID.
+ */
+export const deleteGlobalBlock = async (blockId: number): Promise<void> => {
+    await apiFetch<ApiResponse<null>>({
+        path: `${API_BASE}/global-blocks/${blockId}`,
+        method: 'DELETE',
+    });
+};
+
+// ============================================================================
+// EXPORT / IMPORT
+// ============================================================================
+
+/**
+ * Page export data structure.
+ */
+interface PageExport {
+    version: string;
+    exportedAt: string;
+    settings: BuilderData['settings'];
+    components: ComponentData[];
+    customCss: string;
+    globalBlockRefs: number[];
+}
+
+/**
+ * Export a page as JSON.
+ *
+ * @param postId - Post ID to export.
+ * @returns Exportable page data.
+ */
+export const exportPage = async (postId: number): Promise<PageExport> => {
+    const response = await apiFetch<ApiResponse<PageExport>>({
+        path: `${API_BASE}/posts/${postId}/export`,
+        method: 'GET',
+    });
+
+    return response.data;
+};
+
+/**
+ * Import a page from JSON.
+ *
+ * @param data        - Page export data.
+ * @param targetPostId - Optional target post ID (creates new if not provided).
+ * @returns Import result.
+ */
+export const importPage = async (
+    data: PageExport,
+    targetPostId?: number
+): Promise<{ postId: number; imported: boolean }> => {
+    const response = await apiFetch<
+        ApiResponse<{ post_id: number; imported: boolean }>
+    >({
+        path: `${API_BASE}/import`,
+        method: 'POST',
+        data: { data, target_post_id: targetPostId },
+    });
+
+    return {
+        postId: response.data.post_id,
+        imported: response.data.imported,
+    };
+};
+
+// ============================================================================
+// COMPONENT UTILITIES
+// ============================================================================
+
+/**
+ * Generate new IDs for a component tree (for duplication).
+ *
+ * @param component - Component to clone.
+ * @returns Component with new IDs.
+ */
+export const duplicateComponent = (component: ComponentData): ComponentData => {
+    const generateId = () => `${component.type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    const cloneWithNewIds = (comp: ComponentData): ComponentData => ({
+        ...comp,
+        id: generateId(),
+        children: comp.children?.map(cloneWithNewIds),
+    });
+
+    return cloneWithNewIds(component);
+};
+
+/**
+ * Export a component as JSON string.
+ *
+ * @param component - Component to export.
+ * @returns JSON string.
+ */
+export const exportComponent = (component: ComponentData): string => {
+    return JSON.stringify(component, null, 2);
+};
+
+/**
+ * Import a component from JSON string.
+ *
+ * @param json - JSON string.
+ * @returns Imported component with new IDs.
+ */
+export const importComponent = (json: string): ComponentData => {
+    const component = JSON.parse(json) as ComponentData;
+    return duplicateComponent(component);
+};
+

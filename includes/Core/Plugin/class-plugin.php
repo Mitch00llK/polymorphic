@@ -13,6 +13,7 @@ use Polymorphic\Admin\Assets;
 use Polymorphic\Admin\Editor_Integration;
 use Polymorphic\Api\Rest_Controller;
 use Polymorphic\Api\Global_Settings_Controller;
+use Polymorphic\Api\Global_Blocks_Controller;
 use Polymorphic\Components\Component_Registry;
 use Polymorphic\Frontend\Renderer;
 use Polymorphic\Frontend\Assets\Frontend_Assets;
@@ -133,6 +134,10 @@ final class Plugin {
         // Global settings API routes.
         $settings_controller = new Global_Settings_Controller();
         $settings_controller->register_routes();
+
+        // Global blocks API routes.
+        $blocks_controller = new Global_Blocks_Controller();
+        $blocks_controller->register_routes();
     }
 
     /**

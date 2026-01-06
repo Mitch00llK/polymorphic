@@ -123,6 +123,72 @@ class Rest_Controller extends WP_REST_Controller {
                 ],
             ]
         );
+
+        // Auto-save.
+        register_rest_route(
+            $this->namespace,
+            '/posts/(?P<id>\d+)/autosave',
+            [
+                'methods'             => 'POST',
+                'callback'            => [ $this, 'autosave_builder_data' ],
+                'permission_callback' => [ $this, 'can_edit_post' ],
+                'args'                => $this->get_save_args(),
+            ]
+        );
+
+        // Revisions.
+        register_rest_route(
+            $this->namespace,
+            '/posts/(?P<id>\d+)/revisions',
+            [
+                'methods'             => 'GET',
+                'callback'            => [ $this, 'get_revisions' ],
+                'permission_callback' => [ $this, 'can_edit_post' ],
+            ]
+        );
+
+        // Restore revision.
+        register_rest_route(
+            $this->namespace,
+            '/posts/(?P<id>\d+)/revisions/(?P<revision_id>\d+)/restore',
+            [
+                'methods'             => 'POST',
+                'callback'            => [ $this, 'restore_revision' ],
+                'permission_callback' => [ $this, 'can_edit_post' ],
+            ]
+        );
+
+        // Export page.
+        register_rest_route(
+            $this->namespace,
+            '/posts/(?P<id>\d+)/export',
+            [
+                'methods'             => 'GET',
+                'callback'            => [ $this, 'export_page' ],
+                'permission_callback' => [ $this, 'can_edit_post' ],
+            ]
+        );
+
+        // Import page.
+        register_rest_route(
+            $this->namespace,
+            '/import',
+            [
+                'methods'             => 'POST',
+                'callback'            => [ $this, 'import_page' ],
+                'permission_callback' => [ $this, 'can_edit_posts' ],
+                'args'                => [
+                    'data' => [
+                        'required' => true,
+                        'type'     => 'object',
+                    ],
+                    'target_post_id' => [
+                        'required' => false,
+                        'type'     => 'integer',
+                    ],
+                ],
+            ]
+        );
     }
 
     /**
@@ -360,6 +426,202 @@ class Rest_Controller extends WP_REST_Controller {
             ],
             200
         );
+    }
+
+    /**
+     * Auto-save builder data (creates revision).
+     *
+     * @since 1.0.0
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response|WP_Error
+     */
+    public function autosave_builder_data( WP_REST_Request $request ) {
+        $post_id = $request->get_param( 'id' );
+        $data    = $request->get_param( 'data' );
+
+        $post = get_post( $post_id );
+        if ( ! $post ) {
+            return new WP_Error( 'polymorphic_invalid_post', __( 'Invalid post ID.', 'polymorphic' ), [ 'status' => 404 ] );
+        }
+
+        $sanitized_data = $this->sanitize_builder_data( $data );
+        if ( is_wp_error( $sanitized_data ) ) {
+            return $sanitized_data;
+        }
+
+        // Save as revision
+        $revision_id = $this->create_revision( $post_id, $sanitized_data );
+
+        return new WP_REST_Response(
+            [
+                'success' => true,
+                'data'    => [
+                    'revision_id' => $revision_id,
+                    'saved_at'    => current_time( 'mysql' ),
+                ],
+            ],
+            200
+        );
+    }
+
+    /**
+     * Get revisions for a post.
+     *
+     * @since 1.0.0
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response
+     */
+    public function get_revisions( WP_REST_Request $request ) {
+        $post_id = $request->get_param( 'id' );
+
+        $revisions = get_post_meta( $post_id, '_polymorphic_revisions', true );
+        $revisions = is_array( $revisions ) ? $revisions : [];
+
+        // Limit to last 20 revisions
+        $revisions = array_slice( $revisions, -20 );
+
+        $formatted = array_map( function( $rev ) {
+            return [
+                'id'         => $rev['id'] ?? 0,
+                'date'       => $rev['date'] ?? '',
+                'author'     => $rev['author'] ?? 0,
+                'authorName' => get_the_author_meta( 'display_name', $rev['author'] ?? 0 ),
+            ];
+        }, $revisions );
+
+        return new WP_REST_Response( [ 'success' => true, 'data' => array_reverse( $formatted ) ], 200 );
+    }
+
+    /**
+     * Restore a revision.
+     *
+     * @since 1.0.0
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response|WP_Error
+     */
+    public function restore_revision( WP_REST_Request $request ) {
+        $post_id     = $request->get_param( 'id' );
+        $revision_id = $request->get_param( 'revision_id' );
+
+        $revisions = get_post_meta( $post_id, '_polymorphic_revisions', true );
+        $revisions = is_array( $revisions ) ? $revisions : [];
+
+        $revision = null;
+        foreach ( $revisions as $rev ) {
+            if ( ( $rev['id'] ?? 0 ) === (int) $revision_id ) {
+                $revision = $rev;
+                break;
+            }
+        }
+
+        if ( ! $revision || empty( $revision['data'] ) ) {
+            return new WP_Error( 'polymorphic_revision_not_found', __( 'Revision not found.', 'polymorphic' ), [ 'status' => 404 ] );
+        }
+
+        // Restore the data
+        update_post_meta( $post_id, '_polymorphic_data', wp_json_encode( $revision['data'] ) );
+        $this->cache->invalidate( $post_id );
+
+        return new WP_REST_Response( [ 'success' => true, 'data' => $revision['data'] ], 200 );
+    }
+
+    /**
+     * Export page as JSON.
+     *
+     * @since 1.0.0
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response
+     */
+    public function export_page( WP_REST_Request $request ) {
+        $post_id = $request->get_param( 'id' );
+        $json    = get_post_meta( $post_id, '_polymorphic_data', true );
+        $data    = $json ? json_decode( $json, true ) : [];
+
+        return new WP_REST_Response(
+            [
+                'success' => true,
+                'data'    => [
+                    'version'         => POLYMORPHIC_VERSION,
+                    'exportedAt'      => current_time( 'mysql' ),
+                    'settings'        => $data['settings'] ?? [],
+                    'components'      => $data['components'] ?? [],
+                    'customCss'       => $data['customCss'] ?? '',
+                    'globalBlockRefs' => [],
+                ],
+            ],
+            200
+        );
+    }
+
+    /**
+     * Import page from JSON.
+     *
+     * @since 1.0.0
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response|WP_Error
+     */
+    public function import_page( WP_REST_Request $request ) {
+        $data           = $request->get_param( 'data' );
+        $target_post_id = $request->get_param( 'target_post_id' );
+
+        if ( $target_post_id ) {
+            $post = get_post( $target_post_id );
+            if ( ! $post || ! current_user_can( 'edit_post', $target_post_id ) ) {
+                return new WP_Error( 'polymorphic_invalid_post', __( 'Invalid target post.', 'polymorphic' ), [ 'status' => 404 ] );
+            }
+            $post_id = $target_post_id;
+        } else {
+            $post_id = wp_insert_post( [
+                'post_title'  => __( 'Imported Page', 'polymorphic' ),
+                'post_type'   => 'page',
+                'post_status' => 'draft',
+            ] );
+        }
+
+        $save_data = [
+            'version'    => POLYMORPHIC_VERSION,
+            'created'    => current_time( 'mysql' ),
+            'modified'   => current_time( 'mysql' ),
+            'settings'   => $data['settings'] ?? [],
+            'components' => $data['components'] ?? [],
+            'customCss'  => $data['customCss'] ?? '',
+        ];
+
+        update_post_meta( $post_id, '_polymorphic_data', wp_json_encode( $save_data ) );
+        update_post_meta( $post_id, '_polymorphic_enabled', true );
+
+        return new WP_REST_Response( [ 'success' => true, 'data' => [ 'post_id' => $post_id, 'imported' => true ] ], 200 );
+    }
+
+    /**
+     * Create a revision.
+     *
+     * @param int   $post_id Post ID.
+     * @param array $data    Builder data.
+     * @return int Revision ID.
+     */
+    private function create_revision( int $post_id, array $data ): int {
+        $revisions = get_post_meta( $post_id, '_polymorphic_revisions', true );
+        $revisions = is_array( $revisions ) ? $revisions : [];
+
+        $revision_id = time();
+        $revisions[] = [
+            'id'     => $revision_id,
+            'date'   => current_time( 'mysql' ),
+            'author' => get_current_user_id(),
+            'data'   => $data,
+        ];
+
+        // Keep only last 20 revisions
+        $revisions = array_slice( $revisions, -20 );
+        update_post_meta( $post_id, '_polymorphic_revisions', $revisions );
+
+        return $revision_id;
     }
 
     /**
