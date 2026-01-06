@@ -41,6 +41,7 @@ interface BuilderActions {
     addComponent: (type: ComponentType, parentId?: string, index?: number) => string;
     updateComponent: (id: string, updates: Partial<ComponentData>) => void;
     removeComponent: (id: string) => void;
+    deleteComponent: (id: string) => void; // Alias for removeComponent
     moveComponent: (id: string, newParentId: string | null, newIndex: number) => void;
     duplicateComponent: (id: string) => string | null;
 
@@ -359,6 +360,15 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
 
             // Remove component.
             removeComponent: (id) => {
+                set((state) => ({
+                    components: removeFromTree(state.components, id),
+                    selectedId: state.selectedId === id ? null : state.selectedId,
+                    isDirty: true,
+                }));
+            },
+
+            // Alias for removeComponent.
+            deleteComponent: (id) => {
                 set((state) => ({
                     components: removeFromTree(state.components, id),
                     selectedId: state.selectedId === id ? null : state.selectedId,
