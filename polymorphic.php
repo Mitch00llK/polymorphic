@@ -112,11 +112,16 @@ if ( file_exists( POLYMORPHIC_PATH . 'vendor/autoload.php' ) ) {
     require_once POLYMORPHIC_PATH . 'includes/Components/PricingBlock/class-pricingblock.php';
     require_once POLYMORPHIC_PATH . 'includes/Components/FaqBlock/class-faqblock.php';
     require_once POLYMORPHIC_PATH . 'includes/Components/CtaBlock/class-ctablock.php';
+    // SaaS Blocks
+    require_once POLYMORPHIC_PATH . 'includes/Components/TestimonialBlock/class-testimonial-block.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/StatsBlock/class-stats-block.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/LogoCloud/class-logo-cloud.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/AdminMenu/class-admin-menu.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/Assets/class-assets.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/EditorIntegration/class-editor-integration.php';
     require_once POLYMORPHIC_PATH . 'includes/Api/RestController/class-rest-controller.php';
     require_once POLYMORPHIC_PATH . 'includes/Api/GlobalSettingsController/class-global-settings-controller.php';
+    require_once POLYMORPHIC_PATH . 'includes/Api/GlobalBlocksController/class-global-blocks-controller.php';
     require_once POLYMORPHIC_PATH . 'includes/Frontend/Renderer/class-renderer.php';
     require_once POLYMORPHIC_PATH . 'includes/Frontend/Assets/class-frontend-assets.php';
     require_once POLYMORPHIC_PATH . 'includes/Settings/GlobalSettings/class-global-settings.php';
