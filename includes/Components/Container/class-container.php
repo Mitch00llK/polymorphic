@@ -101,57 +101,37 @@ class Container extends Component_Base {
         $id       = $component['id'] ?? '';
         $children = $component['children'] ?? [];
 
-        // Build CSS classes (generic, no 'polymorphic-' prefix).
-        $classes = [ 'container' ];
+        // Build CSS classes using poly-* convention.
+        $classes = [ 'poly-container' ];
 
         if ( ! empty( $props['width'] ) && 'default' !== $props['width'] ) {
-            $classes[] = 'container--' . sanitize_html_class( $props['width'] );
+            $classes[] = 'poly-container--' . sanitize_html_class( $props['width'] );
         }
 
         if ( ! empty( $props['className'] ) ) {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build inline styles.
-        $styles = [];
+        // Build CSS variables for clean DOM.
+        $css_vars = $this->build_css_variables( $props, [
+            'maxWidth'        => 'max-width',
+            'backgroundColor' => 'background-color',
+            'paddingTop'      => 'padding-top',
+            'paddingBottom'   => 'padding-bottom',
+            'paddingLeft'     => 'padding-left',
+            'paddingRight'    => 'padding-right',
+            'marginTop'       => 'margin-top',
+            'marginBottom'    => 'margin-bottom',
+            'textAlign'       => 'text-align',
+            'gap'             => 'gap',
+        ]);
 
-        if ( ! empty( $props['maxWidth'] ) ) {
-            $styles[] = 'max-width:' . esc_attr( $props['maxWidth'] );
-        }
-
-        if ( ! empty( $props['backgroundColor'] ) ) {
-            $styles[] = 'background-color:' . esc_attr( $props['backgroundColor'] );
-        }
-
-        if ( ! empty( $props['paddingTop'] ) && '0' !== $props['paddingTop'] ) {
-            $styles[] = 'padding-top:' . esc_attr( $props['paddingTop'] );
-        }
-
-        if ( ! empty( $props['paddingBottom'] ) && '0' !== $props['paddingBottom'] ) {
-            $styles[] = 'padding-bottom:' . esc_attr( $props['paddingBottom'] );
-        }
-
-        if ( ! empty( $props['paddingLeft'] ) ) {
-            $styles[] = 'padding-left:' . esc_attr( $props['paddingLeft'] );
-        }
-
-        if ( ! empty( $props['paddingRight'] ) ) {
-            $styles[] = 'padding-right:' . esc_attr( $props['paddingRight'] );
-        }
-
-        if ( ! empty( $props['textAlign'] ) && 'left' !== $props['textAlign'] ) {
-            $styles[] = 'text-align:' . esc_attr( $props['textAlign'] );
-        }
-
+        // Add display/flex properties if display is flex.
         if ( 'flex' === $props['display'] ) {
-            $styles[] = 'display:flex';
-            $styles[] = 'flex-direction:' . esc_attr( $props['flexDirection'] );
-            $styles[] = 'justify-content:' . esc_attr( $props['justifyContent'] );
-            $styles[] = 'align-items:' . esc_attr( $props['alignItems'] );
-
-            if ( ! empty( $props['gap'] ) && '0' !== $props['gap'] ) {
-                $styles[] = 'gap:' . esc_attr( $props['gap'] );
-            }
+            $css_vars .= ( ! empty( $css_vars ) ? '; ' : '' ) . '--poly-display: flex';
+            $css_vars .= '; --poly-flex-direction: ' . esc_attr( $props['flexDirection'] );
+            $css_vars .= '; --poly-justify-content: ' . esc_attr( $props['justifyContent'] );
+            $css_vars .= '; --poly-align-items: ' . esc_attr( $props['alignItems'] );
         }
 
         // Build attributes.
@@ -159,21 +139,21 @@ class Container extends Component_Base {
             'class' => implode( ' ', $classes ),
         ];
 
-        if ( ! empty( $styles ) ) {
-            $attrs['style'] = implode( ';', $styles );
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
         }
 
         if ( ! empty( $props['htmlId'] ) ) {
             $attrs['id'] = sanitize_html_class( $props['htmlId'] );
-        } elseif ( ! empty( $id ) ) {
-            $attrs['data-component-id'] = esc_attr( $id );
         }
+
+        $attrs['data-component-id'] = esc_attr( $id );
 
         // Render children.
         $children_html = $this->render_children( $children, $context );
 
         // Build HTML.
-        $html = '<div ' . $this->build_attributes( $attrs ) . '>';
+        $html  = '<div ' . $this->build_attributes( $attrs ) . '>';
         $html .= $children_html;
         $html .= '</div>';
 

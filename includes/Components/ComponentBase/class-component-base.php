@@ -211,6 +211,33 @@ abstract class Component_Base {
     }
 
     /**
+     * Build CSS custom properties (variables) from props.
+     *
+     * This outputs --poly-* CSS variables instead of direct CSS properties,
+     * keeping the DOM clean and allowing styles to be controlled via CSS.
+     *
+     * @since 1.0.0
+     *
+     * @param array $props         Properties.
+     * @param array $style_mapping Map of prop keys to CSS properties.
+     * @return string CSS variables string.
+     */
+    protected function build_css_variables( array $props, array $style_mapping ): string {
+        $variables = [];
+
+        foreach ( $style_mapping as $prop_key => $css_property ) {
+            if ( ! empty( $props[ $prop_key ] ) ) {
+                $value = esc_attr( $props[ $prop_key ] );
+                // Convert CSS property to variable name: font-size -> --poly-font-size
+                $var_name = '--poly-' . $css_property;
+                $variables[] = "{$var_name}: {$value}";
+            }
+        }
+
+        return implode( '; ', $variables );
+    }
+
+    /**
      * Build class list.
      *
      * @since 1.0.0

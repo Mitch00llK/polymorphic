@@ -30,15 +30,18 @@ class Heading extends Component_Base {
      */
     protected array $defaults = [
         'content'       => 'New Heading',
-        'level'         => 'h2',
-        'textAlign'     => 'left',
+        'tag'           => 'h2',
+        'level'         => 'h2', // Alias for tag.
+        'textAlign'     => '',
         'color'         => '',
         'fontSize'      => '',
-        'fontWeight'    => '600',
+        'fontWeight'    => '',
+        'fontFamily'    => '',
         'lineHeight'    => '',
         'letterSpacing' => '',
-        'marginTop'     => '0',
-        'marginBottom'  => '20px',
+        'textTransform' => '',
+        'marginTop'     => '',
+        'marginBottom'  => '',
     ];
 
     /**
@@ -90,24 +93,26 @@ class Heading extends Component_Base {
         $props = $this->parse_props( $data['props'] ?? [] );
         $id    = esc_attr( $data['id'] ?? '' );
 
-        // Sanitize heading tag.
-        $tag = Sanitizer::sanitize_heading_tag( $props['level'] );
+        // Sanitize heading tag (support both 'tag' and 'level' props).
+        $tag = Sanitizer::sanitize_heading_tag( $props['tag'] ?: $props['level'] );
 
-        // Build styles.
-        $styles = $this->build_styles( $props, [
+        // Build CSS variables for clean DOM.
+        $css_vars = $this->build_css_variables( $props, [
             'textAlign'     => 'text-align',
             'color'         => 'color',
             'fontSize'      => 'font-size',
             'fontWeight'    => 'font-weight',
+            'fontFamily'    => 'font-family',
             'lineHeight'    => 'line-height',
             'letterSpacing' => 'letter-spacing',
+            'textTransform' => 'text-transform',
             'marginTop'     => 'margin-top',
             'marginBottom'  => 'margin-bottom',
         ]);
 
-        // Build classes.
+        // Build classes using poly-* naming convention.
         $classes = $this->build_classes(
-            [ 'polymorphic-heading' ],
+            [ 'poly-heading', "poly-heading--{$tag}" ],
             []
         );
 
@@ -125,12 +130,15 @@ class Heading extends Component_Base {
             );
         }
 
+        // Build style attribute (only if we have CSS variables).
+        $style_attr = ! empty( $css_vars ) ? sprintf( ' style="%s"', esc_attr( $css_vars ) ) : '';
+
         return sprintf(
-            '<%1$s class="%2$s" data-id="%3$s" style="%4$s">%5$s</%1$s>',
+            '<%1$s class="%2$s" data-component-id="%3$s"%4$s>%5$s</%1$s>',
             $tag,
             $classes,
             $id,
-            esc_attr( $styles ),
+            $style_attr,
             $content
         );
     }

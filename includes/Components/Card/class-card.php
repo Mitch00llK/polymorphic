@@ -74,8 +74,11 @@ class Card extends Component_Base {
             'footer'          => '',
             'variant'         => 'default',
             'backgroundColor' => '',
+            'borderColor'     => '',
             'borderRadius'    => '',
             'padding'         => '',
+            'marginTop'       => '',
+            'marginBottom'    => '',
             'className'       => '',
         ];
     }
@@ -92,31 +95,26 @@ class Card extends Component_Base {
         $id       = $component['id'] ?? '';
         $children = $component['children'] ?? [];
 
-        // Build classes.
-        $classes = [ 'card' ];
+        // Build classes using poly-* convention.
+        $classes = [ 'poly-card' ];
 
         if ( 'default' !== $props['variant'] ) {
-            $classes[] = 'card--' . sanitize_html_class( $props['variant'] );
+            $classes[] = 'poly-card--' . sanitize_html_class( $props['variant'] );
         }
 
         if ( ! empty( $props['className'] ) ) {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build styles.
-        $styles = [];
-
-        if ( ! empty( $props['backgroundColor'] ) ) {
-            $styles[] = 'background-color:' . esc_attr( $props['backgroundColor'] );
-        }
-
-        if ( ! empty( $props['borderRadius'] ) ) {
-            $styles[] = 'border-radius:' . esc_attr( $props['borderRadius'] );
-        }
-
-        if ( ! empty( $props['padding'] ) ) {
-            $styles[] = 'padding:' . esc_attr( $props['padding'] );
-        }
+        // Build CSS variables.
+        $css_vars = $this->build_css_variables( $props, [
+            'backgroundColor' => 'background-color',
+            'borderColor'     => 'border-color',
+            'borderRadius'    => 'border-radius',
+            'padding'         => 'padding',
+            'marginTop'       => 'margin-top',
+            'marginBottom'    => 'margin-bottom',
+        ]);
 
         // Build attributes.
         $attrs = [
@@ -124,8 +122,8 @@ class Card extends Component_Base {
             'data-component-id' => esc_attr( $id ),
         ];
 
-        if ( ! empty( $styles ) ) {
-            $attrs['style'] = implode( ';', $styles );
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
         }
 
         // Build HTML.
@@ -133,24 +131,24 @@ class Card extends Component_Base {
 
         // Header.
         if ( ! empty( $props['title'] ) || ! empty( $props['description'] ) ) {
-            $html .= '<div class="card__header">';
+            $html .= '<div class="poly-card__header">';
             if ( ! empty( $props['title'] ) ) {
-                $html .= '<h3 class="card__title">' . esc_html( $props['title'] ) . '</h3>';
+                $html .= '<h3 class="poly-card__title">' . esc_html( $props['title'] ) . '</h3>';
             }
             if ( ! empty( $props['description'] ) ) {
-                $html .= '<p class="card__description">' . esc_html( $props['description'] ) . '</p>';
+                $html .= '<p class="poly-card__description">' . esc_html( $props['description'] ) . '</p>';
             }
             $html .= '</div>';
         }
 
         // Content.
-        $html .= '<div class="card__content">';
+        $html .= '<div class="poly-card__content">';
         $html .= $this->render_children( $children, $context );
         $html .= '</div>';
 
         // Footer.
         if ( ! empty( $props['footer'] ) ) {
-            $html .= '<div class="card__footer">';
+            $html .= '<div class="poly-card__footer">';
             $html .= '<p>' . esc_html( $props['footer'] ) . '</p>';
             $html .= '</div>';
         }

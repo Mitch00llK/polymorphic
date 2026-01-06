@@ -69,10 +69,14 @@ class Separator extends Component_Base {
      */
     public function get_defaults(): array {
         return [
-            'orientation' => 'horizontal',
-            'color'       => '',
-            'margin'      => '',
-            'className'   => '',
+            'orientation'     => 'horizontal',
+            'color'           => '',
+            'backgroundColor' => '',
+            'width'           => '',
+            'height'          => '',
+            'marginTop'       => '',
+            'marginBottom'    => '',
+            'className'       => '',
         ];
     }
 
@@ -87,23 +91,26 @@ class Separator extends Component_Base {
         $props = $this->merge_defaults( $component['props'] ?? [] );
         $id    = $component['id'] ?? '';
 
-        // Build classes.
-        $classes = [ 'separator', 'separator--' . sanitize_html_class( $props['orientation'] ) ];
+        // Build classes using poly-* convention.
+        $classes = [ 'poly-separator', 'poly-separator--' . sanitize_html_class( $props['orientation'] ) ];
 
         if ( ! empty( $props['className'] ) ) {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build styles.
-        $styles = [];
-
-        if ( ! empty( $props['color'] ) ) {
-            $styles[] = 'background-color:' . esc_attr( $props['color'] );
+        // Build CSS variables (support both 'color' and 'backgroundColor' for the line color).
+        $bg_color = ! empty( $props['backgroundColor'] ) ? $props['backgroundColor'] : $props['color'];
+        if ( ! empty( $bg_color ) ) {
+            $props['backgroundColor'] = $bg_color;
         }
 
-        if ( ! empty( $props['margin'] ) ) {
-            $styles[] = 'margin:' . esc_attr( $props['margin'] );
-        }
+        $css_vars = $this->build_css_variables( $props, [
+            'backgroundColor' => 'background-color',
+            'width'           => 'width',
+            'height'          => 'height',
+            'marginTop'       => 'margin-top',
+            'marginBottom'    => 'margin-bottom',
+        ]);
 
         // Build attributes.
         $attrs = [
@@ -113,8 +120,8 @@ class Separator extends Component_Base {
             'data-component-id' => esc_attr( $id ),
         ];
 
-        if ( ! empty( $styles ) ) {
-            $attrs['style'] = implode( ';', $styles );
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
         }
 
         return '<div ' . $this->build_attributes( $attrs ) . '></div>';

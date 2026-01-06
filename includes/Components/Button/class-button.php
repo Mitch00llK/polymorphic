@@ -86,8 +86,8 @@ class Button extends Component_Base {
             'paddingY'        => '',
             'fontSize'        => '',
             'fontWeight'      => '',
-            'marginTop'       => '0',
-            'marginBottom'    => '0',
+            'marginTop'       => '',
+            'marginBottom'    => '',
             'className'       => '',
             'htmlId'          => '',
         ];
@@ -104,77 +104,55 @@ class Button extends Component_Base {
         $props = $this->merge_defaults( $component['props'] ?? [] );
         $id    = $component['id'] ?? '';
 
-        // Build CSS classes (generic, no 'polymorphic-' prefix).
-        $classes = [ 'btn' ];
+        // Build CSS classes using poly-* convention.
+        $classes = [ 'poly-button' ];
 
         // Variant modifier.
         if ( ! empty( $props['variant'] ) ) {
-            $classes[] = 'btn--' . sanitize_html_class( $props['variant'] );
+            $classes[] = 'poly-button--' . sanitize_html_class( $props['variant'] );
         }
 
         // Size modifier.
         if ( ! empty( $props['size'] ) && 'default' !== $props['size'] ) {
-            $classes[] = 'btn--' . sanitize_html_class( $props['size'] );
+            $classes[] = 'poly-button--' . sanitize_html_class( $props['size'] );
         }
 
         // Full width modifier.
         if ( $props['fullWidth'] ) {
-            $classes[] = 'btn--full';
+            $classes[] = 'poly-button--full';
         }
 
         // Has icon modifier.
         if ( ! empty( $props['icon'] ) ) {
-            $classes[] = 'btn--has-icon';
-            $classes[] = 'btn--icon-' . sanitize_html_class( $props['iconPosition'] );
+            $classes[] = 'poly-button--has-icon';
+            $classes[] = 'poly-button--icon-' . sanitize_html_class( $props['iconPosition'] );
         }
 
         if ( ! empty( $props['className'] ) ) {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build inline styles.
-        $styles = [];
+        // Build CSS variables for clean DOM.
+        $css_vars = $this->build_css_variables( $props, [
+            'backgroundColor' => 'background-color',
+            'textColor'       => 'color',
+            'borderColor'     => 'border-color',
+            'borderRadius'    => 'border-radius',
+            'fontSize'        => 'font-size',
+            'fontWeight'      => 'font-weight',
+            'marginTop'       => 'margin-top',
+            'marginBottom'    => 'margin-bottom',
+        ]);
 
-        if ( ! empty( $props['backgroundColor'] ) ) {
-            $styles[] = 'background-color:' . esc_attr( $props['backgroundColor'] );
-        }
-
-        if ( ! empty( $props['textColor'] ) ) {
-            $styles[] = 'color:' . esc_attr( $props['textColor'] );
-        }
-
-        if ( ! empty( $props['borderColor'] ) ) {
-            $styles[] = 'border-color:' . esc_attr( $props['borderColor'] );
-        }
-
-        if ( ! empty( $props['borderRadius'] ) ) {
-            $styles[] = 'border-radius:' . esc_attr( $props['borderRadius'] );
-        }
-
+        // Handle padding separately (paddingX/paddingY).
         if ( ! empty( $props['paddingX'] ) ) {
-            $styles[] = 'padding-left:' . esc_attr( $props['paddingX'] );
-            $styles[] = 'padding-right:' . esc_attr( $props['paddingX'] );
+            $css_vars .= ( ! empty( $css_vars ) ? '; ' : '' ) . '--poly-padding-left: ' . esc_attr( $props['paddingX'] );
+            $css_vars .= '; --poly-padding-right: ' . esc_attr( $props['paddingX'] );
         }
 
         if ( ! empty( $props['paddingY'] ) ) {
-            $styles[] = 'padding-top:' . esc_attr( $props['paddingY'] );
-            $styles[] = 'padding-bottom:' . esc_attr( $props['paddingY'] );
-        }
-
-        if ( ! empty( $props['fontSize'] ) ) {
-            $styles[] = 'font-size:' . esc_attr( $props['fontSize'] );
-        }
-
-        if ( ! empty( $props['fontWeight'] ) ) {
-            $styles[] = 'font-weight:' . esc_attr( $props['fontWeight'] );
-        }
-
-        if ( ! empty( $props['marginTop'] ) && '0' !== $props['marginTop'] ) {
-            $styles[] = 'margin-top:' . esc_attr( $props['marginTop'] );
-        }
-
-        if ( ! empty( $props['marginBottom'] ) && '0' !== $props['marginBottom'] ) {
-            $styles[] = 'margin-bottom:' . esc_attr( $props['marginBottom'] );
+            $css_vars .= ( ! empty( $css_vars ) ? '; ' : '' ) . '--poly-padding-top: ' . esc_attr( $props['paddingY'] );
+            $css_vars .= '; --poly-padding-bottom: ' . esc_attr( $props['paddingY'] );
         }
 
         // Build link attributes.
@@ -183,15 +161,15 @@ class Button extends Component_Base {
             'href'  => esc_url( $props['url'] ),
         ];
 
-        if ( ! empty( $styles ) ) {
-            $attrs['style'] = implode( ';', $styles );
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
         }
 
         if ( ! empty( $props['htmlId'] ) ) {
             $attrs['id'] = sanitize_html_class( $props['htmlId'] );
-        } elseif ( ! empty( $id ) ) {
-            $attrs['data-component-id'] = esc_attr( $id );
         }
+
+        $attrs['data-component-id'] = esc_attr( $id );
 
         if ( '_blank' === $props['target'] ) {
             $attrs['target'] = '_blank';
@@ -205,15 +183,15 @@ class Button extends Component_Base {
 
         // Icon before text.
         if ( ! empty( $props['icon'] ) && 'left' === $props['iconPosition'] ) {
-            $html .= '<span class="btn__icon">' . $this->render_icon( $props['icon'] ) . '</span>';
+            $html .= '<span class="poly-button__icon">' . $this->render_icon( $props['icon'] ) . '</span>';
         }
 
         // Button text.
-        $html .= '<span class="btn__text">' . esc_html( $props['text'] ) . '</span>';
+        $html .= '<span class="poly-button__text">' . esc_html( $props['text'] ) . '</span>';
 
         // Icon after text.
         if ( ! empty( $props['icon'] ) && 'right' === $props['iconPosition'] ) {
-            $html .= '<span class="btn__icon">' . $this->render_icon( $props['icon'] ) . '</span>';
+            $html .= '<span class="poly-button__icon">' . $this->render_icon( $props['icon'] ) . '</span>';
         }
 
         $html .= '</a>';

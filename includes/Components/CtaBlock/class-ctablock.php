@@ -69,11 +69,18 @@ class CtaBlock extends Component_Base {
      */
     public function get_defaults(): array {
         return [
-            'title'       => 'Ready to get started?',
-            'description' => 'Join thousands of users building amazing websites with our page builder.',
-            'buttonText'  => 'Start Building Now',
-            'buttonUrl'   => '#',
-            'variant'     => 'default',
+            'title'           => 'Ready to get started?',
+            'description'     => 'Join thousands of users building amazing websites with our page builder.',
+            'buttonText'      => 'Start Building Now',
+            'buttonUrl'       => '#',
+            'variant'         => 'default',
+            'backgroundColor' => '',
+            'backgroundImage' => '',
+            'textColor'       => '',
+            'paddingTop'      => '',
+            'paddingBottom'   => '',
+            'borderRadius'    => '',
+            'className'       => '',
         ];
     }
 
@@ -88,16 +95,45 @@ class CtaBlock extends Component_Base {
         $props = $this->merge_defaults( $component['props'] ?? [] );
         $id    = $component['id'] ?? '';
 
-        $classes = [ 'cta-block' ];
+        // Build classes using poly-* convention.
+        $classes = [ 'poly-cta-block' ];
         if ( 'default' !== $props['variant'] ) {
-            $classes[] = 'cta-block--' . sanitize_html_class( $props['variant'] );
+            $classes[] = 'poly-cta-block--' . sanitize_html_class( $props['variant'] );
         }
 
-        $html  = '<section class="' . esc_attr( implode( ' ', $classes ) ) . '" data-component-id="' . esc_attr( $id ) . '">';
-        $html .= '<div class="cta-block__content">';
-        $html .= '<h2 class="cta-block__title">' . esc_html( $props['title'] ) . '</h2>';
-        $html .= '<p class="cta-block__desc">' . esc_html( $props['description'] ) . '</p>';
-        $html .= '<a href="' . esc_url( $props['buttonUrl'] ) . '" class="cta-block__btn">' . esc_html( $props['buttonText'] ) . '</a>';
+        if ( ! empty( $props['className'] ) ) {
+            $classes[] = sanitize_html_class( $props['className'] );
+        }
+
+        // Build CSS variables.
+        $css_vars = $this->build_css_variables( $props, [
+            'backgroundColor' => 'background-color',
+            'textColor'       => 'color',
+            'paddingTop'      => 'padding-top',
+            'paddingBottom'   => 'padding-bottom',
+            'borderRadius'    => 'border-radius',
+        ]);
+
+        // Handle background image.
+        if ( ! empty( $props['backgroundImage'] ) ) {
+            $css_vars .= ( ! empty( $css_vars ) ? '; ' : '' ) . '--poly-background-image: url(' . esc_url( $props['backgroundImage'] ) . ')';
+        }
+
+        // Build attributes.
+        $attrs = [
+            'class'             => implode( ' ', $classes ),
+            'data-component-id' => esc_attr( $id ),
+        ];
+
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
+        }
+
+        $html  = '<section ' . $this->build_attributes( $attrs ) . '>';
+        $html .= '<div class="poly-cta-block__content">';
+        $html .= '<h2 class="poly-cta-block__title">' . esc_html( $props['title'] ) . '</h2>';
+        $html .= '<p class="poly-cta-block__desc">' . esc_html( $props['description'] ) . '</p>';
+        $html .= '<a href="' . esc_url( $props['buttonUrl'] ) . '" class="poly-cta-block__btn">' . esc_html( $props['buttonText'] ) . '</a>';
         $html .= '</div>';
         $html .= '</section>';
 

@@ -69,11 +69,18 @@ class Avatar extends Component_Base {
      */
     public function get_defaults(): array {
         return [
-            'src'       => '',
-            'alt'       => 'Avatar',
-            'fallback'  => 'U',
-            'size'      => 'medium',
-            'className' => '',
+            'src'             => '',
+            'alt'             => 'Avatar',
+            'fallback'        => 'U',
+            'size'            => 'medium',
+            'width'           => '',
+            'height'          => '',
+            'borderRadius'    => '',
+            'backgroundColor' => '',
+            'textColor'       => '',
+            'fontSize'        => '',
+            'fontWeight'      => '',
+            'className'       => '',
         ];
     }
 
@@ -88,12 +95,23 @@ class Avatar extends Component_Base {
         $props = $this->merge_defaults( $component['props'] ?? [] );
         $id    = $component['id'] ?? '';
 
-        // Build classes.
-        $classes = [ 'avatar', 'avatar--' . sanitize_html_class( $props['size'] ) ];
+        // Build classes using poly-* convention.
+        $classes = [ 'poly-avatar', 'poly-avatar--' . sanitize_html_class( $props['size'] ) ];
 
         if ( ! empty( $props['className'] ) ) {
             $classes[] = sanitize_html_class( $props['className'] );
         }
+
+        // Build CSS variables.
+        $css_vars = $this->build_css_variables( $props, [
+            'width'           => 'width',
+            'height'          => 'height',
+            'borderRadius'    => 'border-radius',
+            'backgroundColor' => 'background-color',
+            'textColor'       => 'color',
+            'fontSize'        => 'font-size',
+            'fontWeight'      => 'font-weight',
+        ]);
 
         // Build attributes.
         $attrs = [
@@ -101,14 +119,18 @@ class Avatar extends Component_Base {
             'data-component-id' => esc_attr( $id ),
         ];
 
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
+        }
+
         // Build HTML.
         $html = '<div ' . $this->build_attributes( $attrs ) . '>';
 
         if ( ! empty( $props['src'] ) ) {
-            $html .= '<img class="avatar__image" src="' . esc_url( $props['src'] ) . '" alt="' . esc_attr( $props['alt'] ) . '" />';
+            $html .= '<img class="poly-avatar__image" src="' . esc_url( $props['src'] ) . '" alt="' . esc_attr( $props['alt'] ) . '" />';
         } else {
             $fallback = strtoupper( substr( $props['fallback'], 0, 2 ) );
-            $html    .= '<span class="avatar__fallback">' . esc_html( $fallback ) . '</span>';
+            $html    .= '<span class="poly-avatar__fallback">' . esc_html( $fallback ) . '</span>';
         }
 
         $html .= '</div>';

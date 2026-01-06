@@ -69,14 +69,20 @@ class FeaturesBlock extends Component_Base {
      */
     public function get_defaults(): array {
         return [
-            'title'    => 'Why Choose Us',
-            'subtitle' => 'Everything you need to build amazing websites',
-            'columns'  => 3,
-            'features' => [
+            'title'           => 'Why Choose Us',
+            'subtitle'        => 'Everything you need to build amazing websites',
+            'columns'         => 3,
+            'features'        => [
                 [ 'icon' => 'zap', 'title' => 'Lightning Fast', 'description' => 'Optimized for speed and performance' ],
                 [ 'icon' => 'shield', 'title' => 'Secure', 'description' => 'Built with security best practices' ],
                 [ 'icon' => 'rocket', 'title' => 'Easy to Use', 'description' => 'Intuitive drag-and-drop interface' ],
             ],
+            'backgroundColor' => '',
+            'textColor'       => '',
+            'paddingTop'      => '',
+            'paddingBottom'   => '',
+            'gap'             => '',
+            'className'       => '',
         ];
     }
 
@@ -93,18 +99,44 @@ class FeaturesBlock extends Component_Base {
         $features = $props['features'] ?? [];
         $columns  = (int) $props['columns'];
 
-        $html  = '<section class="features-block" data-component-id="' . esc_attr( $id ) . '">';
-        $html .= '<div class="features-block__header">';
-        $html .= '<h2 class="features-block__title">' . esc_html( $props['title'] ) . '</h2>';
-        $html .= '<p class="features-block__subtitle">' . esc_html( $props['subtitle'] ) . '</p>';
+        // Build classes using poly-* convention.
+        $classes = [ 'poly-features-block' ];
+
+        if ( ! empty( $props['className'] ) ) {
+            $classes[] = sanitize_html_class( $props['className'] );
+        }
+
+        // Build CSS variables.
+        $css_vars = $this->build_css_variables( $props, [
+            'backgroundColor' => 'background-color',
+            'textColor'       => 'color',
+            'paddingTop'      => 'padding-top',
+            'paddingBottom'   => 'padding-bottom',
+            'gap'             => 'gap',
+        ]);
+
+        // Build attributes.
+        $attrs = [
+            'class'             => implode( ' ', $classes ),
+            'data-component-id' => esc_attr( $id ),
+        ];
+
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
+        }
+
+        $html  = '<section ' . $this->build_attributes( $attrs ) . '>';
+        $html .= '<div class="poly-features-block__header">';
+        $html .= '<h2 class="poly-features-block__title">' . esc_html( $props['title'] ) . '</h2>';
+        $html .= '<p class="poly-features-block__subtitle">' . esc_html( $props['subtitle'] ) . '</p>';
         $html .= '</div>';
-        $html .= '<div class="features-block__grid" style="grid-template-columns: repeat(' . esc_attr( $columns ) . ', 1fr);">';
+        $html .= '<div class="poly-features-block__grid" style="--poly-columns: ' . esc_attr( $columns ) . ';">';
 
         foreach ( $features as $feature ) {
-            $html .= '<div class="features-block__card">';
-            $html .= '<div class="features-block__icon">' . $this->get_icon_svg( $feature['icon'] ?? 'zap' ) . '</div>';
-            $html .= '<h3 class="features-block__card-title">' . esc_html( $feature['title'] ?? '' ) . '</h3>';
-            $html .= '<p class="features-block__card-desc">' . esc_html( $feature['description'] ?? '' ) . '</p>';
+            $html .= '<div class="poly-features-block__card">';
+            $html .= '<div class="poly-features-block__icon">' . $this->get_icon_svg( $feature['icon'] ?? 'zap' ) . '</div>';
+            $html .= '<h3 class="poly-features-block__card-title">' . esc_html( $feature['title'] ?? '' ) . '</h3>';
+            $html .= '<p class="poly-features-block__card-desc">' . esc_html( $feature['description'] ?? '' ) . '</p>';
             $html .= '</div>';
         }
 

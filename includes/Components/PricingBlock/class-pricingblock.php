@@ -69,9 +69,9 @@ class PricingBlock extends Component_Base {
      */
     public function get_defaults(): array {
         return [
-            'title'    => 'Simple, Transparent Pricing',
-            'subtitle' => 'Choose the plan that works for you',
-            'plans'    => [
+            'title'           => 'Simple, Transparent Pricing',
+            'subtitle'        => 'Choose the plan that works for you',
+            'plans'           => [
                 [
                     'name'        => 'Starter',
                     'price'       => '$9',
@@ -103,6 +103,12 @@ class PricingBlock extends Component_Base {
                     'featured'    => false,
                 ],
             ],
+            'backgroundColor' => '',
+            'textColor'       => '',
+            'paddingTop'      => '',
+            'paddingBottom'   => '',
+            'gap'             => '',
+            'className'       => '',
         ];
     }
 
@@ -118,39 +124,65 @@ class PricingBlock extends Component_Base {
         $id    = $component['id'] ?? '';
         $plans = $props['plans'] ?? [];
 
-        $html  = '<section class="pricing-block" data-component-id="' . esc_attr( $id ) . '">';
-        $html .= '<div class="pricing-block__header">';
-        $html .= '<h2 class="pricing-block__title">' . esc_html( $props['title'] ) . '</h2>';
-        $html .= '<p class="pricing-block__subtitle">' . esc_html( $props['subtitle'] ) . '</p>';
+        // Build classes using poly-* convention.
+        $classes = [ 'poly-pricing-block' ];
+
+        if ( ! empty( $props['className'] ) ) {
+            $classes[] = sanitize_html_class( $props['className'] );
+        }
+
+        // Build CSS variables.
+        $css_vars = $this->build_css_variables( $props, [
+            'backgroundColor' => 'background-color',
+            'textColor'       => 'color',
+            'paddingTop'      => 'padding-top',
+            'paddingBottom'   => 'padding-bottom',
+            'gap'             => 'gap',
+        ]);
+
+        // Build attributes.
+        $attrs = [
+            'class'             => implode( ' ', $classes ),
+            'data-component-id' => esc_attr( $id ),
+        ];
+
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
+        }
+
+        $html  = '<section ' . $this->build_attributes( $attrs ) . '>';
+        $html .= '<div class="poly-pricing-block__header">';
+        $html .= '<h2 class="poly-pricing-block__title">' . esc_html( $props['title'] ) . '</h2>';
+        $html .= '<p class="poly-pricing-block__subtitle">' . esc_html( $props['subtitle'] ) . '</p>';
         $html .= '</div>';
-        $html .= '<div class="pricing-block__grid">';
+        $html .= '<div class="poly-pricing-block__grid">';
 
         foreach ( $plans as $plan ) {
-            $card_class = 'pricing-block__card';
+            $card_class = 'poly-pricing-block__card';
             if ( ! empty( $plan['featured'] ) ) {
-                $card_class .= ' pricing-block__card--featured';
+                $card_class .= ' poly-pricing-block__card--featured';
             }
 
             $html .= '<div class="' . esc_attr( $card_class ) . '">';
-            
+
             if ( ! empty( $plan['featured'] ) ) {
-                $html .= '<span class="pricing-block__badge">Most Popular</span>';
+                $html .= '<span class="poly-pricing-block__badge">Most Popular</span>';
             }
 
-            $html .= '<h3 class="pricing-block__name">' . esc_html( $plan['name'] ?? '' ) . '</h3>';
-            $html .= '<p class="pricing-block__desc">' . esc_html( $plan['description'] ?? '' ) . '</p>';
-            $html .= '<div class="pricing-block__price">';
-            $html .= '<span class="pricing-block__amount">' . esc_html( $plan['price'] ?? '' ) . '</span>';
-            $html .= '<span class="pricing-block__period">' . esc_html( $plan['period'] ?? '' ) . '</span>';
+            $html .= '<h3 class="poly-pricing-block__name">' . esc_html( $plan['name'] ?? '' ) . '</h3>';
+            $html .= '<p class="poly-pricing-block__desc">' . esc_html( $plan['description'] ?? '' ) . '</p>';
+            $html .= '<div class="poly-pricing-block__price">';
+            $html .= '<span class="poly-pricing-block__amount">' . esc_html( $plan['price'] ?? '' ) . '</span>';
+            $html .= '<span class="poly-pricing-block__period">' . esc_html( $plan['period'] ?? '' ) . '</span>';
             $html .= '</div>';
 
-            $html .= '<ul class="pricing-block__features">';
+            $html .= '<ul class="poly-pricing-block__features">';
             foreach ( $plan['features'] ?? [] as $feature ) {
                 $html .= '<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>' . esc_html( $feature ) . '</span></li>';
             }
             $html .= '</ul>';
 
-            $btn_class = ! empty( $plan['featured'] ) ? 'pricing-block__btn--primary' : 'pricing-block__btn';
+            $btn_class = ! empty( $plan['featured'] ) ? 'poly-pricing-block__btn--primary' : 'poly-pricing-block__btn';
             $html     .= '<a href="' . esc_url( $plan['buttonUrl'] ?? '#' ) . '" class="' . esc_attr( $btn_class ) . '">' . esc_html( $plan['buttonText'] ?? 'Get Started' ) . '</a>';
 
             $html .= '</div>';

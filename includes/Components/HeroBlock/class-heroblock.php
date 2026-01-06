@@ -78,6 +78,13 @@ class HeroBlock extends Component_Base {
             'showSecondaryButton' => true,
             'imageUrl'            => '',
             'alignment'           => 'center',
+            'backgroundColor'     => '',
+            'backgroundImage'     => '',
+            'textColor'           => '',
+            'paddingTop'          => '',
+            'paddingBottom'       => '',
+            'minHeight'           => '',
+            'className'           => '',
         ];
     }
 
@@ -92,24 +99,53 @@ class HeroBlock extends Component_Base {
         $props = $this->merge_defaults( $component['props'] ?? [] );
         $id    = $component['id'] ?? '';
 
-        $classes = [ 'hero-block', 'hero-block--' . sanitize_html_class( $props['alignment'] ) ];
+        // Build classes using poly-* convention.
+        $classes = [ 'poly-hero-block', 'poly-hero-block--' . sanitize_html_class( $props['alignment'] ) ];
 
-        $html  = '<section class="' . esc_attr( implode( ' ', $classes ) ) . '" data-component-id="' . esc_attr( $id ) . '">';
-        $html .= '<div class="hero-block__content">';
-        $html .= '<h1 class="hero-block__title">' . esc_html( $props['title'] ) . '</h1>';
-        $html .= '<p class="hero-block__subtitle">' . esc_html( $props['subtitle'] ) . '</p>';
-        $html .= '<div class="hero-block__buttons">';
-        $html .= '<a href="' . esc_url( $props['primaryButtonUrl'] ) . '" class="hero-block__btn-primary">' . esc_html( $props['primaryButtonText'] ) . '</a>';
-        
-        if ( $props['showSecondaryButton'] ) {
-            $html .= '<a href="' . esc_url( $props['secondaryButtonUrl'] ) . '" class="hero-block__btn-secondary">' . esc_html( $props['secondaryButtonText'] ) . '</a>';
+        if ( ! empty( $props['className'] ) ) {
+            $classes[] = sanitize_html_class( $props['className'] );
         }
-        
+
+        // Build CSS variables.
+        $css_vars = $this->build_css_variables( $props, [
+            'backgroundColor' => 'background-color',
+            'textColor'       => 'color',
+            'paddingTop'      => 'padding-top',
+            'paddingBottom'   => 'padding-bottom',
+            'minHeight'       => 'min-height',
+        ]);
+
+        // Handle background image.
+        if ( ! empty( $props['backgroundImage'] ) ) {
+            $css_vars .= ( ! empty( $css_vars ) ? '; ' : '' ) . '--poly-background-image: url(' . esc_url( $props['backgroundImage'] ) . ')';
+        }
+
+        // Build attributes.
+        $attrs = [
+            'class'             => implode( ' ', $classes ),
+            'data-component-id' => esc_attr( $id ),
+        ];
+
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
+        }
+
+        $html  = '<section ' . $this->build_attributes( $attrs ) . '>';
+        $html .= '<div class="poly-hero-block__content">';
+        $html .= '<h1 class="poly-hero-block__title">' . esc_html( $props['title'] ) . '</h1>';
+        $html .= '<p class="poly-hero-block__subtitle">' . esc_html( $props['subtitle'] ) . '</p>';
+        $html .= '<div class="poly-hero-block__buttons">';
+        $html .= '<a href="' . esc_url( $props['primaryButtonUrl'] ) . '" class="poly-hero-block__btn-primary">' . esc_html( $props['primaryButtonText'] ) . '</a>';
+
+        if ( $props['showSecondaryButton'] ) {
+            $html .= '<a href="' . esc_url( $props['secondaryButtonUrl'] ) . '" class="poly-hero-block__btn-secondary">' . esc_html( $props['secondaryButtonText'] ) . '</a>';
+        }
+
         $html .= '</div>';
         $html .= '</div>';
 
         if ( ! empty( $props['imageUrl'] ) ) {
-            $html .= '<div class="hero-block__image">';
+            $html .= '<div class="poly-hero-block__image">';
             $html .= '<img src="' . esc_url( $props['imageUrl'] ) . '" alt="" />';
             $html .= '</div>';
         }

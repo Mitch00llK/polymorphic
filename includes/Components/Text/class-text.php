@@ -69,19 +69,21 @@ class Text extends Component_Base {
      */
     public function get_defaults(): array {
         return [
-            'content'         => 'Enter your text here...',
-            'tag'             => 'p',
-            'variant'         => 'default',
-            'textAlign'       => 'left',
-            'fontSize'        => '',
-            'fontWeight'      => '',
-            'lineHeight'      => '',
-            'letterSpacing'   => '',
-            'color'           => '',
-            'marginTop'       => '0',
-            'marginBottom'    => '1rem',
-            'className'       => '',
-            'htmlId'          => '',
+            'content'       => 'Enter your text here...',
+            'tag'           => 'p',
+            'variant'       => 'default',
+            'textAlign'     => '',
+            'fontSize'      => '',
+            'fontWeight'    => '',
+            'fontFamily'    => '',
+            'lineHeight'    => '',
+            'letterSpacing' => '',
+            'textTransform' => '',
+            'color'         => '',
+            'marginTop'     => '',
+            'marginBottom'  => '',
+            'className'     => '',
+            'htmlId'        => '',
         ];
     }
 
@@ -98,74 +100,53 @@ class Text extends Component_Base {
 
         // Validate tag.
         $allowed_tags = [ 'p', 'div', 'span', 'blockquote', 'pre' ];
-        $tag = in_array( $props['tag'], $allowed_tags, true ) ? $props['tag'] : 'p';
+        $tag          = in_array( $props['tag'], $allowed_tags, true ) ? $props['tag'] : 'p';
 
-        // Build CSS classes (generic, no 'polymorphic-' prefix).
-        $classes = [ 'text' ];
+        // Build CSS classes using poly-* convention.
+        $classes = [ 'poly-text' ];
 
         if ( ! empty( $props['variant'] ) && 'default' !== $props['variant'] ) {
-            $classes[] = 'text--' . sanitize_html_class( $props['variant'] );
-        }
-
-        if ( ! empty( $props['textAlign'] ) && 'left' !== $props['textAlign'] ) {
-            $classes[] = 'text-' . sanitize_html_class( $props['textAlign'] );
+            $classes[] = 'poly-text--' . sanitize_html_class( $props['variant'] );
         }
 
         if ( ! empty( $props['className'] ) ) {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build inline styles.
-        $styles = [];
-
-        if ( ! empty( $props['fontSize'] ) ) {
-            $styles[] = 'font-size:' . esc_attr( $props['fontSize'] );
-        }
-
-        if ( ! empty( $props['fontWeight'] ) ) {
-            $styles[] = 'font-weight:' . esc_attr( $props['fontWeight'] );
-        }
-
-        if ( ! empty( $props['lineHeight'] ) ) {
-            $styles[] = 'line-height:' . esc_attr( $props['lineHeight'] );
-        }
-
-        if ( ! empty( $props['letterSpacing'] ) ) {
-            $styles[] = 'letter-spacing:' . esc_attr( $props['letterSpacing'] );
-        }
-
-        if ( ! empty( $props['color'] ) ) {
-            $styles[] = 'color:' . esc_attr( $props['color'] );
-        }
-
-        if ( ! empty( $props['marginTop'] ) && '0' !== $props['marginTop'] ) {
-            $styles[] = 'margin-top:' . esc_attr( $props['marginTop'] );
-        }
-
-        if ( ! empty( $props['marginBottom'] ) && '1rem' !== $props['marginBottom'] ) {
-            $styles[] = 'margin-bottom:' . esc_attr( $props['marginBottom'] );
-        }
+        // Build CSS variables for clean DOM.
+        $css_vars = $this->build_css_variables( $props, [
+            'textAlign'     => 'text-align',
+            'fontSize'      => 'font-size',
+            'fontWeight'    => 'font-weight',
+            'fontFamily'    => 'font-family',
+            'lineHeight'    => 'line-height',
+            'letterSpacing' => 'letter-spacing',
+            'textTransform' => 'text-transform',
+            'color'         => 'color',
+            'marginTop'     => 'margin-top',
+            'marginBottom'  => 'margin-bottom',
+        ]);
 
         // Build attributes.
         $attrs = [
             'class' => implode( ' ', $classes ),
         ];
 
-        if ( ! empty( $styles ) ) {
-            $attrs['style'] = implode( ';', $styles );
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
         }
 
         if ( ! empty( $props['htmlId'] ) ) {
             $attrs['id'] = sanitize_html_class( $props['htmlId'] );
-        } elseif ( ! empty( $id ) ) {
-            $attrs['data-component-id'] = esc_attr( $id );
         }
+
+        $attrs['data-component-id'] = esc_attr( $id );
 
         // Sanitize content (allow basic HTML).
         $content = wp_kses_post( $props['content'] );
 
         // Build HTML.
-        $html = '<' . $tag . ' ' . $this->build_attributes( $attrs ) . '>';
+        $html  = '<' . $tag . ' ' . $this->build_attributes( $attrs ) . '>';
         $html .= $content;
         $html .= '</' . $tag . '>';
 

@@ -69,10 +69,16 @@ class Accordion extends Component_Base {
      */
     public function get_defaults(): array {
         return [
-            'type'         => 'single',
-            'defaultValue' => '',
-            'items'        => [],
-            'className'    => '',
+            'type'            => 'single',
+            'defaultValue'    => '',
+            'items'           => [],
+            'backgroundColor' => '',
+            'borderColor'     => '',
+            'borderRadius'    => '',
+            'padding'         => '',
+            'marginTop'       => '',
+            'marginBottom'    => '',
+            'className'       => '',
         ];
     }
 
@@ -103,12 +109,22 @@ class Accordion extends Component_Base {
             ];
         }
 
-        // Build classes.
-        $classes = [ 'accordion' ];
+        // Build classes using poly-* convention.
+        $classes = [ 'poly-accordion' ];
 
         if ( ! empty( $props['className'] ) ) {
             $classes[] = sanitize_html_class( $props['className'] );
         }
+
+        // Build CSS variables.
+        $css_vars = $this->build_css_variables( $props, [
+            'backgroundColor' => 'background-color',
+            'borderColor'     => 'border-color',
+            'borderRadius'    => 'border-radius',
+            'padding'         => 'padding',
+            'marginTop'       => 'margin-top',
+            'marginBottom'    => 'margin-bottom',
+        ]);
 
         // Build attributes.
         $attrs = [
@@ -117,7 +133,11 @@ class Accordion extends Component_Base {
             'data-type'         => esc_attr( $props['type'] ),
         ];
 
-        // JavaScript handles the interactivity, but we render valid HTML structure.
+        if ( ! empty( $css_vars ) ) {
+            $attrs['style'] = $css_vars;
+        }
+
+        // Build HTML.
         $html = '<div ' . $this->build_attributes( $attrs ) . '>';
 
         foreach ( $items as $item ) {
@@ -125,19 +145,19 @@ class Accordion extends Component_Base {
             $title   = $item['title'] ?? '';
             $content = $item['content'] ?? '';
 
-            $html .= '<div class="accordion__item">';
-            
+            $html .= '<div class="poly-accordion__item">';
+
             // Header/Trigger.
-            $html .= '<h3 class="accordion__header">';
-            $html .= '<button type="button" class="accordion__trigger" aria-controls="content-' . esc_attr( $item_id ) . '" aria-expanded="false">';
+            $html .= '<h3 class="poly-accordion__header">';
+            $html .= '<button type="button" class="poly-accordion__trigger" aria-controls="content-' . esc_attr( $item_id ) . '" aria-expanded="false">';
             $html .= esc_html( $title );
-            $html .= '<span class="accordion__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>';
+            $html .= '<span class="poly-accordion__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>';
             $html .= '</button>';
             $html .= '</h3>';
 
             // Content.
-            $html .= '<div id="content-' . esc_attr( $item_id ) . '" class="accordion__content" hidden>';
-            $html .= '<div class="accordion__content-inner">';
+            $html .= '<div id="content-' . esc_attr( $item_id ) . '" class="poly-accordion__content" hidden>';
+            $html .= '<div class="poly-accordion__content-inner">';
             $html .= wp_kses_post( $content );
             $html .= '</div>';
             $html .= '</div>';
@@ -147,11 +167,6 @@ class Accordion extends Component_Base {
 
         $html .= '</div>';
 
-        // Add vanilla JS script for simple toggling if not already present.
-        // In a real scenario, this should be in a separate JS file enqueued by the plugin.
-        // For simplicity and to ensure standard JS functionality without React, we can inline it or rely on global theme JS.
-        // Assuming theme/global JS handles `.accordion` interactions.
-        
         return $html;
     }
 }

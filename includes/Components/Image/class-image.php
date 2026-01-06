@@ -69,24 +69,24 @@ class Image extends Component_Base {
      */
     public function get_defaults(): array {
         return [
-            'src'             => '',
-            'alt'             => '',
-            'caption'         => '',
-            'width'           => '',
-            'height'          => '',
-            'maxWidth'        => '100%',
-            'objectFit'       => 'cover',
-            'objectPosition'  => 'center',
-            'borderRadius'    => '',
-            'style'           => 'default',
-            'align'           => 'none',
-            'lazyLoad'        => true,
-            'linkUrl'         => '',
-            'linkTarget'      => '_self',
-            'marginTop'       => '0',
-            'marginBottom'    => '1rem',
-            'className'       => '',
-            'htmlId'          => '',
+            'src'            => '',
+            'alt'            => '',
+            'caption'        => '',
+            'width'          => '',
+            'height'         => '',
+            'maxWidth'       => '',
+            'objectFit'      => 'cover',
+            'objectPosition' => 'center',
+            'borderRadius'   => '',
+            'style'          => 'default',
+            'align'          => 'none',
+            'lazyLoad'       => true,
+            'linkUrl'        => '',
+            'linkTarget'     => '_self',
+            'marginTop'      => '',
+            'marginBottom'   => '',
+            'className'      => '',
+            'htmlId'         => '',
         ];
     }
 
@@ -104,80 +104,64 @@ class Image extends Component_Base {
         // Return placeholder if no image.
         if ( empty( $props['src'] ) ) {
             if ( 'editor' === $context || 'preview' === $context ) {
-                return '<figure class="image image--placeholder"><div class="image__placeholder">Select an image</div></figure>';
+                return '<figure class="poly-image poly-image--placeholder" data-component-id="' . esc_attr( $id ) . '"><div class="poly-image__placeholder">Select an image</div></figure>';
             }
             return '';
         }
 
-        // Build figure CSS classes (generic, no 'polymorphic-' prefix).
-        $classes = [ 'image' ];
+        // Build figure CSS classes using poly-* convention.
+        $classes = [ 'poly-image' ];
 
         if ( ! empty( $props['style'] ) && 'default' !== $props['style'] ) {
-            $classes[] = 'image--' . sanitize_html_class( $props['style'] );
+            $classes[] = 'poly-image--' . sanitize_html_class( $props['style'] );
         }
 
         if ( ! empty( $props['align'] ) && 'none' !== $props['align'] ) {
-            $classes[] = 'image--align-' . sanitize_html_class( $props['align'] );
+            $classes[] = 'poly-image--align-' . sanitize_html_class( $props['align'] );
         }
 
         if ( ! empty( $props['className'] ) ) {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build figure inline styles.
-        $figure_styles = [];
+        // Build CSS variables for figure.
+        $css_vars = $this->build_css_variables( $props, [
+            'marginTop'    => 'margin-top',
+            'marginBottom' => 'margin-bottom',
+            'maxWidth'     => 'max-width',
+        ]);
 
-        if ( ! empty( $props['marginTop'] ) && '0' !== $props['marginTop'] ) {
-            $figure_styles[] = 'margin-top:' . esc_attr( $props['marginTop'] );
-        }
-
-        if ( ! empty( $props['marginBottom'] ) && '1rem' !== $props['marginBottom'] ) {
-            $figure_styles[] = 'margin-bottom:' . esc_attr( $props['marginBottom'] );
-        }
-
-        if ( ! empty( $props['maxWidth'] ) && '100%' !== $props['maxWidth'] ) {
-            $figure_styles[] = 'max-width:' . esc_attr( $props['maxWidth'] );
-        }
-
-        // Build img inline styles.
-        $img_styles = [];
-
-        if ( ! empty( $props['objectFit'] ) ) {
-            $img_styles[] = 'object-fit:' . esc_attr( $props['objectFit'] );
-        }
-
-        if ( ! empty( $props['objectPosition'] ) && 'center' !== $props['objectPosition'] ) {
-            $img_styles[] = 'object-position:' . esc_attr( $props['objectPosition'] );
-        }
-
-        if ( ! empty( $props['borderRadius'] ) ) {
-            $img_styles[] = 'border-radius:' . esc_attr( $props['borderRadius'] );
-        }
+        // Build CSS variables for img element.
+        $img_css_vars = $this->build_css_variables( $props, [
+            'objectFit'      => 'object-fit',
+            'objectPosition' => 'object-position',
+            'borderRadius'   => 'border-radius',
+        ]);
 
         // Build figure attributes.
         $figure_attrs = [
             'class' => implode( ' ', $classes ),
         ];
 
-        if ( ! empty( $figure_styles ) ) {
-            $figure_attrs['style'] = implode( ';', $figure_styles );
+        if ( ! empty( $css_vars ) ) {
+            $figure_attrs['style'] = $css_vars;
         }
 
         if ( ! empty( $props['htmlId'] ) ) {
             $figure_attrs['id'] = sanitize_html_class( $props['htmlId'] );
-        } elseif ( ! empty( $id ) ) {
-            $figure_attrs['data-component-id'] = esc_attr( $id );
         }
+
+        $figure_attrs['data-component-id'] = esc_attr( $id );
 
         // Build img attributes.
         $img_attrs = [
             'src'   => esc_url( $props['src'] ),
             'alt'   => esc_attr( $props['alt'] ),
-            'class' => 'image__img',
+            'class' => 'poly-image__img',
         ];
 
-        if ( ! empty( $img_styles ) ) {
-            $img_attrs['style'] = implode( ';', $img_styles );
+        if ( ! empty( $img_css_vars ) ) {
+            $img_attrs['style'] = $img_css_vars;
         }
 
         if ( ! empty( $props['width'] ) ) {
@@ -198,8 +182,8 @@ class Image extends Component_Base {
         // Wrap in link if URL provided.
         if ( ! empty( $props['linkUrl'] ) ) {
             $link_attrs = [
-                'href'   => esc_url( $props['linkUrl'] ),
-                'class'  => 'image__link',
+                'href'  => esc_url( $props['linkUrl'] ),
+                'class' => 'poly-image__link',
             ];
 
             if ( '_blank' === $props['linkTarget'] ) {
@@ -218,7 +202,7 @@ class Image extends Component_Base {
 
         // Caption.
         if ( ! empty( $props['caption'] ) ) {
-            $html .= '<figcaption class="image__caption">' . esc_html( $props['caption'] ) . '</figcaption>';
+            $html .= '<figcaption class="poly-image__caption">' . esc_html( $props['caption'] ) . '</figcaption>';
         }
 
         $html .= '</figure>';

@@ -15,7 +15,7 @@ use Polymorphic\Api\Rest_Controller;
 use Polymorphic\Api\Global_Settings_Controller;
 use Polymorphic\Components\Component_Registry;
 use Polymorphic\Frontend\Renderer;
-use Polymorphic\Frontend\Frontend_Assets;
+use Polymorphic\Frontend\Assets\Frontend_Assets;
 use Polymorphic\Settings\Global_Settings;
 
 /**
