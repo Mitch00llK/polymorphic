@@ -31,7 +31,12 @@ import {
     HelpCircle,
     Megaphone,
     // Template library
+    // Template library
     LayoutTemplate,
+    // SaaS Icons
+    Quote,
+    BarChart3,
+    LayoutGrid,
 } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
@@ -78,6 +83,10 @@ const COMPONENTS: ComponentDefinition[] = [
     { type: 'pricingBlock', label: 'Pricing', icon: <DollarSign size={20} />, category: 'blocks' },
     { type: 'faqBlock', label: 'FAQ', icon: <HelpCircle size={20} />, category: 'blocks' },
     { type: 'ctaBlock', label: 'CTA', icon: <Megaphone size={20} />, category: 'blocks' },
+    // SaaS Blocks
+    { type: 'testimonialBlock', label: 'Testimonials', icon: <Quote size={20} />, category: 'blocks' },
+    { type: 'statsBlock', label: 'Stats Grid', icon: <BarChart3 size={20} />, category: 'blocks' },
+    { type: 'logoCloud', label: 'Logo Cloud', icon: <LayoutGrid size={20} />, category: 'blocks' },
 ];
 
 /**
