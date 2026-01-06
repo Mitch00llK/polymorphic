@@ -50,7 +50,144 @@ class Renderer {
      * @since 1.0.0
      */
     public function init(): void {
+        // Use template_redirect for full page takeover.
+        add_action( 'template_redirect', [ $this, 'maybe_take_over_template' ], 1 );
+
+        // Also filter the_content for partial integration (block themes).
         add_filter( 'the_content', [ $this, 'maybe_render_builder_content' ], 5 );
+
+        // Disable wpautop for builder content.
+        add_action( 'wp', [ $this, 'maybe_disable_wpautop' ] );
+    }
+
+    /**
+     * Disable wpautop for posts with builder enabled.
+     *
+     * @since 1.0.0
+     */
+    public function maybe_disable_wpautop(): void {
+        if ( ! is_singular() ) {
+            return;
+        }
+
+        $post_id = get_the_ID();
+
+        if ( $this->is_builder_enabled( $post_id ) ) {
+            // Remove WordPress auto-paragraph formatting.
+            remove_filter( 'the_content', 'wpautop' );
+            remove_filter( 'the_content', 'wptexturize' );
+
+            // Disable block styling that wraps content.
+            add_filter( 'render_block', [ $this, 'unwrap_post_content_block' ], 10, 2 );
+        }
+    }
+
+    /**
+     * Remove wrapper from post-content block.
+     *
+     * @since 1.0.0
+     *
+     * @param string $block_content Block HTML.
+     * @param array  $block         Block data.
+     * @return string Modified HTML.
+     */
+    public function unwrap_post_content_block( string $block_content, array $block ): string {
+        if ( 'core/post-content' === $block['blockName'] ) {
+            // Return just the inner content without the wrapper divs.
+            return $this->render( get_the_ID() );
+        }
+
+        return $block_content;
+    }
+
+    /**
+     * Take over the entire template for builder pages.
+     *
+     * @since 1.0.0
+     */
+    public function maybe_take_over_template(): void {
+        if ( ! is_singular() ) {
+            return;
+        }
+
+        $post_id = get_the_ID();
+
+        if ( ! $this->is_builder_enabled( $post_id ) ) {
+            return;
+        }
+
+        // Check if full takeover is enabled (can be filtered).
+        $full_takeover = apply_filters( 'polymorphic/render/full_takeover', true, $post_id );
+
+        if ( ! $full_takeover ) {
+            return;
+        }
+
+        // Load custom template.
+        $this->render_full_page( $post_id );
+        exit;
+    }
+
+    /**
+     * Render full page with custom template.
+     *
+     * @since 1.0.0
+     *
+     * @param int $post_id Post ID.
+     */
+    private function render_full_page( int $post_id ): void {
+        $post = get_post( $post_id );
+
+        if ( ! $post ) {
+            return;
+        }
+
+        // Get rendered content.
+        $content = $this->render( $post_id );
+
+        // Check for custom template.
+        $template = POLYMORPHIC_PATH . 'templates/frontend-page.php';
+
+        if ( file_exists( $template ) ) {
+            // Pass variables to template.
+            set_query_var( 'polymorphic_content', $content );
+            set_query_var( 'polymorphic_post', $post );
+
+            include $template;
+        } else {
+            // Fallback: output basic HTML structure.
+            $this->render_default_template( $post, $content );
+        }
+    }
+
+    /**
+     * Render default full-page template.
+     *
+     * @since 1.0.0
+     *
+     * @param \WP_Post $post    Post object.
+     * @param string   $content Rendered content.
+     */
+    private function render_default_template( \WP_Post $post, string $content ): void {
+        ?>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+    <meta charset="<?php bloginfo( 'charset' ); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?php wp_head(); ?>
+</head>
+<body <?php body_class( 'polymorphic-page' ); ?>>
+<?php wp_body_open(); ?>
+
+<main class="polymorphic-main" role="main">
+    <?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput ?>
+</main>
+
+<?php wp_footer(); ?>
+</body>
+</html>
+        <?php
     }
 
     /**
@@ -74,19 +211,9 @@ class Renderer {
             return $content;
         }
 
-        // Try to get from cache.
-        $cached = $this->cache->get_rendered( $post_id );
-        if ( false !== $cached ) {
-            return $cached;
-        }
-
-        // Render the content.
-        $rendered = $this->render( $post_id );
-
-        // Cache the result.
-        $this->cache->set_rendered( $post_id, $rendered );
-
-        return $rendered;
+        // If full takeover is enabled, this won't be reached.
+        // This is fallback for non-takeover mode.
+        return $this->render( $post_id );
     }
 
     /**
@@ -110,6 +237,12 @@ class Renderer {
      * @return string Rendered HTML.
      */
     public function render( int $post_id ): string {
+        // Try to get from cache.
+        $cached = $this->cache->get_rendered( $post_id );
+        if ( false !== $cached ) {
+            return $cached;
+        }
+
         $data = get_post_meta( $post_id, '_polymorphic_data', true );
 
         if ( empty( $data ) ) {
@@ -132,13 +265,11 @@ class Renderer {
          */
         do_action( 'polymorphic/render/before', $post_id, $data );
 
-        $html = '<div class="polymorphic-content">';
+        $html = '';
 
         foreach ( $data['components'] as $component ) {
             $html .= $this->registry->render( $component, 'frontend' );
         }
-
-        $html .= '</div>';
 
         /**
          * Fires after rendering completes.
@@ -158,6 +289,12 @@ class Renderer {
          * @param string $html    Rendered HTML.
          * @param int    $post_id Post ID.
          */
-        return apply_filters( 'polymorphic/render/page', $html, $post_id );
+        $html = apply_filters( 'polymorphic/render/page', $html, $post_id );
+
+        // Cache the result.
+        $this->cache->set_rendered( $post_id, $html );
+
+        return $html;
     }
 }
+
