@@ -94,6 +94,10 @@ const App: React.FC = () => {
         if (active.data.current?.type === 'new-component') {
             setDraggedType(active.data.current.componentType as ComponentType);
         }
+        // Check if this is moving an existing component.
+        else if (active.data.current?.type === 'move') {
+            setDraggedType(active.data.current.componentType as ComponentType);
+        }
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
@@ -106,7 +110,8 @@ const App: React.FC = () => {
         }
 
         // Check if dropping into a container (Section or Container).
-        const isContainerDrop = over.data.current?.type === 'container-drop-zone';
+        const isContainerDrop = over.data.current?.type === 'container-drop-zone' ||
+            over.data.current?.type === 'container';
         const containerId = over.data.current?.containerId as string | undefined;
 
         // New component from sidebar.
@@ -121,7 +126,30 @@ const App: React.FC = () => {
                 addComponent(componentType);
             }
         }
-        // Moving existing components.
+        // Moving existing components (from drag handle).
+        else if (active.data.current?.type === 'move') {
+            const componentId = active.data.current.componentId as string;
+
+            if (isContainerDrop && containerId && componentId !== containerId) {
+                // Move into container.
+                moveComponent(componentId, containerId, 0);
+            } else if (!isContainerDrop) {
+                // Reordering at current level - find target position.
+                // Extract component ID from over.id if it has move- prefix.
+                let overId = String(over.id);
+                if (overId.startsWith('move-')) {
+                    overId = overId.replace('move-', '');
+                }
+
+                const oldIndex = components.findIndex((c) => c.id === componentId);
+                const newIndex = components.findIndex((c) => c.id === overId);
+
+                if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+                    moveComponent(componentId, null, newIndex);
+                }
+            }
+        }
+        // Legacy: Moving existing components without data.current.type.
         else if (active.id !== over.id) {
             const activeId = String(active.id);
 

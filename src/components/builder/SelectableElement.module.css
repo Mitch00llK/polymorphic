@@ -1,13 +1,13 @@
 /**
  * Selectable Element Styles
  *
- * Visual selection frame for builder elements.
+ * Visual selection frame and drag handles for builder elements.
  */
 
 .selectableElement {
     position: relative;
     cursor: pointer;
-    transition: outline 0.15s ease;
+    transition: outline 0.15s ease, opacity 0.15s ease;
 }
 
 /* Hover state - subtle outline */
@@ -26,6 +26,13 @@
     outline: 2px solid var(--polymorphic-color-primary);
 }
 
+/* Dragging state */
+.selectableElement.isDragging {
+    outline: 2px dashed var(--polymorphic-color-primary);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    cursor: grabbing;
+}
+
 /* Selection frame overlay */
 .selectionFrame {
     position: absolute;
@@ -34,24 +41,98 @@
     right: -2px;
     bottom: -2px;
     pointer-events: none;
-    z-index: 1;
+    z-index: 10;
+}
+
+/* Selection toolbar (contains drag handle + label) */
+.selectionToolbar {
+    position: absolute;
+    top: -26px;
+    left: -2px;
+    display: flex;
+    align-items: stretch;
+    height: 22px;
+    pointer-events: auto;
+}
+
+/* Drag handle in toolbar */
+.dragHandle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    background-color: var(--polymorphic-color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--polymorphic-border-radius-sm) 0 0 0;
+    cursor: grab;
+    transition: background-color 0.15s ease;
+}
+
+.dragHandle:hover {
+    background-color: var(--polymorphic-color-primary-dark, #4f46e5);
+}
+
+.dragHandle:active {
+    cursor: grabbing;
 }
 
 /* Selection label */
 .selectionLabel {
-    position: absolute;
-    top: -22px;
-    left: -2px;
+    display: flex;
+    align-items: center;
     background-color: var(--polymorphic-color-primary);
     color: white;
     font-size: 10px;
     font-weight: 500;
-    padding: 2px 8px;
-    border-radius: var(--polymorphic-border-radius-sm) var(--polymorphic-border-radius-sm) 0 0;
+    padding: 0 8px;
+    border-radius: 0 var(--polymorphic-border-radius-sm) 0 0;
     text-transform: capitalize;
     white-space: nowrap;
-    line-height: 1.4;
+    line-height: 1;
     letter-spacing: 0.02em;
+}
+
+/* Hover drag handle (visible on hover when not selected) */
+.hoverDragHandle {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.selectableElement:hover .hoverDragHandle {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.dragHandleButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background-color: white;
+    color: var(--polymorphic-color-gray-600);
+    border: 1px solid var(--polymorphic-color-gray-300);
+    border-radius: var(--polymorphic-border-radius-sm);
+    cursor: grab;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.15s ease;
+}
+
+.dragHandleButton:hover {
+    background-color: var(--polymorphic-color-primary);
+    color: white;
+    border-color: var(--polymorphic-color-primary);
+}
+
+.dragHandleButton:active {
+    cursor: grabbing;
 }
 
 /* Handle nested selections - prevent double outlines */
@@ -63,8 +144,8 @@
     outline: none;
 }
 
-/* Ensure selection label doesn't overlap with other content */
-.selectableElement:first-child .selectionLabel {
-    /* First child might need adjustment */
+/* Hide hover drag handle when nested element is not hovered */
+.selectableElement:hover .selectableElement:not(:hover) .hoverDragHandle {
+    opacity: 0;
+    pointer-events: none;
 }
-
