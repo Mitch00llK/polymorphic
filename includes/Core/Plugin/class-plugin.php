@@ -12,8 +12,10 @@ use Polymorphic\Admin\Admin_Menu;
 use Polymorphic\Admin\Assets;
 use Polymorphic\Admin\Editor_Integration;
 use Polymorphic\Api\Rest_Controller;
+use Polymorphic\Api\Global_Settings_Controller;
 use Polymorphic\Components\Component_Registry;
 use Polymorphic\Frontend\Renderer;
+use Polymorphic\Settings\Global_Settings;
 
 /**
  * Core plugin class.
@@ -118,8 +120,13 @@ final class Plugin {
      * @since 1.0.0
      */
     public function register_rest_routes(): void {
+        // Builder API routes.
         $rest_controller = new Rest_Controller( $this->component_registry );
         $rest_controller->register_routes();
+
+        // Global settings API routes.
+        $settings_controller = new Global_Settings_Controller();
+        $settings_controller->register_routes();
     }
 
     /**
