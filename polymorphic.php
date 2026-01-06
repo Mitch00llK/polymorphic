@@ -93,6 +93,11 @@ if ( file_exists( POLYMORPHIC_PATH . 'vendor/autoload.php' ) ) {
     require_once POLYMORPHIC_PATH . 'includes/Components/ComponentRegistry/class-component-registry.php';
     require_once POLYMORPHIC_PATH . 'includes/Components/ComponentBase/class-component-base.php';
     require_once POLYMORPHIC_PATH . 'includes/Components/Heading/class-heading.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Section/class-section.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Container/class-container.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Text/class-text.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Image/class-image.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Button/class-button.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/AdminMenu/class-admin-menu.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/Assets/class-assets.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/EditorIntegration/class-editor-integration.php';
