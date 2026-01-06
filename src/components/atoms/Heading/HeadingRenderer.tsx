@@ -1,7 +1,7 @@
 /**
  * Heading Renderer
  *
- * Supports ALL control groups for maximum customization.
+ * Uses CSS classes + custom properties for clean DOM.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -9,9 +9,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
-import { buildAllStyles, type StyleableProps } from '../../../utils/styleBuilder';
-
-import styles from '../atoms.module.css';
+import { buildCSSVariables, type CSSVariableProps } from '../../../utils/cssVariables';
 
 interface HeadingRendererProps {
     component: ComponentData;
@@ -19,32 +17,31 @@ interface HeadingRendererProps {
 }
 
 /**
- * Renders a Heading component in the editor/preview.
+ * Renders a Heading component with CSS variables.
  */
 export const HeadingRenderer: React.FC<HeadingRendererProps> = ({
     component,
 }) => {
-    const props = (component.props || {}) as StyleableProps;
+    const props = (component.props || {}) as CSSVariableProps;
 
     const tag = (props.tag as string) || 'h2';
     const content = (props.content as string) || 'Heading';
 
-    // Build ALL styles from ALL control groups
-    const allStyles = buildAllStyles(props);
+    // Build CSS variables from props
+    const cssVars = buildCSSVariables(props);
 
-    const style: React.CSSProperties = {
-        ...allStyles,
-        // Reset default browser margins if no margin set
-        margin: (!allStyles.marginTop && !allStyles.marginBottom && 
-                 !allStyles.marginLeft && !allStyles.marginRight) ? 0 : undefined,
-    };
+    // Build class names
+    const classNames = [
+        'poly-heading',
+        `poly-heading--${tag}`,
+    ].join(' ');
 
     const HeadingTag = tag as keyof JSX.IntrinsicElements;
 
     return (
         <HeadingTag
-            className={styles.heading}
-            style={style}
+            className={classNames}
+            style={cssVars}
             data-component-id={component.id}
         >
             {content}

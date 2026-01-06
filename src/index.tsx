@@ -11,6 +11,7 @@ import App from './App';
 
 import './styles/variables.css';
 import './styles/builder.css';
+import './styles/components.css';
 
 // Type declarations for WordPress globals.
 declare global {

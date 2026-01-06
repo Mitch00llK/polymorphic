@@ -1,0 +1,484 @@
+/**
+ * Component Base Styles
+ *
+ * Uses CSS custom properties (variables) for styling.
+ * Components set --poly-* variables, CSS applies them.
+ *
+ * @package Polymorphic
+ * @since   1.0.0
+ */
+
+/* ==========================================================================
+   BASE COMPONENT STYLES
+   ========================================================================== */
+
+/**
+ * All polymorphic components inherit these base styles.
+ */
+[data-component-id] {
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   TYPOGRAPHY
+   ========================================================================== */
+
+.poly-heading {
+    margin: 0;
+    font-family: var(--poly-font-family, inherit);
+    font-size: var(--poly-font-size);
+    font-weight: var(--poly-font-weight, 700);
+    line-height: var(--poly-line-height, 1.2);
+    letter-spacing: var(--poly-letter-spacing);
+    text-transform: var(--poly-text-transform);
+    text-align: var(--poly-text-align);
+    font-style: var(--poly-font-style);
+    text-decoration: var(--poly-text-decoration);
+    color: var(--poly-color, inherit);
+    /* Spacing */
+    margin-top: var(--poly-margin-top);
+    margin-bottom: var(--poly-margin-bottom);
+    margin-left: var(--poly-margin-left);
+    margin-right: var(--poly-margin-right);
+    /* Box */
+    background-color: var(--poly-background-color);
+    padding: var(--poly-padding);
+    padding-top: var(--poly-padding-top);
+    padding-right: var(--poly-padding-right);
+    padding-bottom: var(--poly-padding-bottom);
+    padding-left: var(--poly-padding-left);
+    border-radius: var(--poly-border-radius);
+}
+
+/* Heading size defaults */
+.poly-heading--h1 { font-size: var(--poly-font-size, 2.5rem); }
+.poly-heading--h2 { font-size: var(--poly-font-size, 2rem); }
+.poly-heading--h3 { font-size: var(--poly-font-size, 1.75rem); }
+.poly-heading--h4 { font-size: var(--poly-font-size, 1.5rem); }
+.poly-heading--h5 { font-size: var(--poly-font-size, 1.25rem); }
+.poly-heading--h6 { font-size: var(--poly-font-size, 1rem); }
+
+.poly-text {
+    margin: 0;
+    font-family: var(--poly-font-family, inherit);
+    font-size: var(--poly-font-size, 1rem);
+    font-weight: var(--poly-font-weight, 400);
+    line-height: var(--poly-line-height, 1.6);
+    letter-spacing: var(--poly-letter-spacing);
+    text-transform: var(--poly-text-transform);
+    text-align: var(--poly-text-align);
+    font-style: var(--poly-font-style);
+    text-decoration: var(--poly-text-decoration);
+    color: var(--poly-color, inherit);
+    /* Spacing */
+    margin-top: var(--poly-margin-top);
+    margin-bottom: var(--poly-margin-bottom);
+    margin-left: var(--poly-margin-left);
+    margin-right: var(--poly-margin-right);
+    /* Multi-column */
+    column-count: var(--poly-column-count);
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+.poly-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    /* Typography */
+    font-family: var(--poly-font-family, inherit);
+    font-size: var(--poly-font-size, 0.9375rem);
+    font-weight: var(--poly-font-weight, 500);
+    line-height: var(--poly-line-height, 1.4);
+    text-decoration: var(--poly-text-decoration, none);
+    color: var(--poly-color, #fff);
+    /* Box */
+    background-color: var(--poly-background-color, #6366f1);
+    border: var(--poly-border-width, 0) var(--poly-border-style, solid) var(--poly-border-color, transparent);
+    border-radius: var(--poly-border-radius, 6px);
+    box-shadow: var(--poly-box-shadow);
+    /* Size */
+    padding: var(--poly-padding, 10px 20px);
+    width: var(--poly-width, auto);
+    /* Behavior */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.poly-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Button sizes */
+.poly-button--sm { padding: var(--poly-padding, 8px 16px); font-size: var(--poly-font-size, 0.875rem); }
+.poly-button--lg { padding: var(--poly-padding, 14px 28px); font-size: var(--poly-font-size, 1rem); }
+
+/* Button variants */
+.poly-button--outline {
+    background-color: transparent;
+    color: var(--poly-color, var(--poly-border-color, #333));
+    border: 1px solid var(--poly-border-color, #333);
+}
+
+.poly-button--ghost {
+    background-color: transparent;
+    color: var(--poly-color, #333);
+    border: none;
+}
+
+.poly-button--link {
+    background-color: transparent;
+    color: var(--poly-color, #6366f1);
+    border: none;
+    padding: 0;
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   IMAGES
+   ========================================================================== */
+
+.poly-image {
+    display: block;
+    margin: 0;
+    max-width: var(--poly-max-width, 100%);
+    width: var(--poly-width, 100%);
+    /* Spacing */
+    margin-top: var(--poly-margin-top);
+    margin-bottom: var(--poly-margin-bottom);
+}
+
+.poly-image img {
+    display: block;
+    width: 100%;
+    height: var(--poly-height, auto);
+    aspect-ratio: var(--poly-aspect-ratio);
+    object-fit: var(--poly-object-fit, cover);
+    border-radius: var(--poly-border-radius);
+    box-shadow: var(--poly-box-shadow);
+}
+
+.poly-image--align-center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.poly-image--align-right {
+    margin-left: auto;
+}
+
+.poly-image__caption {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--poly-caption-color, #6b7280);
+    text-align: var(--poly-caption-text-align, center);
+}
+
+.poly-image__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+    background-color: #f3f4f6;
+    border: 2px dashed #d1d5db;
+    border-radius: var(--poly-border-radius, 8px);
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+/* ==========================================================================
+   BADGES
+   ========================================================================== */
+
+.poly-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Typography */
+    font-family: var(--poly-font-family, inherit);
+    font-size: var(--poly-font-size, 0.75rem);
+    font-weight: var(--poly-font-weight, 500);
+    line-height: var(--poly-line-height, 1.4);
+    color: var(--poly-color, #374151);
+    /* Box */
+    background-color: var(--poly-background-color, #f3f4f6);
+    border: var(--poly-border-width) var(--poly-border-style, solid) var(--poly-border-color);
+    border-radius: var(--poly-border-radius, 9999px);
+    padding: var(--poly-padding, 4px 12px);
+}
+
+/* Badge variants */
+.poly-badge--success { background-color: var(--poly-background-color, #22c55e); color: var(--poly-color, #fff); }
+.poly-badge--warning { background-color: var(--poly-background-color, #f59e0b); color: var(--poly-color, #fff); }
+.poly-badge--error { background-color: var(--poly-background-color, #ef4444); color: var(--poly-color, #fff); }
+.poly-badge--info { background-color: var(--poly-background-color, #3b82f6); color: var(--poly-color, #fff); }
+
+/* ==========================================================================
+   LAYOUT: SECTIONS
+   ========================================================================== */
+
+.poly-section {
+    position: relative;
+    width: 100%;
+    /* Layout */
+    display: var(--poly-display, flex);
+    flex-direction: var(--poly-flex-direction, column);
+    justify-content: var(--poly-justify-content, center);
+    align-items: var(--poly-align-items, center);
+    gap: var(--poly-gap);
+    flex-wrap: var(--poly-flex-wrap, nowrap);
+    /* Size */
+    min-height: var(--poly-min-height);
+    /* Spacing */
+    padding: var(--poly-padding);
+    padding-top: var(--poly-padding-top, 60px);
+    padding-right: var(--poly-padding-right, 20px);
+    padding-bottom: var(--poly-padding-bottom, 60px);
+    padding-left: var(--poly-padding-left, 20px);
+    margin-top: var(--poly-margin-top);
+    margin-bottom: var(--poly-margin-bottom);
+    /* Box */
+    background-color: var(--poly-background-color);
+    background-image: var(--poly-background-image);
+    background-size: var(--poly-background-size, cover);
+    background-position: var(--poly-background-position, center);
+    background-repeat: var(--poly-background-repeat, no-repeat);
+}
+
+.poly-section__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    width: 100%;
+}
+
+/* ==========================================================================
+   LAYOUT: CONTAINERS
+   ========================================================================== */
+
+.poly-container {
+    /* Layout */
+    display: var(--poly-display, flex);
+    flex-direction: var(--poly-flex-direction, column);
+    justify-content: var(--poly-justify-content, flex-start);
+    align-items: var(--poly-align-items, stretch);
+    gap: var(--poly-gap);
+    flex-wrap: var(--poly-flex-wrap, nowrap);
+    /* Size */
+    width: var(--poly-width, 100%);
+    max-width: var(--poly-max-width, 1200px);
+    /* Spacing - auto margins for centering by default */
+    margin-left: var(--poly-margin-left, auto);
+    margin-right: var(--poly-margin-right, auto);
+    margin-top: var(--poly-margin-top);
+    margin-bottom: var(--poly-margin-bottom);
+    padding: var(--poly-padding);
+    padding-top: var(--poly-padding-top);
+    padding-right: var(--poly-padding-right);
+    padding-bottom: var(--poly-padding-bottom);
+    padding-left: var(--poly-padding-left);
+    /* Box */
+    background-color: var(--poly-background-color);
+    border-radius: var(--poly-border-radius);
+    box-shadow: var(--poly-box-shadow);
+}
+
+.poly-container__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    width: 100%;
+}
+
+/* ==========================================================================
+   CARDS
+   ========================================================================== */
+
+.poly-card {
+    box-sizing: border-box;
+    /* Box */
+    background-color: var(--poly-background-color, #fff);
+    border: var(--poly-border-width, 1px) var(--poly-border-style, solid) var(--poly-border-color, #e5e7eb);
+    border-radius: var(--poly-border-radius, 8px);
+    box-shadow: var(--poly-box-shadow);
+    /* Spacing */
+    padding: var(--poly-padding, 24px);
+    /* Size */
+    width: var(--poly-width);
+    max-width: var(--poly-max-width);
+    overflow: var(--poly-overflow, hidden);
+}
+
+.poly-card--ghost {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.poly-card--elevated {
+    box-shadow: var(--poly-box-shadow, 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06));
+}
+
+.poly-card__header {
+    margin-bottom: 1rem;
+}
+
+.poly-card__title {
+    margin: 0 0 0.5rem 0;
+    font-size: var(--poly-title-font-size, 1.25rem);
+    font-weight: var(--poly-title-font-weight, 600);
+    line-height: var(--poly-title-line-height, 1.4);
+    color: var(--poly-title-color, inherit);
+}
+
+.poly-card__description {
+    margin: 0;
+    font-size: var(--poly-description-font-size, 0.875rem);
+    line-height: var(--poly-description-line-height, 1.5);
+    color: var(--poly-description-color, #6b7280);
+}
+
+.poly-card__content {
+    /* Content area */
+}
+
+.poly-card__footer {
+    margin-top: 1rem;
+    font-size: var(--poly-footer-font-size, 0.875rem);
+    color: var(--poly-footer-color, #6b7280);
+}
+
+.poly-card__footer p {
+    margin: 0;
+}
+
+/* ==========================================================================
+   SEPARATORS
+   ========================================================================== */
+
+.poly-separator {
+    width: var(--poly-width, 100%);
+    height: var(--poly-height, 1px);
+    background-color: var(--poly-background-color, #e5e7eb);
+    border: none;
+    margin: var(--poly-margin, 1rem 0);
+    margin-top: var(--poly-margin-top);
+    margin-bottom: var(--poly-margin-bottom);
+}
+
+.poly-separator--vertical {
+    width: var(--poly-width, 1px);
+    height: var(--poly-height, 100%);
+    margin: var(--poly-margin, 0 1rem);
+}
+
+/* ==========================================================================
+   AVATARS
+   ========================================================================== */
+
+.poly-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--poly-width, 40px);
+    height: var(--poly-height, 40px);
+    border-radius: var(--poly-border-radius, 50%);
+    background-color: var(--poly-background-color, #e5e7eb);
+    overflow: hidden;
+}
+
+.poly-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--poly-object-fit, cover);
+}
+
+.poly-avatar__fallback {
+    font-size: var(--poly-font-size, 1rem);
+    font-weight: var(--poly-font-weight, 500);
+    color: var(--poly-color, #374151);
+}
+
+/* ==========================================================================
+   ALERTS
+   ========================================================================== */
+
+.poly-alert {
+    display: flex;
+    gap: 0.75rem;
+    padding: var(--poly-padding, 1rem);
+    background-color: var(--poly-background-color, #f3f4f6);
+    border: var(--poly-border-width, 1px) var(--poly-border-style, solid) var(--poly-border-color, #e5e7eb);
+    border-radius: var(--poly-border-radius, 8px);
+    color: var(--poly-color, #374151);
+}
+
+.poly-alert--info { 
+    background-color: var(--poly-background-color, #eff6ff); 
+    border-color: var(--poly-border-color, #bfdbfe);
+    color: var(--poly-color, #1e40af);
+}
+.poly-alert--success { 
+    background-color: var(--poly-background-color, #f0fdf4); 
+    border-color: var(--poly-border-color, #bbf7d0);
+    color: var(--poly-color, #166534);
+}
+.poly-alert--warning { 
+    background-color: var(--poly-background-color, #fffbeb); 
+    border-color: var(--poly-border-color, #fde68a);
+    color: var(--poly-color, #92400e);
+}
+.poly-alert--error { 
+    background-color: var(--poly-background-color, #fef2f2); 
+    border-color: var(--poly-border-color, #fecaca);
+    color: var(--poly-color, #991b1b);
+}
+
+.poly-alert__title {
+    margin: 0 0 0.25rem 0;
+    font-weight: 600;
+    font-size: var(--poly-title-font-size, 0.875rem);
+}
+
+.poly-alert__description {
+    margin: 0;
+    font-size: var(--poly-description-font-size, 0.875rem);
+    opacity: 0.9;
+}
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+/* Text alignment */
+.poly-text-left { text-align: left; }
+.poly-text-center { text-align: center; }
+.poly-text-right { text-align: right; }
+
+/* Flex alignment */
+.poly-items-start { align-items: flex-start; }
+.poly-items-center { align-items: center; }
+.poly-items-end { align-items: flex-end; }
+.poly-justify-start { justify-content: flex-start; }
+.poly-justify-center { justify-content: center; }
+.poly-justify-end { justify-content: flex-end; }
+.poly-justify-between { justify-content: space-between; }
+
+/* Width */
+.poly-w-full { width: 100%; }
+.poly-w-auto { width: auto; }
+

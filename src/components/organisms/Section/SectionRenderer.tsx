@@ -1,8 +1,7 @@
 /**
  * Section Renderer
  *
- * A full-width layout container that spans the entire viewport.
- * Supports ALL control groups for maximum customization.
+ * Uses CSS classes + custom properties for clean DOM.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -11,19 +10,23 @@
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
-import { buildAllStyles, type StyleableProps } from '../../../utils/styleBuilder';
-
-import styles from '../organisms.module.css';
+import { buildCSSVariables, type CSSVariableProps } from '../../../utils/cssVariables';
 
 interface SectionRendererProps {
     component: ComponentData;
     context: 'editor' | 'preview';
 }
 
+interface SectionProps extends CSSVariableProps {
+    verticalAlign?: 'start' | 'center' | 'end' | 'stretch' | 'between' | 'around';
+    horizontalAlign?: 'start' | 'center' | 'end' | 'stretch';
+    direction?: 'row' | 'column';
+}
+
 /**
- * Maps vertical/horizontal align to CSS flexbox properties.
+ * Maps alignment values to CSS flexbox properties.
  */
-const mapAlignToFlex = (align?: string): string => {
+const mapAlign = (align?: string): string | undefined => {
     switch (align) {
         case 'start': return 'flex-start';
         case 'center': return 'center';
@@ -31,52 +34,41 @@ const mapAlignToFlex = (align?: string): string => {
         case 'stretch': return 'stretch';
         case 'between': return 'space-between';
         case 'around': return 'space-around';
-        default: return 'center';
+        default: return undefined;
     }
 };
 
 /**
- * Renders a Section layout component.
+ * Renders a Section component with CSS variables.
  */
 export const SectionRenderer: React.FC<SectionRendererProps> = ({
     component,
     context,
 }) => {
-    const props = (component.props || {}) as StyleableProps;
+    const props = (component.props || {}) as SectionProps;
     const children = component.children || [];
 
-    // Build ALL styles from ALL control groups
-    const allStyles = buildAllStyles(props);
+    // Build CSS variables from props
+    const cssVars = buildCSSVariables(props) as Record<string, string | number | undefined>;
 
-    // Section-specific props (legacy support)
-    const verticalAlign = props.verticalAlign as string;
-    const horizontalAlign = props.horizontalAlign as string;
-    const direction = props.direction as string;
-
-    // Build section styles with defaults
-    const style: React.CSSProperties = {
-        ...allStyles,
-        // Layout defaults (if not set via PropertyPanel)
-        display: allStyles.display || 'flex',
-        flexDirection: allStyles.flexDirection || direction || 'column',
-        justifyContent: allStyles.justifyContent || mapAlignToFlex(verticalAlign),
-        alignItems: allStyles.alignItems || mapAlignToFlex(horizontalAlign),
-        gap: allStyles.gap || (props.gap as string) || undefined,
-        flexWrap: allStyles.flexWrap || 'nowrap',
-        // Size defaults
-        width: allStyles.width || '100%',
-        minHeight: allStyles.minHeight || (props.minHeight as string) || undefined,
-        // Spacing defaults
-        paddingTop: allStyles.paddingTop || '60px',
-        paddingRight: allStyles.paddingRight || '20px',
-        paddingBottom: allStyles.paddingBottom || '60px',
-        paddingLeft: allStyles.paddingLeft || '20px',
-    };
+    // Map legacy alignment props to CSS variables
+    const justifyContent = mapAlign(props.verticalAlign);
+    const alignItems = mapAlign(props.horizontalAlign);
+    
+    if (justifyContent && !cssVars['--poly-justify-content']) {
+        cssVars['--poly-justify-content'] = justifyContent;
+    }
+    if (alignItems && !cssVars['--poly-align-items']) {
+        cssVars['--poly-align-items'] = alignItems;
+    }
+    if (props.direction && !cssVars['--poly-flex-direction']) {
+        cssVars['--poly-flex-direction'] = props.direction;
+    }
 
     return (
         <section
-            className={styles.section}
-            style={style}
+            className="poly-section"
+            style={cssVars as React.CSSProperties}
             data-component-id={component.id}
         >
             {children.length > 0 ? (
@@ -88,8 +80,8 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
                     />
                 ))
             ) : context === 'editor' ? (
-                <div className={styles.emptySection}>
-                    <span>+ Add content to this section</span>
+                <div className="poly-section__empty">
+                    + Add content to this section
                 </div>
             ) : null}
         </section>

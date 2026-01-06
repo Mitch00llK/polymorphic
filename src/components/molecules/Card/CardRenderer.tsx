@@ -1,7 +1,7 @@
 /**
  * Card Renderer
  *
- * Supports ALL control groups for maximum customization.
+ * Uses CSS classes + custom properties for clean DOM.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -10,9 +10,7 @@
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
-import { buildAllStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
-
-import styles from '../molecules.module.css';
+import { buildCSSVariables, buildElementVariables, type CSSVariableProps } from '../../../utils/cssVariables';
 
 interface PaddingObject {
     top?: string;
@@ -26,122 +24,69 @@ interface CardRendererProps {
     context?: 'editor' | 'preview';
 }
 
+interface CardProps extends CSSVariableProps {
+    title?: string;
+    description?: string;
+    footer?: string;
+    showHeader?: boolean;
+    showFooter?: boolean;
+    variant?: 'default' | 'ghost' | 'elevated';
+    padding?: PaddingObject | string;
+}
+
 /**
- * Renders a Card component.
+ * Renders a Card component with CSS variables.
  */
 export const CardRenderer: React.FC<CardRendererProps> = ({
     component,
     context = 'preview',
 }) => {
-    const props = (component.props || {}) as StyleableProps;
+    const props = (component.props || {}) as CardProps;
     const children = component.children || [];
 
-    const title = props.title as string;
-    const description = props.description as string;
-    const footer = props.footer as string;
+    const title = props.title;
+    const description = props.description;
+    const footer = props.footer;
     const showHeader = props.showHeader !== false;
     const showFooter = props.showFooter !== false;
-    const variant = (props.variant as string) || 'default';
+    const variant = props.variant || 'default';
 
-    // Build ALL styles from ALL control groups
-    const allStyles = buildAllStyles(props);
+    // Build CSS variables from props
+    const cssVars = buildCSSVariables(props) as Record<string, string | number | undefined>;
 
-    // Build element-specific styles
-    const titleStyle = buildElementStyles(props, 'title');
-    const descriptionStyle = buildElementStyles(props, 'description');
-    const footerStyle = buildElementStyles(props, 'footer');
+    // Build element-specific CSS variables
+    const titleVars = buildElementVariables(props, 'title');
+    const descriptionVars = buildElementVariables(props, 'description');
+    const footerVars = buildElementVariables(props, 'footer');
 
-    // Legacy padding support (object format from templates)
-    const legacyPadding = props.padding as PaddingObject | string | undefined;
-    let paddingStyles: React.CSSProperties = {};
-    if (!allStyles.paddingTop && !allStyles.paddingRight && 
-        !allStyles.paddingBottom && !allStyles.paddingLeft) {
-        if (legacyPadding) {
-            if (typeof legacyPadding === 'object') {
-                paddingStyles = {
-                    paddingTop: legacyPadding.top || '24px',
-                    paddingRight: legacyPadding.right || '24px',
-                    paddingBottom: legacyPadding.bottom || '24px',
-                    paddingLeft: legacyPadding.left || '24px',
-                };
-            } else {
-                paddingStyles = { padding: legacyPadding };
-            }
-        } else {
-            paddingStyles = { padding: '24px' };
-        }
+    // Handle legacy padding object
+    if (props.padding && typeof props.padding === 'object') {
+        const pad = props.padding;
+        const paddingValue = `${pad.top || '24px'} ${pad.right || '24px'} ${pad.bottom || '24px'} ${pad.left || '24px'}`;
+        cssVars['--poly-padding'] = paddingValue;
     }
 
-    // Card styles
-    const cardStyle: React.CSSProperties = {
-        ...allStyles,
-        boxSizing: 'border-box',
-        // Defaults
-        backgroundColor: allStyles.backgroundColor || '#ffffff',
-        borderRadius: allStyles.borderRadius || '8px',
-        ...paddingStyles,
-    };
-
-    // Handle border default
-    if (!allStyles.borderWidth && !allStyles.borderColor && variant !== 'ghost') {
-        cardStyle.border = '1px solid #e5e7eb';
-    }
-
-    // Variant-specific styles
-    switch (variant) {
-        case 'ghost':
-            cardStyle.backgroundColor = 'transparent';
-            cardStyle.border = 'none';
-            cardStyle.boxShadow = 'none';
-            break;
-        case 'elevated':
-            cardStyle.boxShadow = allStyles.boxShadow || '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
-            break;
-    }
-
-    // Title default styles
-    const finalTitleStyle: React.CSSProperties = {
-        margin: 0,
-        fontSize: '1.25rem',
-        fontWeight: '600',
-        lineHeight: '1.4',
-        marginBottom: '0.5rem',
-        ...titleStyle,
-    };
-
-    // Description default styles
-    const finalDescriptionStyle: React.CSSProperties = {
-        margin: 0,
-        fontSize: '0.875rem',
-        lineHeight: '1.5',
-        color: '#6b7280',
-        ...descriptionStyle,
-    };
-
-    // Footer default styles
-    const finalFooterStyle: React.CSSProperties = {
-        fontSize: '0.875rem',
-        lineHeight: '1.5',
-        color: '#6b7280',
-        marginTop: '1rem',
-        ...footerStyle,
-    };
+    // Build class names
+    const classNames = [
+        'poly-card',
+        variant !== 'default' && `poly-card--${variant}`,
+    ].filter(Boolean).join(' ');
 
     return (
         <div
-            className={styles.card}
-            style={cardStyle}
+            className={classNames}
+            style={cssVars as React.CSSProperties}
             data-component-id={component.id}
         >
             {showHeader && title && (
-                <div className={styles.cardHeader}>
-                    <h3 className={styles.cardTitle} style={finalTitleStyle}>{title}</h3>
+                <div className="poly-card__header">
+                    <h3 className="poly-card__title" style={titleVars}>{title}</h3>
                     {description && (
-                        <p className={styles.cardDescription} style={finalDescriptionStyle}>{description}</p>
+                        <p className="poly-card__description" style={descriptionVars}>{description}</p>
                     )}
                 </div>
             )}
-            <div className={styles.cardContent}>
+            <div className="poly-card__content">
                 {children.length > 0 ? (
                     children.map((child) => (
                         <ComponentRenderer
@@ -151,12 +96,12 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
                         />
                     ))
                 ) : context === 'editor' ? (
-                    <p className={styles.placeholder}>Add content here</p>
+                    <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.875rem' }}>Add content here</p>
                 ) : null}
             </div>
             {showFooter && footer && (
-                <div className={styles.cardFooter} style={finalFooterStyle}>
-                    <p style={{ margin: 0 }}>{footer}</p>
+                <div className="poly-card__footer" style={footerVars}>
+                    <p>{footer}</p>
                 </div>
             )}
         </div>

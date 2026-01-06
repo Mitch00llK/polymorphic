@@ -1,7 +1,7 @@
 /**
  * Text Renderer
  *
- * Supports ALL control groups for maximum customization.
+ * Uses CSS classes + custom properties for clean DOM.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -9,9 +9,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
-import { buildAllStyles, type StyleableProps } from '../../../utils/styleBuilder';
-
-import styles from '../atoms.module.css';
+import { buildCSSVariables, type CSSVariableProps } from '../../../utils/cssVariables';
 
 interface TextRendererProps {
     component: ComponentData;
@@ -19,32 +17,27 @@ interface TextRendererProps {
 }
 
 /**
- * Renders a Text component in the editor/preview.
+ * Renders a Text component with CSS variables.
  */
 export const TextRenderer: React.FC<TextRendererProps> = ({
     component,
 }) => {
-    const props = (component.props || {}) as StyleableProps;
+    const props = (component.props || {}) as CSSVariableProps & { content?: string; columns?: number };
 
-    const content = (props.content as string) || '<p>Enter your text here...</p>';
-    const columns = props.columns as number;
+    const content = props.content || '<p>Enter your text here...</p>';
 
-    // Build ALL styles from ALL control groups
-    const allStyles = buildAllStyles(props);
+    // Build CSS variables from props
+    const cssVars = buildCSSVariables(props);
 
-    const style: React.CSSProperties = {
-        ...allStyles,
-        // Multi-column support
-        columnCount: columns && columns > 1 ? columns : undefined,
-        // Reset default browser margins if no margin set
-        margin: (!allStyles.marginTop && !allStyles.marginBottom && 
-                 !allStyles.marginLeft && !allStyles.marginRight) ? 0 : undefined,
-    };
+    // Add column count as CSS variable if set
+    if (props.columns && props.columns > 1) {
+        (cssVars as Record<string, unknown>)['--poly-column-count'] = props.columns;
+    }
 
     return (
         <div
-            className={styles.text}
-            style={style}
+            className="poly-text"
+            style={cssVars}
             data-component-id={component.id}
             dangerouslySetInnerHTML={{ __html: content }}
         />
