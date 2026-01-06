@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "wp-scripts start",
-    "build": "wp-scripts build",
-    "build:dev": "wp-scripts build --mode=development",
+    "build": "wp-scripts build && npm run copy-assets",
+    "build:dev": "wp-scripts build --mode=development && npm run copy-assets",
+    "copy-assets": "cp build/index.js assets/admin/builder.js && cp build/index.css assets/admin/builder.css && cp build/index.asset.php assets/admin/builder.asset.php",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "wp-scripts lint-js src/",
     "lint:css": "wp-scripts lint-style src/**/*.css",

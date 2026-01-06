@@ -15,8 +15,10 @@
 
 .main {
     position: relative;
+    display: flex;
     flex: 1;
     min-height: 0; /* Important for flex children to scroll */
+    overflow: hidden;
 }
 
 .loading {

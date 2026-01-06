@@ -3,11 +3,10 @@
  */
 
 .canvas {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
+    flex: 1;
     display: flex;
     flex-direction: column;
+    align-items: center;
     overflow-y: auto;
     overflow-x: hidden;
     background-color: var(--polymorphic-color-gray-100);
@@ -19,11 +18,11 @@
 
 .viewport {
     width: 100%;
+    max-width: 100%;
     background-color: var(--polymorphic-color-white);
     border-radius: var(--polymorphic-border-radius-lg);
     box-shadow: var(--polymorphic-shadow-lg);
     min-height: 600px;
-    margin: 0 auto;
 }
 
 .empty {
