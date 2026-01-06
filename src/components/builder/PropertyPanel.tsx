@@ -9,6 +9,9 @@ import React, { useState } from 'react';
 import { X, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
+import { SpacingControl, FlexLayoutControl } from '../controls';
+import type { SpacingValue } from '../controls';
+import type { FlexLayoutValue } from '../controls';
 import type { ComponentType } from '../../types/components';
 
 import styles from './PropertyPanel.module.css';
@@ -283,16 +286,38 @@ export const PropertyPanel: React.FC = () => {
                                 placeholder="400px"
                             />
                         </ControlGroup>
-                        <ControlGroup title="Spacing">
-                            <TextControl
-                                label="Padding Top"
-                                value={(props.paddingTop as string) || '4rem'}
-                                onChange={(v) => handlePropChange('paddingTop', v)}
+                        <ControlGroup title="Padding">
+                            <SpacingControl
+                                label="Padding"
+                                value={{
+                                    top: (props.paddingTop as string) || '4rem',
+                                    right: (props.paddingRight as string) || '',
+                                    bottom: (props.paddingBottom as string) || '4rem',
+                                    left: (props.paddingLeft as string) || '',
+                                }}
+                                onChange={(v: SpacingValue) => {
+                                    handlePropChange('paddingTop', v.top);
+                                    handlePropChange('paddingRight', v.right);
+                                    handlePropChange('paddingBottom', v.bottom);
+                                    handlePropChange('paddingLeft', v.left);
+                                }}
                             />
-                            <TextControl
-                                label="Padding Bottom"
-                                value={(props.paddingBottom as string) || '4rem'}
-                                onChange={(v) => handlePropChange('paddingBottom', v)}
+                        </ControlGroup>
+                        <ControlGroup title="Margin">
+                            <SpacingControl
+                                label="Margin"
+                                value={{
+                                    top: (props.marginTop as string) || '',
+                                    right: (props.marginRight as string) || '',
+                                    bottom: (props.marginBottom as string) || '',
+                                    left: (props.marginLeft as string) || '',
+                                }}
+                                onChange={(v: SpacingValue) => {
+                                    handlePropChange('marginTop', v.top);
+                                    handlePropChange('marginRight', v.right);
+                                    handlePropChange('marginBottom', v.bottom);
+                                    handlePropChange('marginLeft', v.left);
+                                }}
                             />
                         </ControlGroup>
                     </>
@@ -302,6 +327,24 @@ export const PropertyPanel: React.FC = () => {
                 {type === 'container' && (
                     <>
                         <ControlGroup title="Layout">
+                            <FlexLayoutControl
+                                value={{
+                                    display: (props.display as FlexLayoutValue['display']) || 'block',
+                                    flexDirection: (props.flexDirection as FlexLayoutValue['flexDirection']) || 'column',
+                                    justifyContent: (props.justifyContent as FlexLayoutValue['justifyContent']) || 'flex-start',
+                                    alignItems: (props.alignItems as FlexLayoutValue['alignItems']) || 'stretch',
+                                    gap: (props.gap as string) || '',
+                                    flexWrap: (props.flexWrap as FlexLayoutValue['flexWrap']) || 'nowrap',
+                                }}
+                                onChange={(v) => {
+                                    if (v.display !== undefined) handlePropChange('display', v.display);
+                                    if (v.flexDirection !== undefined) handlePropChange('flexDirection', v.flexDirection);
+                                    if (v.justifyContent !== undefined) handlePropChange('justifyContent', v.justifyContent);
+                                    if (v.alignItems !== undefined) handlePropChange('alignItems', v.alignItems);
+                                    if (v.gap !== undefined) handlePropChange('gap', v.gap);
+                                    if (v.flexWrap !== undefined) handlePropChange('flexWrap', v.flexWrap);
+                                }}
+                            />
                             <SelectControl
                                 label="Width"
                                 value={(props.width as string) || 'default'}
@@ -313,16 +356,6 @@ export const PropertyPanel: React.FC = () => {
                                     { value: 'full', label: 'Full Width' },
                                 ]}
                             />
-                            <SelectControl
-                                label="Text Align"
-                                value={(props.textAlign as string) || 'left'}
-                                onChange={(v) => handlePropChange('textAlign', v)}
-                                options={[
-                                    { value: 'left', label: 'Left' },
-                                    { value: 'center', label: 'Center' },
-                                    { value: 'right', label: 'Right' },
-                                ]}
-                            />
                         </ControlGroup>
                         <ControlGroup title="Style">
                             <ColorControl
@@ -331,16 +364,38 @@ export const PropertyPanel: React.FC = () => {
                                 onChange={(v) => handlePropChange('backgroundColor', v)}
                             />
                         </ControlGroup>
-                        <ControlGroup title="Spacing">
-                            <TextControl
-                                label="Padding Top"
-                                value={(props.paddingTop as string) || ''}
-                                onChange={(v) => handlePropChange('paddingTop', v)}
+                        <ControlGroup title="Padding">
+                            <SpacingControl
+                                label="Padding"
+                                value={{
+                                    top: (props.paddingTop as string) || '',
+                                    right: (props.paddingRight as string) || '',
+                                    bottom: (props.paddingBottom as string) || '',
+                                    left: (props.paddingLeft as string) || '',
+                                }}
+                                onChange={(v: SpacingValue) => {
+                                    handlePropChange('paddingTop', v.top);
+                                    handlePropChange('paddingRight', v.right);
+                                    handlePropChange('paddingBottom', v.bottom);
+                                    handlePropChange('paddingLeft', v.left);
+                                }}
                             />
-                            <TextControl
-                                label="Padding Bottom"
-                                value={(props.paddingBottom as string) || ''}
-                                onChange={(v) => handlePropChange('paddingBottom', v)}
+                        </ControlGroup>
+                        <ControlGroup title="Margin">
+                            <SpacingControl
+                                label="Margin"
+                                value={{
+                                    top: (props.marginTop as string) || '',
+                                    right: (props.marginRight as string) || '',
+                                    bottom: (props.marginBottom as string) || '',
+                                    left: (props.marginLeft as string) || '',
+                                }}
+                                onChange={(v: SpacingValue) => {
+                                    handlePropChange('marginTop', v.top);
+                                    handlePropChange('marginRight', v.right);
+                                    handlePropChange('marginBottom', v.bottom);
+                                    handlePropChange('marginLeft', v.left);
+                                }}
                             />
                         </ControlGroup>
                     </>

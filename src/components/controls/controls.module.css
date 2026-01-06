@@ -1,0 +1,216 @@
+/**
+ * Controls Component Styles
+ *
+ * @package Polymorphic
+ * @since   1.0.0
+ */
+
+/* ===========================
+   Spacing Control
+=========================== */
+
+.spacingControl {
+    margin-bottom: var(--polymorphic-spacing-4);
+}
+
+.spacingHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--polymorphic-spacing-2);
+}
+
+.spacingLabel {
+    font-size: var(--polymorphic-font-size-xs);
+    font-weight: var(--polymorphic-font-weight-medium);
+    color: var(--polymorphic-color-gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.spacingActions {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-2);
+}
+
+.unitSelect {
+    padding: 2px 4px;
+    font-size: var(--polymorphic-font-size-xs);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+    cursor: pointer;
+}
+
+.linkButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+    color: var(--polymorphic-color-gray-400);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.linkButton:hover {
+    border-color: var(--polymorphic-color-primary);
+    color: var(--polymorphic-color-primary);
+}
+
+.linkButton.linked {
+    background: var(--polymorphic-color-primary);
+    border-color: var(--polymorphic-color-primary);
+    color: white;
+}
+
+.spacingInputs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--polymorphic-spacing-2);
+}
+
+.spacingInput {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.spacingInput input {
+    width: 100%;
+    padding: var(--polymorphic-spacing-2);
+    font-size: var(--polymorphic-font-size-sm);
+    text-align: center;
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+}
+
+.spacingInput input:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+    box-shadow: 0 0 0 2px var(--polymorphic-color-primary-light);
+}
+
+.spacingInput span {
+    font-size: 10px;
+    color: var(--polymorphic-color-gray-400);
+    text-transform: uppercase;
+}
+
+/* ===========================
+   Flex Layout Control
+=========================== */
+
+.flexControl {
+    display: flex;
+    flex-direction: column;
+    gap: var(--polymorphic-spacing-3);
+}
+
+.controlRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--polymorphic-spacing-2);
+}
+
+.controlLabel {
+    font-size: var(--polymorphic-font-size-xs);
+    font-weight: var(--polymorphic-font-weight-medium);
+    color: var(--polymorphic-color-gray-600);
+    min-width: 60px;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 2px;
+    background: var(--polymorphic-color-gray-100);
+    border-radius: var(--polymorphic-border-radius-sm);
+    padding: 2px;
+}
+
+.iconButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: transparent;
+    color: var(--polymorphic-color-gray-500);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.iconButton:hover {
+    background: var(--polymorphic-color-gray-200);
+    color: var(--polymorphic-color-gray-700);
+}
+
+.iconButton.active {
+    background: var(--polymorphic-color-white);
+    color: var(--polymorphic-color-primary);
+    box-shadow: var(--polymorphic-shadow-sm);
+}
+
+.textButton {
+    padding: 4px 8px;
+    border: none;
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: transparent;
+    font-size: var(--polymorphic-font-size-xs);
+    color: var(--polymorphic-color-gray-500);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.textButton:hover {
+    background: var(--polymorphic-color-gray-200);
+}
+
+.textButton.active {
+    background: var(--polymorphic-color-white);
+    color: var(--polymorphic-color-primary);
+    box-shadow: var(--polymorphic-shadow-sm);
+}
+
+.selectSmall {
+    flex: 1;
+    max-width: 120px;
+    padding: 4px 8px;
+    font-size: var(--polymorphic-font-size-xs);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+    cursor: pointer;
+}
+
+.selectSmall:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+}
+
+.inputSmall {
+    flex: 1;
+    max-width: 80px;
+    padding: 4px 8px;
+    font-size: var(--polymorphic-font-size-xs);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+}
+
+.inputSmall:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+    box-shadow: 0 0 0 2px var(--polymorphic-color-primary-light);
+}
