@@ -19,7 +19,7 @@ import { Canvas } from './components/builder/Canvas';
 import { Sidebar } from './components/builder/Sidebar';
 import { Toolbar } from './components/builder/Toolbar';
 import { PropertyPanel } from './components/builder/PropertyPanel';
-import { useBuilderStore } from './store/builderStore';
+import { useBuilderStore, useBuilderKeyboardShortcuts } from './store/builderStore';
 import { loadBuilderData } from './utils/api';
 import type { ComponentType } from './types/components';
 
@@ -43,6 +43,14 @@ const App: React.FC = () => {
     const [draggedType, setDraggedType] = useState<ComponentType | null>(null);
     const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false);
     const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+
+    // Keyboard shortcuts for undo/redo, delete, duplicate.
+    const { handleKeyDown } = useBuilderKeyboardShortcuts();
+
+    useEffect(() => {
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [handleKeyDown]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
