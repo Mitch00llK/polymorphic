@@ -14,7 +14,15 @@ export type ComponentType =
     | 'heading'
     | 'text'
     | 'image'
-    | 'button';
+    | 'button'
+    // UI Components (shadcn-style)
+    | 'card'
+    | 'accordion'
+    | 'tabs'
+    | 'alert'
+    | 'badge'
+    | 'avatar'
+    | 'separator';
 
 /**
  * Available breakpoints.

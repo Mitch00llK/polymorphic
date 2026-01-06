@@ -8,7 +8,22 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Type, Image, MousePointer2, Layout, Box, AlignLeft } from 'lucide-react';
+import {
+    Type,
+    Image,
+    MousePointer2,
+    Layout,
+    Box,
+    AlignLeft,
+    // UI component icons
+    CreditCard,
+    ChevronDown,
+    Layers,
+    AlertCircle,
+    Tag,
+    User,
+    Minus,
+} from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
 import type { ComponentType } from '../../types/components';
@@ -22,19 +37,31 @@ interface ComponentDefinition {
     type: ComponentType;
     label: string;
     icon: React.ReactNode;
-    category: 'layout' | 'content' | 'media' | 'actions';
+    category: 'layout' | 'content' | 'media' | 'actions' | 'ui';
 }
 
 /**
  * Available components to drag onto the canvas.
  */
 const COMPONENTS: ComponentDefinition[] = [
+    // Layout
     { type: 'section', label: 'Section', icon: <Layout size={20} />, category: 'layout' },
     { type: 'container', label: 'Container', icon: <Box size={20} />, category: 'layout' },
+    // Content
     { type: 'heading', label: 'Heading', icon: <Type size={20} />, category: 'content' },
     { type: 'text', label: 'Text', icon: <AlignLeft size={20} />, category: 'content' },
+    // Media
     { type: 'image', label: 'Image', icon: <Image size={20} />, category: 'media' },
+    // Actions
     { type: 'button', label: 'Button', icon: <MousePointer2 size={20} />, category: 'actions' },
+    // UI Components (shadcn-style)
+    { type: 'card', label: 'Card', icon: <CreditCard size={20} />, category: 'ui' },
+    { type: 'accordion', label: 'Accordion', icon: <ChevronDown size={20} />, category: 'ui' },
+    { type: 'tabs', label: 'Tabs', icon: <Layers size={20} />, category: 'ui' },
+    { type: 'alert', label: 'Alert', icon: <AlertCircle size={20} />, category: 'ui' },
+    { type: 'badge', label: 'Badge', icon: <Tag size={20} />, category: 'ui' },
+    { type: 'avatar', label: 'Avatar', icon: <User size={20} />, category: 'ui' },
+    { type: 'separator', label: 'Separator', icon: <Minus size={20} />, category: 'ui' },
 ];
 
 /**
@@ -101,6 +128,7 @@ export const Sidebar: React.FC = () => {
         content: 'Content',
         media: 'Media',
         actions: 'Actions',
+        ui: 'UI Components',
     };
 
     return (

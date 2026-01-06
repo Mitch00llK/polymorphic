@@ -135,6 +135,15 @@ final class Plugin {
             'text'      => \Polymorphic\Components\Text\Text::class,
             'image'     => \Polymorphic\Components\Image\Image::class,
             'button'    => \Polymorphic\Components\Button\Button::class,
+
+            // UI Components.
+            'card'      => \Polymorphic\Components\Card\Card::class,
+            'accordion' => \Polymorphic\Components\Accordion\Accordion::class,
+            'tabs'      => \Polymorphic\Components\Tabs\Tabs::class,
+            'alert'     => \Polymorphic\Components\Alert\Alert::class,
+            'badge'     => \Polymorphic\Components\Badge\Badge::class,
+            'avatar'    => \Polymorphic\Components\Avatar\Avatar::class,
+            'separator' => \Polymorphic\Components\Separator\Separator::class,
         ];
 
         /**

@@ -596,6 +596,205 @@ export const PropertyPanel: React.FC = () => {
                         </ControlGroup>
                     </>
                 )}
+
+                {/* Card Controls */}
+                {type === 'card' && (
+                    <>
+                        <ControlGroup title="Content">
+                            <TextControl
+                                label="Title"
+                                value={(props.title as string) || ''}
+                                onChange={(v) => handlePropChange('title', v)}
+                                placeholder="Card Title"
+                            />
+                            <TextareaControl
+                                label="Description"
+                                value={(props.description as string) || ''}
+                                onChange={(v) => handlePropChange('description', v)}
+                                rows={2}
+                            />
+                            <TextControl
+                                label="Footer"
+                                value={(props.footer as string) || ''}
+                                onChange={(v) => handlePropChange('footer', v)}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Style">
+                            <SelectControl
+                                label="Variant"
+                                value={(props.variant as string) || 'default'}
+                                onChange={(v) => handlePropChange('variant', v)}
+                                options={[
+                                    { value: 'default', label: 'Default' },
+                                    { value: 'outline', label: 'Outline' },
+                                    { value: 'ghost', label: 'Ghost' },
+                                ]}
+                            />
+                            <ColorControl
+                                label="Background"
+                                value={(props.backgroundColor as string) || ''}
+                                onChange={(v) => handlePropChange('backgroundColor', v)}
+                            />
+                        </ControlGroup>
+                    </>
+                )}
+
+                {/* Alert Controls */}
+                {type === 'alert' && (
+                    <>
+                        <ControlGroup title="Content">
+                            <TextControl
+                                label="Title"
+                                value={(props.title as string) || ''}
+                                onChange={(v) => handlePropChange('title', v)}
+                                placeholder="Alert Title"
+                            />
+                            <TextareaControl
+                                label="Description"
+                                value={(props.description as string) || ''}
+                                onChange={(v) => handlePropChange('description', v)}
+                                rows={2}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Style">
+                            <SelectControl
+                                label="Variant"
+                                value={(props.variant as string) || 'info'}
+                                onChange={(v) => handlePropChange('variant', v)}
+                                options={[
+                                    { value: 'info', label: 'Info' },
+                                    { value: 'success', label: 'Success' },
+                                    { value: 'warning', label: 'Warning' },
+                                    { value: 'error', label: 'Error' },
+                                ]}
+                            />
+                        </ControlGroup>
+                    </>
+                )}
+
+                {/* Badge Controls */}
+                {type === 'badge' && (
+                    <>
+                        <ControlGroup title="Content">
+                            <TextControl
+                                label="Text"
+                                value={(props.text as string) || 'Badge'}
+                                onChange={(v) => handlePropChange('text', v)}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Style">
+                            <SelectControl
+                                label="Variant"
+                                value={(props.variant as string) || 'default'}
+                                onChange={(v) => handlePropChange('variant', v)}
+                                options={[
+                                    { value: 'default', label: 'Default' },
+                                    { value: 'secondary', label: 'Secondary' },
+                                    { value: 'outline', label: 'Outline' },
+                                    { value: 'destructive', label: 'Destructive' },
+                                ]}
+                            />
+                        </ControlGroup>
+                    </>
+                )}
+
+                {/* Avatar Controls */}
+                {type === 'avatar' && (
+                    <>
+                        <ControlGroup title="Content">
+                            <TextControl
+                                label="Image URL"
+                                value={(props.src as string) || ''}
+                                onChange={(v) => handlePropChange('src', v)}
+                                placeholder="https://..."
+                            />
+                            <TextControl
+                                label="Alt Text"
+                                value={(props.alt as string) || ''}
+                                onChange={(v) => handlePropChange('alt', v)}
+                            />
+                            <TextControl
+                                label="Fallback Initials"
+                                value={(props.fallback as string) || 'U'}
+                                onChange={(v) => handlePropChange('fallback', v)}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Style">
+                            <SelectControl
+                                label="Size"
+                                value={(props.size as string) || 'medium'}
+                                onChange={(v) => handlePropChange('size', v)}
+                                options={[
+                                    { value: 'small', label: 'Small' },
+                                    { value: 'medium', label: 'Medium' },
+                                    { value: 'large', label: 'Large' },
+                                ]}
+                            />
+                        </ControlGroup>
+                    </>
+                )}
+
+                {/* Separator Controls */}
+                {type === 'separator' && (
+                    <>
+                        <ControlGroup title="Style">
+                            <SelectControl
+                                label="Orientation"
+                                value={(props.orientation as string) || 'horizontal'}
+                                onChange={(v) => handlePropChange('orientation', v)}
+                                options={[
+                                    { value: 'horizontal', label: 'Horizontal' },
+                                    { value: 'vertical', label: 'Vertical' },
+                                ]}
+                            />
+                            <ColorControl
+                                label="Color"
+                                value={(props.color as string) || ''}
+                                onChange={(v) => handlePropChange('color', v)}
+                            />
+                        </ControlGroup>
+                    </>
+                )}
+
+                {/* Accordion Controls */}
+                {type === 'accordion' && (
+                    <>
+                        <ControlGroup title="Settings">
+                            <SelectControl
+                                label="Type"
+                                value={(props.type as string) || 'single'}
+                                onChange={(v) => handlePropChange('type', v)}
+                                options={[
+                                    { value: 'single', label: 'Single (one open)' },
+                                    { value: 'multiple', label: 'Multiple' },
+                                ]}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Items" defaultOpen={false}>
+                            <p className={styles.hint}>
+                                Edit accordion items in the code props.
+                            </p>
+                        </ControlGroup>
+                    </>
+                )}
+
+                {/* Tabs Controls */}
+                {type === 'tabs' && (
+                    <>
+                        <ControlGroup title="Settings">
+                            <TextControl
+                                label="Default Tab ID"
+                                value={(props.defaultTab as string) || 'tab1'}
+                                onChange={(v) => handlePropChange('defaultTab', v)}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Tabs" defaultOpen={false}>
+                            <p className={styles.hint}>
+                                Edit tab items in the code props.
+                            </p>
+                        </ControlGroup>
+                    </>
+                )}
             </div>
 
             {/* Delete Button */}
