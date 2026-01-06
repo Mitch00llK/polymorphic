@@ -19,7 +19,7 @@ import {
     searchTemplates,
     type Template,
     type TemplateCategory,
-} from '../../data/templates';
+} from '../../data/templates/index';
 
 import styles from './TemplateLibrary.module.css';
 
