@@ -7,9 +7,23 @@
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
-import { buildStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../atoms.module.css';
+
+interface HeadingProps {
+    content?: string;
+    tag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+    fontSize?: string;
+    fontWeight?: string;
+    fontFamily?: string;
+    lineHeight?: string;
+    letterSpacing?: string;
+    textTransform?: string;
+    textAlign?: 'left' | 'center' | 'right';
+    color?: string;
+    marginTop?: string;
+    marginBottom?: string;
+}
 
 interface HeadingRendererProps {
     component: ComponentData;
@@ -22,32 +36,31 @@ interface HeadingRendererProps {
 export const HeadingRenderer: React.FC<HeadingRendererProps> = ({
     component,
 }) => {
-    const props = component.props as StyleableProps || {};
+    const props = (component.props || {}) as HeadingProps;
 
-    const tag = (props.tag as string) || 'h2';
-    const content = (props.content as string) || 'Heading';
+    const tag = props.tag || 'h2';
+    const content = props.content || 'Heading';
 
-    // Build styles from shared control groups
-    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
-
-    // Component-specific defaults
     const style: React.CSSProperties = {
-        ...sharedStyles,
-        // Default margin if not set
-        marginBottom: sharedStyles.marginBottom || '1rem',
+        fontSize: props.fontSize || undefined,
+        fontWeight: props.fontWeight || undefined,
+        fontFamily: props.fontFamily || undefined,
+        lineHeight: props.lineHeight || undefined,
+        letterSpacing: props.letterSpacing || undefined,
+        textTransform: props.textTransform as React.CSSProperties['textTransform'] || undefined,
+        textAlign: props.textAlign || undefined,
+        color: props.color || undefined,
+        marginTop: props.marginTop || undefined,
+        marginBottom: props.marginBottom || undefined,
+        // Reset default browser margins
+        margin: (props.marginTop || props.marginBottom) ? undefined : 0,
     };
-
-    const classNames = [
-        styles.heading,
-        styles[`heading--${tag}`],
-        props.textAlign && props.textAlign !== 'left' ? styles[`text-${props.textAlign}`] : '',
-    ].filter(Boolean).join(' ');
 
     const HeadingTag = tag as keyof JSX.IntrinsicElements;
 
     return (
         <HeadingTag
-            className={classNames}
+            className={styles.heading}
             style={style}
             data-component-id={component.id}
         >
@@ -57,4 +70,3 @@ export const HeadingRenderer: React.FC<HeadingRendererProps> = ({
 };
 
 export default HeadingRenderer;
-

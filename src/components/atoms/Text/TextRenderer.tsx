@@ -7,9 +7,22 @@
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
-import { buildStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../atoms.module.css';
+
+interface TextProps {
+    content?: string;
+    fontSize?: string;
+    fontWeight?: string;
+    fontFamily?: string;
+    lineHeight?: string;
+    letterSpacing?: string;
+    textAlign?: 'left' | 'center' | 'right' | 'justify';
+    color?: string;
+    marginTop?: string;
+    marginBottom?: string;
+    columns?: number;
+}
 
 interface TextRendererProps {
     component: ComponentData;
@@ -22,32 +35,28 @@ interface TextRendererProps {
 export const TextRenderer: React.FC<TextRendererProps> = ({
     component,
 }) => {
-    const props = component.props as StyleableProps || {};
+    const props = (component.props || {}) as TextProps;
 
-    const tag = (props.tag as string) || 'p';
-    const content = (props.content as string) || 'Enter your text here...';
+    const content = props.content || '<p>Enter your text here...</p>';
 
-    // Build styles from shared control groups
-    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
-
-    // Component-specific defaults
     const style: React.CSSProperties = {
-        ...sharedStyles,
-        // Default margin if not set
-        marginBottom: sharedStyles.marginBottom || '1rem',
+        fontSize: props.fontSize || undefined,
+        fontWeight: props.fontWeight || undefined,
+        fontFamily: props.fontFamily || undefined,
+        lineHeight: props.lineHeight || undefined,
+        letterSpacing: props.letterSpacing || undefined,
+        textAlign: props.textAlign || undefined,
+        color: props.color || undefined,
+        marginTop: props.marginTop || undefined,
+        marginBottom: props.marginBottom || undefined,
+        columnCount: props.columns && props.columns > 1 ? props.columns : undefined,
+        // Reset default browser margins
+        margin: (props.marginTop || props.marginBottom) ? undefined : 0,
     };
 
-    const classNames = [
-        styles.text,
-        props.variant && props.variant !== 'default' ? styles[`text--${props.variant}`] : '',
-        props.textAlign && props.textAlign !== 'left' ? styles[`text-${props.textAlign}`] : '',
-    ].filter(Boolean).join(' ');
-
-    const TextTag = tag as keyof JSX.IntrinsicElements;
-
     return (
-        <TextTag
-            className={classNames}
+        <div
+            className={styles.text}
             style={style}
             data-component-id={component.id}
             dangerouslySetInnerHTML={{ __html: content }}
@@ -56,4 +65,3 @@ export const TextRenderer: React.FC<TextRendererProps> = ({
 };
 
 export default TextRenderer;
-

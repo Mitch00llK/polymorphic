@@ -6,43 +6,54 @@
  */
 
 import React from 'react';
-
 import type { ComponentData } from '../../../types/components';
-import { buildStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../atoms.module.css';
 
+interface BadgeProps {
+    text?: string;
+    variant?: 'default' | 'success' | 'warning' | 'error' | 'info';
+    fontSize?: string;
+    fontWeight?: string;
+    backgroundColor?: string;
+    textColor?: string;
+    borderRadius?: string;
+}
+
 interface BadgeRendererProps {
     component: ComponentData;
-    context?: 'editor' | 'frontend';
+    context?: 'editor' | 'preview';
 }
 
 export const BadgeRenderer: React.FC<BadgeRendererProps> = ({
     component,
 }) => {
-    const props = component.props as StyleableProps || {};
+    const props = (component.props || {}) as BadgeProps;
 
-    const text = (props.text as string) || 'Badge';
-    const variant = (props.variant as string) || 'default';
-
-    // Build styles from shared control groups
-    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
-
-    const badgeClasses = [
-        styles.badge,
-        styles[`badge--${variant}`],
-    ].filter(Boolean).join(' ');
+    const text = props.text || 'Badge';
 
     const badgeStyle: React.CSSProperties = {
-        ...sharedStyles,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '4px 12px',
+        fontSize: props.fontSize || '12px',
+        fontWeight: props.fontWeight || '500',
+        backgroundColor: props.backgroundColor || '#f3f4f6',
+        color: props.textColor || '#374151',
+        borderRadius: props.borderRadius || '9999px',
+        lineHeight: '1.4',
     };
 
     return (
-        <span className={badgeClasses} style={badgeStyle} data-component-id={component.id}>
+        <span
+            className={styles.badge}
+            style={badgeStyle}
+            data-component-id={component.id}
+        >
             {text}
         </span>
     );
 };
 
 export default BadgeRenderer;
-

@@ -6,54 +6,90 @@
  */
 
 import React from 'react';
-
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../molecules.module.css';
 
+interface PaddingObject {
+    top?: string;
+    right?: string;
+    bottom?: string;
+    left?: string;
+}
+
+interface CardProps {
+    title?: string;
+    description?: string;
+    showHeader?: boolean;
+    showFooter?: boolean;
+    variant?: 'default' | 'elevated' | 'outlined';
+    backgroundColor?: string;
+    borderColor?: string;
+    borderWidth?: string;
+    borderRadius?: string;
+    boxShadow?: string;
+    padding?: PaddingObject | string;
+    width?: string;
+    minWidth?: string;
+    maxWidth?: string;
+}
+
 interface CardRendererProps {
     component: ComponentData;
-    context?: 'editor' | 'frontend';
+    context?: 'editor' | 'preview';
 }
 
 export const CardRenderer: React.FC<CardRendererProps> = ({
     component,
-    context = 'frontend',
+    context = 'preview',
 }) => {
-    const props = component.props as StyleableProps || {};
+    const props = (component.props || {}) as CardProps;
     const children = component.children || [];
 
-    const variant = (props.variant as string) || 'default';
-    const title = (props.title as string) || '';
-    const description = (props.description as string) || '';
-    const footer = (props.footer as string) || '';
-
-    // Build styles from shared control groups
-    const sharedStyles = buildStyles(props, ['box', 'size', 'spacing', 'position']);
-
-    // Build element-specific styles
-    const titleStyle = buildElementStyles(props, 'title');
-    const descriptionStyle = buildElementStyles(props, 'description');
-    const footerStyle = buildElementStyles(props, 'footer');
-
-    const cardClasses = [
-        styles.card,
-        variant !== 'default' && styles[`card--${variant}`],
-    ].filter(Boolean).join(' ');
+    // Handle padding
+    let paddingStyles: React.CSSProperties = {};
+    if (props.padding) {
+        if (typeof props.padding === 'object') {
+            paddingStyles = {
+                paddingTop: props.padding.top || '24px',
+                paddingRight: props.padding.right || '24px',
+                paddingBottom: props.padding.bottom || '24px',
+                paddingLeft: props.padding.left || '24px',
+            };
+        } else {
+            paddingStyles = { padding: props.padding };
+        }
+    } else {
+        paddingStyles = { padding: '24px' };
+    }
 
     const cardStyle: React.CSSProperties = {
-        ...sharedStyles,
+        backgroundColor: props.backgroundColor || '#ffffff',
+        borderRadius: props.borderRadius || '8px',
+        boxShadow: props.boxShadow || undefined,
+        width: props.width || undefined,
+        minWidth: props.minWidth || undefined,
+        maxWidth: props.maxWidth || undefined,
+        ...paddingStyles,
     };
 
+    // Handle border
+    if (props.borderColor || props.borderWidth) {
+        cardStyle.border = `${props.borderWidth || '1px'} solid ${props.borderColor || '#e5e7eb'}`;
+    }
+
     return (
-        <div className={cardClasses} style={cardStyle} data-component-id={component.id}>
-            {title && (
+        <div
+            className={styles.card}
+            style={cardStyle}
+            data-component-id={component.id}
+        >
+            {props.showHeader && props.title && (
                 <div className={styles.cardHeader}>
-                    <h3 className={styles.cardTitle} style={titleStyle}>{title}</h3>
-                    {description && (
-                        <p className={styles.cardDescription} style={descriptionStyle}>{description}</p>
+                    <h3 className={styles.cardTitle}>{props.title}</h3>
+                    {props.description && (
+                        <p className={styles.cardDescription}>{props.description}</p>
                     )}
                 </div>
             )}
@@ -66,20 +102,12 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
                             context={context}
                         />
                     ))
-                ) : (
-                    context === 'editor' && (
-                        <p className={styles.placeholder}>Add content here</p>
-                    )
-                )}
+                ) : context === 'editor' ? (
+                    <p className={styles.placeholder}>Add content here</p>
+                ) : null}
             </div>
-            {footer && (
-                <div className={styles.cardFooter} style={footerStyle}>
-                    <p>{footer}</p>
-                </div>
-            )}
         </div>
     );
 };
 
 export default CardRenderer;
-
