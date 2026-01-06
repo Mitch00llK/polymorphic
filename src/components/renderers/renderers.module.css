@@ -25,6 +25,16 @@
 .sectionInner {
     max-width: 1200px;
     margin: 0 auto;
+    min-height: 60px;
+    transition: background-color var(--polymorphic-transition-fast),
+        outline var(--polymorphic-transition-fast);
+}
+
+/* Droppable target state */
+.isDropTarget {
+    outline: 2px dashed var(--polymorphic-color-primary);
+    outline-offset: -2px;
+    background-color: var(--polymorphic-color-primary-light) !important;
 }
 
 /* Container */

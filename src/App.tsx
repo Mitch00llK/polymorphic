@@ -95,18 +95,43 @@ const App: React.FC = () => {
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
+        if (!over) {
+            setActiveId(null);
+            setDraggedType(null);
+            return;
+        }
+
+        // Check if dropping into a container (Section or Container).
+        const isContainerDrop = over.data.current?.type === 'container-drop-zone';
+        const containerId = over.data.current?.containerId as string | undefined;
+
         // New component from sidebar.
         if (active.data.current?.type === 'new-component') {
             const componentType = active.data.current.componentType as ComponentType;
-            addComponent(componentType);
-        }
-        // Reordering existing components.
-        else if (over && active.id !== over.id) {
-            const oldIndex = components.findIndex((c) => c.id === active.id);
-            const newIndex = components.findIndex((c) => c.id === over.id);
 
-            if (oldIndex !== -1 && newIndex !== -1) {
-                moveComponent(String(active.id), null, newIndex);
+            if (isContainerDrop && containerId) {
+                // Add as child of container.
+                addComponent(componentType, containerId);
+            } else {
+                // Add to root level.
+                addComponent(componentType);
+            }
+        }
+        // Moving existing components.
+        else if (active.id !== over.id) {
+            const activeId = String(active.id);
+
+            if (isContainerDrop && containerId) {
+                // Move into container.
+                moveComponent(activeId, containerId, 0);
+            } else {
+                // Reordering at root level.
+                const oldIndex = components.findIndex((c) => c.id === active.id);
+                const newIndex = components.findIndex((c) => c.id === over.id);
+
+                if (oldIndex !== -1 && newIndex !== -1) {
+                    moveComponent(activeId, null, newIndex);
+                }
             }
         }
 

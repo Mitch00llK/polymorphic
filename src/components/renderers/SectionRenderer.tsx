@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { useDroppable } from '@dnd-kit/core';
 import type { ComponentData } from '../../types/components';
 import { renderChildren } from './ComponentRenderer';
 
@@ -25,6 +26,15 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
 }) => {
     const props = component.props || {};
 
+    const { setNodeRef, isOver } = useDroppable({
+        id: `drop-${component.id}`,
+        data: {
+            type: 'container-drop-zone',
+            containerId: component.id,
+            accepts: ['heading', 'text', 'image', 'button', 'container'],
+        },
+    });
+
     const style: React.CSSProperties = {
         backgroundColor: props.backgroundColor || undefined,
         backgroundImage: props.backgroundImage ? `url(${props.backgroundImage})` : undefined,
@@ -40,19 +50,26 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
         props.style && props.style !== 'default' ? styles[`section--${props.style}`] : '',
     ].filter(Boolean).join(' ');
 
+    const hasChildren = component.children && component.children.length > 0;
+
     return (
         <section
             className={classNames}
             style={style}
             data-component-id={component.id}
         >
-            <div className={styles.sectionInner}>
-                {component.children && component.children.length > 0 ? (
+            <div
+                ref={context === 'editor' ? setNodeRef : undefined}
+                className={`${styles.sectionInner} ${isOver && context === 'editor' ? styles.isDropTarget : ''}`}
+            >
+                {hasChildren ? (
                     renderChildren(component.children, context)
                 ) : (
-                    <div className={styles.dropZone}>
-                        Drop components here
-                    </div>
+                    context === 'editor' && (
+                        <div className={styles.dropZone}>
+                            Drop components here
+                        </div>
+                    )
                 )}
             </div>
         </section>

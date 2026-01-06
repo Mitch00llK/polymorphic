@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { useDroppable } from '@dnd-kit/core';
 import type { ComponentData } from '../../types/components';
 import { renderChildren } from './ComponentRenderer';
 
@@ -24,6 +25,15 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
     context,
 }) => {
     const props = component.props || {};
+
+    const { setNodeRef, isOver } = useDroppable({
+        id: `drop-${component.id}`,
+        data: {
+            type: 'container-drop-zone',
+            containerId: component.id,
+            accepts: ['heading', 'text', 'image', 'button'],
+        },
+    });
 
     const style: React.CSSProperties = {
         maxWidth: props.maxWidth || undefined,
@@ -46,20 +56,26 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
     const classNames = [
         styles.container,
         props.width && props.width !== 'default' ? styles[`container--${props.width}`] : '',
+        isOver && context === 'editor' ? styles.isDropTarget : '',
     ].filter(Boolean).join(' ');
+
+    const hasChildren = component.children && component.children.length > 0;
 
     return (
         <div
+            ref={context === 'editor' ? setNodeRef : undefined}
             className={classNames}
             style={style}
             data-component-id={component.id}
         >
-            {component.children && component.children.length > 0 ? (
+            {hasChildren ? (
                 renderChildren(component.children, context)
             ) : (
-                <div className={styles.dropZone}>
-                    Drop components here
-                </div>
+                context === 'editor' && (
+                    <div className={styles.dropZone}>
+                        Drop components here
+                    </div>
+                )
             )}
         </div>
     );
