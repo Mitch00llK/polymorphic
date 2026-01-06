@@ -7,6 +7,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -22,26 +23,22 @@ export const ButtonRenderer: React.FC<ButtonRendererProps> = ({
     component,
     context,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
-    const text = props.text || 'Click Me';
-    const url = props.url || '#';
+    const text = (props.text as string) || 'Click Me';
+    const url = (props.url as string) || '#';
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['typography', 'box', 'size', 'spacing', 'position']);
+
+    // Component-specific styles
     const style: React.CSSProperties = {
-        backgroundColor: props.backgroundColor || undefined,
-        color: props.textColor || undefined,
-        borderColor: props.borderColor || undefined,
-        borderRadius: props.borderRadius || undefined,
-        fontSize: props.fontSize || undefined,
-        fontWeight: props.fontWeight || undefined,
-        paddingTop: props.paddingY || undefined,
-        paddingBottom: props.paddingY || undefined,
-        paddingLeft: props.paddingX || undefined,
-        paddingRight: props.paddingX || undefined,
-        marginTop: props.marginTop || undefined,
-        marginBottom: props.marginBottom || undefined,
+        ...sharedStyles,
+        // Handle text color specifically for buttons
+        color: (props.textColor as string) || sharedStyles.color,
+        // Full width handling
         display: props.fullWidth ? 'block' : 'inline-flex',
-        width: props.fullWidth ? '100%' : undefined,
+        width: props.fullWidth ? '100%' : sharedStyles.width,
     };
 
     const classNames = [

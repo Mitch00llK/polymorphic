@@ -12,6 +12,7 @@ import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { ChevronDown } from 'lucide-react';
 
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -29,7 +30,7 @@ interface AccordionRendererProps {
 export const AccordionRenderer: React.FC<AccordionRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
     const items = (props.items as AccordionItem[]) || [
         { id: '1', title: 'Accordion Item 1', content: 'Content for item 1' },
@@ -38,11 +39,19 @@ export const AccordionRenderer: React.FC<AccordionRendererProps> = ({
     const type = (props.type as 'single' | 'multiple') || 'single';
     const defaultValue = (props.defaultValue as string) || items[0]?.id;
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
+
+    const accordionStyle: React.CSSProperties = {
+        ...sharedStyles,
+    };
+
     return (
         <AccordionPrimitive.Root
             type={type}
             defaultValue={type === 'single' ? defaultValue : undefined}
             className={styles.accordion}
+            style={accordionStyle}
             data-component-id={component.id}
         >
             {items.map((item) => (

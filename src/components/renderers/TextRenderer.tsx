@@ -7,6 +7,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -21,20 +22,19 @@ interface TextRendererProps {
 export const TextRenderer: React.FC<TextRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
-    const tag = props.tag || 'p';
-    const content = props.content || 'Enter your text here...';
+    const tag = (props.tag as string) || 'p';
+    const content = (props.content as string) || 'Enter your text here...';
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
+
+    // Component-specific defaults
     const style: React.CSSProperties = {
-        fontSize: props.fontSize || undefined,
-        fontWeight: props.fontWeight || undefined,
-        color: props.color || undefined,
-        textAlign: (props.textAlign as React.CSSProperties['textAlign']) || undefined,
-        marginTop: props.marginTop || undefined,
-        marginBottom: props.marginBottom || '1rem',
-        lineHeight: props.lineHeight || undefined,
-        letterSpacing: props.letterSpacing || undefined,
+        ...sharedStyles,
+        // Default margin if not set
+        marginBottom: sharedStyles.marginBottom || '1rem',
     };
 
     const classNames = [

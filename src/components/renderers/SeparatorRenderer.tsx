@@ -8,6 +8,7 @@
 import React from 'react';
 
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -19,9 +20,12 @@ interface SeparatorRendererProps {
 export const SeparatorRenderer: React.FC<SeparatorRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
     const orientation = (props.orientation as string) || 'horizontal';
+
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['box', 'spacing', 'position']);
 
     const separatorClasses = [
         styles.separator,
@@ -29,8 +33,9 @@ export const SeparatorRenderer: React.FC<SeparatorRendererProps> = ({
     ].filter(Boolean).join(' ');
 
     const separatorStyle: React.CSSProperties = {
-        ...(props.color && { backgroundColor: props.color as string }),
-        ...(props.margin && { margin: props.margin as string }),
+        ...sharedStyles,
+        // Use backgroundColor for color if set via color prop
+        backgroundColor: sharedStyles.backgroundColor || (props.color as string),
     };
 
     return (

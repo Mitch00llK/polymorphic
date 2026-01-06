@@ -7,6 +7,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -21,20 +22,19 @@ interface HeadingRendererProps {
 export const HeadingRenderer: React.FC<HeadingRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
-    const tag = props.tag || 'h2';
-    const content = props.content || 'Heading';
+    const tag = (props.tag as string) || 'h2';
+    const content = (props.content as string) || 'Heading';
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
+
+    // Component-specific defaults
     const style: React.CSSProperties = {
-        fontSize: props.fontSize || undefined,
-        fontWeight: props.fontWeight || undefined,
-        color: props.color || undefined,
-        textAlign: (props.textAlign as React.CSSProperties['textAlign']) || undefined,
-        marginTop: props.marginTop || undefined,
-        marginBottom: props.marginBottom || '1rem',
-        lineHeight: props.lineHeight || undefined,
-        letterSpacing: props.letterSpacing || undefined,
+        ...sharedStyles,
+        // Default margin if not set
+        marginBottom: sharedStyles.marginBottom || '1rem',
     };
 
     const classNames = [

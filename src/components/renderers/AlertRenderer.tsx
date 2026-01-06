@@ -9,6 +9,7 @@ import React from 'react';
 import { AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -28,7 +29,7 @@ const variantIcons = {
 export const AlertRenderer: React.FC<AlertRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
     const variant = (props.variant as keyof typeof variantIcons) || 'default';
     const title = (props.title as string) || '';
@@ -36,14 +37,22 @@ export const AlertRenderer: React.FC<AlertRendererProps> = ({
 
     const Icon = variantIcons[variant] || variantIcons.default;
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
+
     const alertClasses = [
         styles.alert,
         styles[`alert--${variant}`],
     ].filter(Boolean).join(' ');
 
+    const alertStyle: React.CSSProperties = {
+        ...sharedStyles,
+    };
+
     return (
         <div
             className={alertClasses}
+            style={alertStyle}
             role="alert"
             data-component-id={component.id}
         >

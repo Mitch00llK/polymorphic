@@ -7,6 +7,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -21,20 +22,25 @@ interface ImageRendererProps {
 export const ImageRenderer: React.FC<ImageRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
+
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['size', 'box', 'spacing', 'position']);
 
     const figureStyle: React.CSSProperties = {
-        marginTop: props.marginTop || undefined,
-        marginBottom: props.marginBottom || '1rem',
-        maxWidth: props.maxWidth || '100%',
+        ...sharedStyles,
+        // Default margin if not set
+        marginBottom: sharedStyles.marginBottom || '1rem',
+        maxWidth: sharedStyles.maxWidth || '100%',
     };
 
     const imgStyle: React.CSSProperties = {
         objectFit: (props.objectFit as React.CSSProperties['objectFit']) || 'cover',
-        objectPosition: props.objectPosition || 'center',
-        borderRadius: props.borderRadius || undefined,
+        objectPosition: (props.objectPosition as string) || 'center',
+        borderRadius: sharedStyles.borderRadius,
         width: '100%',
         height: 'auto',
+        aspectRatio: sharedStyles.aspectRatio,
     };
 
     const classNames = [
@@ -65,14 +71,14 @@ export const ImageRenderer: React.FC<ImageRendererProps> = ({
             data-component-id={component.id}
         >
             <img
-                src={props.src}
-                alt={props.alt || ''}
+                src={props.src as string}
+                alt={(props.alt as string) || ''}
                 style={imgStyle}
                 loading="lazy"
             />
             {props.caption && (
                 <figcaption className={styles.imageCaption}>
-                    {props.caption}
+                    {props.caption as string}
                 </figcaption>
             )}
         </figure>
