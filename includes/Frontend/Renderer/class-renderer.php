@@ -10,6 +10,7 @@ namespace Polymorphic\Frontend;
 
 use Polymorphic\Components\Component_Registry;
 use Polymorphic\Cache\Transient_Cache;
+use Polymorphic\Settings\Global_Settings;
 
 /**
  * Renders builder content on the frontend.
@@ -58,6 +59,26 @@ class Renderer {
 
         // Disable wpautop for builder content.
         add_action( 'wp', [ $this, 'maybe_disable_wpautop' ] );
+
+        // Output global CSS variables in head.
+        add_action( 'wp_head', [ $this, 'output_global_css_variables' ], 5 );
+    }
+
+    /**
+     * Output global CSS variables in the head.
+     *
+     * @since 1.0.0
+     */
+    public function output_global_css_variables(): void {
+        $global_settings = Global_Settings::get_instance();
+        $css = $global_settings->generate_css_variables();
+
+        if ( ! empty( $css ) ) {
+            echo '<style id="polymorphic-global-css">' . "\n";
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            echo $css;
+            echo '</style>' . "\n";
+        }
     }
 
     /**

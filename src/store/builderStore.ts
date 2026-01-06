@@ -41,6 +41,7 @@ interface BuilderActions {
     addComponent: (type: ComponentType, parentId?: string, index?: number) => string;
     updateComponent: (id: string, updates: Partial<ComponentData>) => void;
     removeComponent: (id: string) => void;
+    deleteComponent: (id: string) => void; // Alias for removeComponent
     moveComponent: (id: string, newParentId: string | null, newIndex: number) => void;
     duplicateComponent: (id: string) => string | null;
 
@@ -103,6 +104,92 @@ const COMPONENT_DEFAULTS: Record<ComponentType, Partial<ComponentData['props']>>
         variant: 'solid',
         size: 'medium',
     },
+    // UI Components (shadcn-style)
+    card: {
+        title: 'Card Title',
+        description: 'Card description goes here.',
+        showHeader: true,
+        showFooter: false,
+        variant: 'default',
+    },
+    accordion: {
+        type: 'single',
+        collapsible: true,
+        items: [
+            { title: 'Item 1', content: 'Content for item 1' },
+            { title: 'Item 2', content: 'Content for item 2' },
+        ],
+    },
+    tabs: {
+        defaultValue: 'tab1',
+        tabs: [
+            { value: 'tab1', label: 'Tab 1', content: 'Content for tab 1' },
+            { value: 'tab2', label: 'Tab 2', content: 'Content for tab 2' },
+        ],
+    },
+    alert: {
+        title: 'Alert Title',
+        description: 'Alert description text.',
+        variant: 'info',
+    },
+    badge: {
+        text: 'Badge',
+        variant: 'default',
+    },
+    avatar: {
+        src: '',
+        alt: 'Avatar',
+        fallback: 'AB',
+        size: 'md',
+    },
+    separator: {
+        orientation: 'horizontal',
+        decorative: true,
+    },
+    // Marketing Blocks
+    heroBlock: {
+        title: 'Build something amazing',
+        subtitle: 'Create beautiful, responsive websites with our intuitive page builder.',
+        primaryButtonText: 'Get Started',
+        primaryButtonUrl: '#',
+        secondaryButtonText: 'Learn More',
+        secondaryButtonUrl: '#',
+        showSecondaryButton: true,
+        alignment: 'center',
+    },
+    featuresBlock: {
+        title: 'Why Choose Us',
+        subtitle: 'Everything you need to build amazing websites',
+        columns: 3,
+        features: [
+            { icon: 'zap', title: 'Lightning Fast', description: 'Optimized for speed and performance' },
+            { icon: 'shield', title: 'Secure', description: 'Built with security best practices' },
+            { icon: 'rocket', title: 'Easy to Use', description: 'Intuitive drag-and-drop interface' },
+        ],
+    },
+    pricingBlock: {
+        title: 'Simple, Transparent Pricing',
+        subtitle: 'Choose the plan that works for you',
+        plans: [
+            { name: 'Starter', price: '$9', period: '/month', description: 'Perfect for small projects', features: ['5 pages', 'Basic components'], buttonText: 'Get Started', buttonUrl: '#', featured: false },
+            { name: 'Pro', price: '$29', period: '/month', description: 'Best for growing businesses', features: ['Unlimited pages', 'All components'], buttonText: 'Get Started', buttonUrl: '#', featured: true },
+        ],
+    },
+    faqBlock: {
+        title: 'Frequently Asked Questions',
+        subtitle: 'Find answers to common questions',
+        items: [
+            { question: 'How do I get started?', answer: 'Simply sign up and start building.' },
+            { question: 'Is there a free trial?', answer: 'Yes, we offer a 14-day free trial.' },
+        ],
+    },
+    ctaBlock: {
+        title: 'Ready to get started?',
+        description: 'Join thousands of users building amazing websites.',
+        buttonText: 'Start Building Now',
+        buttonUrl: '#',
+        variant: 'default',
+    },
 };
 
 /**
@@ -116,8 +203,22 @@ const generateId = (type: ComponentType): string => {
         text: 'txt',
         image: 'img',
         button: 'btn',
+        // UI Components
+        card: 'crd',
+        accordion: 'acc',
+        tabs: 'tab',
+        alert: 'alt',
+        badge: 'bdg',
+        avatar: 'avt',
+        separator: 'sep',
+        // Marketing Blocks
+        heroBlock: 'hero',
+        featuresBlock: 'feat',
+        pricingBlock: 'pric',
+        faqBlock: 'faq',
+        ctaBlock: 'cta',
     };
-    return `${prefixes[type]}_${nanoid(8)}`;
+    return `${prefixes[type] || type}_${nanoid(8)}`;
 };
 
 /**
@@ -259,6 +360,15 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
 
             // Remove component.
             removeComponent: (id) => {
+                set((state) => ({
+                    components: removeFromTree(state.components, id),
+                    selectedId: state.selectedId === id ? null : state.selectedId,
+                    isDirty: true,
+                }));
+            },
+
+            // Alias for removeComponent.
+            deleteComponent: (id) => {
                 set((state) => ({
                     components: removeFromTree(state.components, id),
                     selectedId: state.selectedId === id ? null : state.selectedId,

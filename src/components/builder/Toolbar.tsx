@@ -5,11 +5,12 @@
  * @since   1.0.0
  */
 
-import React from 'react';
-import { ArrowLeft, Undo2, Redo2, Monitor, Tablet, Smartphone, Save, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Undo2, Redo2, Monitor, Tablet, Smartphone, Save, Settings } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
 import { saveBuilderData } from '../../utils/api';
+import { GlobalSettingsPanel } from './GlobalSettingsPanel';
 import type { Breakpoint } from '../../types/components';
 
 import styles from './Toolbar.module.css';
@@ -18,6 +19,7 @@ import styles from './Toolbar.module.css';
  * Top toolbar with save, undo/redo, and responsive controls.
  */
 export const Toolbar: React.FC = () => {
+    const [showGlobalSettings, setShowGlobalSettings] = useState(false);
     const {
         components,
         currentBreakpoint,
@@ -132,6 +134,14 @@ export const Toolbar: React.FC = () => {
                 </div>
 
                 <button
+                    className={styles.settingsButton}
+                    onClick={() => setShowGlobalSettings(true)}
+                    title="Global Settings"
+                >
+                    <Settings size={18} />
+                </button>
+
+                <button
                     className={styles.saveButton}
                     onClick={handleSave}
                     disabled={isSaving || !isDirty}
@@ -140,6 +150,12 @@ export const Toolbar: React.FC = () => {
                     <span>{isSaving ? 'Saving...' : 'Save'}</span>
                 </button>
             </div>
+
+            {/* Global Settings Panel */}
+            <GlobalSettingsPanel
+                isOpen={showGlobalSettings}
+                onClose={() => setShowGlobalSettings(false)}
+            />
         </header>
     );
 };

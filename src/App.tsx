@@ -1,10 +1,3 @@
-/**
- * Main App Component
- *
- * @package Polymorphic
- * @since   1.0.0
- */
-
 import React, { useEffect, useState } from 'react';
 import {
     DndContext,
@@ -20,6 +13,7 @@ import {
 import {
     sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
+import { PanelLeftOpen, PanelRightOpen } from 'lucide-react';
 
 import { Canvas } from './components/builder/Canvas';
 import { Sidebar } from './components/builder/Sidebar';
@@ -47,6 +41,8 @@ const App: React.FC = () => {
 
     const [activeId, setActiveId] = useState<string | null>(null);
     const [draggedType, setDraggedType] = useState<ComponentType | null>(null);
+    const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false);
+    const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -167,14 +163,42 @@ const App: React.FC = () => {
 
                 {/* Main Content Area */}
                 <div className={styles.main}>
+                    {/* Left Panel Toggle (when collapsed) */}
+                    {leftPanelCollapsed && (
+                        <button
+                            className={`${styles.panelToggle} ${styles.panelToggleLeft}`}
+                            onClick={() => setLeftPanelCollapsed(false)}
+                            title="Show components panel"
+                        >
+                            <PanelLeftOpen size={18} className={styles.panelToggleIcon} />
+                        </button>
+                    )}
+
                     {/* Left Sidebar - Component Library */}
-                    <Sidebar />
+                    <Sidebar
+                        isCollapsed={leftPanelCollapsed}
+                        onToggle={() => setLeftPanelCollapsed(!leftPanelCollapsed)}
+                    />
 
                     {/* Center - Canvas */}
                     <Canvas />
 
                     {/* Right - Property Panel */}
-                    <PropertyPanel />
+                    <PropertyPanel
+                        isCollapsed={rightPanelCollapsed}
+                        onToggle={() => setRightPanelCollapsed(!rightPanelCollapsed)}
+                    />
+
+                    {/* Right Panel Toggle (when collapsed) */}
+                    {rightPanelCollapsed && (
+                        <button
+                            className={`${styles.panelToggle} ${styles.panelToggleRight}`}
+                            onClick={() => setRightPanelCollapsed(false)}
+                            title="Show properties panel"
+                        >
+                            <PanelRightOpen size={18} className={styles.panelToggleIcon} />
+                        </button>
+                    )}
                 </div>
             </div>
 

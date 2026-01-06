@@ -18,6 +18,7 @@ import {
     // UI component icons
     CreditCard,
     ChevronDown,
+    ChevronLeft,
     Layers,
     AlertCircle,
     Tag,
@@ -120,7 +121,12 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({
 /**
  * Sidebar component with draggable component library.
  */
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+    isCollapsed?: boolean;
+    onToggle?: () => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggle }) => {
     const { addComponent } = useBuilderStore();
 
     const handleAddComponent = (type: ComponentType) => {
@@ -144,11 +150,27 @@ export const Sidebar: React.FC = () => {
         blocks: 'Marketing Blocks',
     };
 
+    const sidebarClasses = [
+        styles.sidebar,
+        isCollapsed && styles.sidebarCollapsed,
+    ].filter(Boolean).join(' ');
+
     return (
-        <aside className={styles.sidebar}>
+        <aside className={sidebarClasses}>
             <div className={styles.header}>
-                <h2 className={styles.title}>Components</h2>
-                <p className={styles.hint}>Drag or click to add</p>
+                <div>
+                    <h2 className={styles.title}>Components</h2>
+                    <p className={styles.hint}>Drag or click to add</p>
+                </div>
+                {onToggle && (
+                    <button
+                        className={styles.collapseButton}
+                        onClick={onToggle}
+                        title="Collapse panel"
+                    >
+                        <ChevronLeft size={16} />
+                    </button>
+                )}
             </div>
 
             <div className={styles.content}>
@@ -174,4 +196,3 @@ export const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
-
