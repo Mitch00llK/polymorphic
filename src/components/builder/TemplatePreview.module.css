@@ -1,0 +1,37 @@
+/**
+ * Template Preview Styles
+ *
+ * @package Polymorphic
+ * @since   1.0.0
+ */
+
+.previewContainer {
+    position: relative;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.previewScaler {
+    position: relative;
+    pointer-events: none;
+    user-select: none;
+}
+
+.previewContent {
+    min-height: 100px;
+}
+
+/* Override some styles for preview context */
+.previewContent * {
+    pointer-events: none !important;
+    cursor: default !important;
+}
+
+/* Ensure images load properly in preview */
+.previewContent img {
+    max-width: 100%;
+    height: auto;
+}
+

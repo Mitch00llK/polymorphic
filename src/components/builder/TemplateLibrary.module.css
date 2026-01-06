@@ -228,9 +228,10 @@
 
 .templateThumbnail {
     position: relative;
-    aspect-ratio: 16 / 10;
-    background: var(--poly-bg-primary, #1a1a2e);
+    height: 160px;
+    background: #ffffff;
     overflow: hidden;
+    border-bottom: 1px solid var(--poly-border, #2d2d44);
 }
 
 .templateThumbnail img {
@@ -452,37 +453,9 @@
 
 .previewFrame {
     height: 100%;
-    background: var(--poly-bg-secondary, #16162a);
+    background: #ffffff;
     border-radius: 12px;
     border: 1px solid var(--poly-border, #2d2d44);
-    overflow: hidden;
-}
-
-.previewContent {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.previewPlaceholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    color: var(--poly-text-tertiary, #5a5a7a);
-}
-
-.previewPlaceholder svg {
-    opacity: 0.5;
-}
-
-.previewPlaceholder span {
-    font-size: 16px;
-}
-
-.previewHint {
-    font-size: 13px !important;
-    opacity: 0.7;
+    overflow: auto;
 }
 
