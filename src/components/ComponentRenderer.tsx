@@ -2,6 +2,7 @@
  * Component Renderer Index
  *
  * Central registry for all component renderers.
+ * Wraps components with SelectableElement in editor mode.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -9,6 +10,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../types/components';
+import { SelectableElement } from './builder/SelectableElement';
 
 // Atoms
 import {
@@ -41,34 +43,47 @@ import {
 } from './organisms';
 
 /**
+ * Context type - 'editor' for builder, 'preview' or 'frontend' for read-only.
+ */
+type RenderContext = 'editor' | 'preview' | 'frontend';
+
+/**
+ * Base renderer props type.
+ */
+interface RendererProps {
+    component: ComponentData;
+    context?: RenderContext;
+}
+
+/**
  * Component renderer map.
  */
-const renderers: Record<string, React.FC<{ component: ComponentData; context: 'editor' | 'preview' }>> = {
+const renderers: Record<string, React.FC<RendererProps>> = {
     // Layout (Organisms)
-    section: SectionRenderer,
-    container: ContainerRenderer,
+    section: SectionRenderer as React.FC<RendererProps>,
+    container: ContainerRenderer as React.FC<RendererProps>,
 
     // Content (Atoms)
-    heading: HeadingRenderer,
-    text: TextRenderer,
-    image: ImageRenderer,
-    button: ButtonRenderer,
-    badge: BadgeRenderer,
-    avatar: AvatarRenderer,
-    separator: SeparatorRenderer,
+    heading: HeadingRenderer as React.FC<RendererProps>,
+    text: TextRenderer as React.FC<RendererProps>,
+    image: ImageRenderer as React.FC<RendererProps>,
+    button: ButtonRenderer as React.FC<RendererProps>,
+    badge: BadgeRenderer as React.FC<RendererProps>,
+    avatar: AvatarRenderer as React.FC<RendererProps>,
+    separator: SeparatorRenderer as React.FC<RendererProps>,
 
     // UI Components (Molecules)
-    card: CardRenderer,
-    accordion: AccordionRenderer,
-    tabs: TabsRenderer,
-    alert: AlertRenderer,
+    card: CardRenderer as React.FC<RendererProps>,
+    accordion: AccordionRenderer as React.FC<RendererProps>,
+    tabs: TabsRenderer as React.FC<RendererProps>,
+    alert: AlertRenderer as React.FC<RendererProps>,
 
     // Marketing Blocks (Organisms)
-    heroBlock: HeroBlockRenderer,
-    featuresBlock: FeaturesBlockRenderer,
-    pricingBlock: PricingBlockRenderer,
-    faqBlock: FaqBlockRenderer,
-    ctaBlock: CtaBlockRenderer,
+    heroBlock: HeroBlockRenderer as React.FC<RendererProps>,
+    featuresBlock: FeaturesBlockRenderer as React.FC<RendererProps>,
+    pricingBlock: PricingBlockRenderer as React.FC<RendererProps>,
+    faqBlock: FaqBlockRenderer as React.FC<RendererProps>,
+    ctaBlock: CtaBlockRenderer as React.FC<RendererProps>,
 };
 
 /**
@@ -76,11 +91,12 @@ const renderers: Record<string, React.FC<{ component: ComponentData; context: 'e
  */
 interface ComponentRendererProps {
     component: ComponentData;
-    context?: 'editor' | 'preview';
+    context?: RenderContext;
 }
 
 /**
  * Renders a component based on its type.
+ * In editor mode, wraps with SelectableElement for selection UI.
  */
 export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
     component,
@@ -96,6 +112,20 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
         );
     }
 
+    // In editor mode, wrap with SelectableElement
+    if (context === 'editor') {
+        return (
+            <SelectableElement
+                componentId={component.id}
+                componentType={component.type}
+                context={context}
+            >
+                <Renderer component={component} context={context} />
+            </SelectableElement>
+        );
+    }
+
+    // In preview/frontend mode, render directly
     return <Renderer component={component} context={context} />;
 };
 
@@ -104,7 +134,7 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
  */
 export const renderChildren = (
     children: ComponentData[] | undefined,
-    context: 'editor' | 'preview' = 'editor'
+    context: RenderContext = 'editor'
 ): React.ReactNode => {
     if (!children || children.length === 0) {
         return null;
@@ -116,4 +146,3 @@ export const renderChildren = (
 };
 
 export default ComponentRenderer;
-

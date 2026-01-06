@@ -1,0 +1,70 @@
+/**
+ * Selectable Element Styles
+ *
+ * Visual selection frame for builder elements.
+ */
+
+.selectableElement {
+    position: relative;
+    cursor: pointer;
+    transition: outline 0.15s ease;
+}
+
+/* Hover state - subtle outline */
+.selectableElement:hover {
+    outline: 1px dashed var(--polymorphic-color-gray-400);
+    outline-offset: 2px;
+}
+
+/* Selected state - prominent frame */
+.selectableElement.isSelected {
+    outline: 2px solid var(--polymorphic-color-primary);
+    outline-offset: 2px;
+}
+
+.selectableElement.isSelected:hover {
+    outline: 2px solid var(--polymorphic-color-primary);
+}
+
+/* Selection frame overlay */
+.selectionFrame {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Selection label */
+.selectionLabel {
+    position: absolute;
+    top: -22px;
+    left: -2px;
+    background-color: var(--polymorphic-color-primary);
+    color: white;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: var(--polymorphic-border-radius-sm) var(--polymorphic-border-radius-sm) 0 0;
+    text-transform: capitalize;
+    white-space: nowrap;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+}
+
+/* Handle nested selections - prevent double outlines */
+.selectableElement .selectableElement {
+    /* Nested elements should not show hover when parent is hovered */
+}
+
+.selectableElement:hover .selectableElement:not(:hover) {
+    outline: none;
+}
+
+/* Ensure selection label doesn't overlap with other content */
+.selectableElement:first-child .selectionLabel {
+    /* First child might need adjustment */
+}
+

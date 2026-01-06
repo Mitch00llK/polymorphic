@@ -32,12 +32,11 @@ interface ContextMenuState {
 }
 
 /**
- * Sortable wrapper for each component.
+ * Sortable wrapper for top-level components (drag-and-drop).
  */
 interface SortableComponentProps {
     component: ComponentData;
     isSelected: boolean;
-    onSelect: (id: string) => void;
     onDelete: (id: string) => void;
     onDuplicate: (id: string) => void;
     onContextMenu: (e: React.MouseEvent, id: string) => void;
@@ -46,7 +45,6 @@ interface SortableComponentProps {
 const SortableComponent: React.FC<SortableComponentProps> = ({
     component,
     isSelected,
-    onSelect,
     onDelete,
     onDuplicate,
     onContextMenu,
@@ -92,16 +90,13 @@ const SortableComponent: React.FC<SortableComponentProps> = ({
         <div
             ref={setNodeRef}
             style={style}
-            className={`${styles.componentWrapper} ${isSelected ? styles.isSelected : ''} ${isDragging ? styles.isDragging : ''}`}
-            onClick={(e) => {
-                e.stopPropagation();
-                onSelect(component.id);
-            }}
+            className={`${styles.sortableWrapper} ${isDragging ? styles.isDragging : ''}`}
             onContextMenu={handleContextMenu}
         >
+            {/* Component with selection handled by SelectableElement */}
             <ComponentRenderer component={component} context="editor" />
 
-            {/* Floating toolbar */}
+            {/* Floating toolbar for top-level components */}
             {isSelected && (
                 <div className={styles.floatingToolbar}>
                     <button
@@ -126,13 +121,6 @@ const SortableComponent: React.FC<SortableComponentProps> = ({
                     >
                         <Trash2 size={14} />
                     </button>
-                </div>
-            )}
-
-            {/* Selection overlay with label */}
-            {isSelected && (
-                <div className={styles.selectedOverlay}>
-                    <span className={styles.componentLabel}>{component.type}</span>
                 </div>
             )}
         </div>
@@ -272,7 +260,6 @@ export const Canvas: React.FC = () => {
                                     key={component.id}
                                     component={component}
                                     isSelected={selectedId === component.id}
-                                    onSelect={selectComponent}
                                     onDelete={handleDelete}
                                     onDuplicate={handleDuplicate}
                                     onContextMenu={handleContextMenu}
@@ -312,4 +299,3 @@ export const Canvas: React.FC = () => {
 };
 
 export default Canvas;
-
