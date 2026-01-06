@@ -6,6 +6,8 @@
  */
 
 import React from 'react';
+import { useDraggable } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
 import { Type, Image, MousePointer2, Layout, Box, AlignLeft } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
@@ -36,6 +38,47 @@ const COMPONENTS: ComponentDefinition[] = [
 ];
 
 /**
+ * Draggable component item in the sidebar.
+ */
+interface DraggableComponentProps {
+    definition: ComponentDefinition;
+    onAdd: (type: ComponentType) => void;
+}
+
+const DraggableComponent: React.FC<DraggableComponentProps> = ({
+    definition,
+    onAdd,
+}) => {
+    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+        id: `sidebar-${definition.type}`,
+        data: {
+            type: 'new-component',
+            componentType: definition.type,
+        },
+    });
+
+    const style: React.CSSProperties = {
+        transform: CSS.Translate.toString(transform),
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <button
+            ref={setNodeRef}
+            style={style}
+            className={`${styles.componentButton} ${isDragging ? styles.isDragging : ''}`}
+            onClick={() => onAdd(definition.type)}
+            title={`Drag or click to add ${definition.label}`}
+            {...listeners}
+            {...attributes}
+        >
+            <span className={styles.componentIcon}>{definition.icon}</span>
+            <span className={styles.componentLabel}>{definition.label}</span>
+        </button>
+    );
+};
+
+/**
  * Sidebar component with draggable component library.
  */
 export const Sidebar: React.FC = () => {
@@ -53,27 +96,33 @@ export const Sidebar: React.FC = () => {
         return acc;
     }, {} as Record<string, ComponentDefinition[]>);
 
+    const categoryLabels: Record<string, string> = {
+        layout: 'Layout',
+        content: 'Content',
+        media: 'Media',
+        actions: 'Actions',
+    };
+
     return (
         <aside className={styles.sidebar}>
             <div className={styles.header}>
                 <h2 className={styles.title}>Components</h2>
+                <p className={styles.hint}>Drag or click to add</p>
             </div>
 
             <div className={styles.content}>
                 {Object.entries(groupedComponents).map(([category, components]) => (
                     <div key={category} className={styles.category}>
-                        <h3 className={styles.categoryTitle}>{category}</h3>
+                        <h3 className={styles.categoryTitle}>
+                            {categoryLabels[category] || category}
+                        </h3>
                         <div className={styles.componentGrid}>
                             {components.map((comp) => (
-                                <button
+                                <DraggableComponent
                                     key={comp.type}
-                                    className={styles.componentButton}
-                                    onClick={() => handleAddComponent(comp.type)}
-                                    title={`Add ${comp.label}`}
-                                >
-                                    <span className={styles.componentIcon}>{comp.icon}</span>
-                                    <span className={styles.componentLabel}>{comp.label}</span>
-                                </button>
+                                    definition={comp}
+                                    onAdd={handleAddComponent}
+                                />
                             ))}
                         </div>
                     </div>
@@ -84,3 +133,4 @@ export const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
+

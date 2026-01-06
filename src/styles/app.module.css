@@ -43,3 +43,18 @@
         transform: rotate(360deg);
     }
 }
+
+.dragPreview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--polymorphic-color-primary), #8b5cf6);
+    color: white;
+    font-size: var(--polymorphic-font-size-sm);
+    font-weight: var(--polymorphic-font-weight-medium);
+    border-radius: var(--polymorphic-border-radius-md);
+    box-shadow: var(--polymorphic-shadow-lg);
+    pointer-events: none;
+    text-transform: capitalize;
+}

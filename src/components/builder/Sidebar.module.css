@@ -84,3 +84,16 @@
     font-weight: var(--polymorphic-font-weight-medium);
     color: var(--polymorphic-color-gray-700);
 }
+
+.hint {
+    font-size: var(--polymorphic-font-size-xs);
+    color: var(--polymorphic-color-gray-400);
+    margin: var(--polymorphic-spacing-1) 0 0;
+}
+
+.isDragging {
+    cursor: grabbing;
+    box-shadow: var(--polymorphic-shadow-lg);
+    border-color: var(--polymorphic-color-primary);
+    background-color: var(--polymorphic-color-primary-light);
+}

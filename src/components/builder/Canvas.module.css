@@ -101,3 +101,14 @@
     border-radius: 0 0 var(--polymorphic-border-radius-sm) 0;
     text-transform: capitalize;
 }
+
+.isDropTarget {
+    outline: 2px dashed var(--polymorphic-color-primary);
+    outline-offset: -2px;
+    background-color: var(--polymorphic-color-primary-light);
+}
+
+.isDragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}

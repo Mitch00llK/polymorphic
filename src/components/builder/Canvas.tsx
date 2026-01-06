@@ -6,65 +6,90 @@
  */
 
 import React from 'react';
-import {
-    DndContext,
-    closestCenter,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    DragEndEvent,
-} from '@dnd-kit/core';
+import { useDroppable } from '@dnd-kit/core';
 import {
     SortableContext,
-    sortableKeyboardCoordinates,
     verticalListSortingStrategy,
+    useSortable,
 } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import { useBuilderStore } from '../../store/builderStore';
 import { ComponentRenderer } from '../renderers/ComponentRenderer';
+import type { ComponentData } from '../../types/components';
 
 import styles from './Canvas.module.css';
+
+/**
+ * Sortable wrapper for each component.
+ */
+interface SortableComponentProps {
+    component: ComponentData;
+    isSelected: boolean;
+    onSelect: (id: string) => void;
+}
+
+const SortableComponent: React.FC<SortableComponentProps> = ({
+    component,
+    isSelected,
+    onSelect,
+}) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({
+        id: component.id,
+        data: {
+            type: 'existing-component',
+            componentId: component.id,
+        },
+    });
+
+    const style: React.CSSProperties = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            className={`${styles.componentWrapper} ${isSelected ? styles.isSelected : ''} ${isDragging ? styles.isDragging : ''}`}
+            onClick={(e) => {
+                e.stopPropagation();
+                onSelect(component.id);
+            }}
+            {...attributes}
+            {...listeners}
+        >
+            <ComponentRenderer component={component} context="editor" />
+            {isSelected && (
+                <div className={styles.selectedOverlay}>
+                    <span className={styles.componentLabel}>{component.type}</span>
+                </div>
+            )}
+        </div>
+    );
+};
 
 /**
  * Main canvas component where components are rendered and arranged.
  */
 export const Canvas: React.FC = () => {
-    const {
-        components,
-        selectedId,
-        selectComponent,
-        moveComponent,
-        currentBreakpoint,
-    } = useBuilderStore();
+    const { components, selectedId, selectComponent, currentBreakpoint } =
+        useBuilderStore();
 
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    );
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-
-        if (over && active.id !== over.id) {
-            const oldIndex = components.findIndex((c) => c.id === active.id);
-            const newIndex = components.findIndex((c) => c.id === over.id);
-
-            if (oldIndex !== -1 && newIndex !== -1) {
-                moveComponent(String(active.id), null, newIndex);
-            }
-        }
-    };
+    const { setNodeRef, isOver } = useDroppable({
+        id: 'canvas-drop-zone',
+    });
 
     const handleCanvasClick = () => {
         selectComponent(null);
-    };
-
-    const handleComponentClick = (e: React.MouseEvent, componentId: string) => {
-        e.stopPropagation();
-        selectComponent(componentId);
     };
 
     // Determine viewport width based on breakpoint.
@@ -77,56 +102,38 @@ export const Canvas: React.FC = () => {
     return (
         <div className={styles.canvas} onClick={handleCanvasClick}>
             <div
-                className={styles.viewport}
+                ref={setNodeRef}
+                className={`${styles.viewport} ${isOver ? styles.isDropTarget : ''}`}
                 style={{ maxWidth: viewportWidth }}
             >
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
+                <SortableContext
+                    items={components.map((c) => c.id)}
+                    strategy={verticalListSortingStrategy}
                 >
-                    <SortableContext
-                        items={components.map((c) => c.id)}
-                        strategy={verticalListSortingStrategy}
-                    >
-                        {components.length === 0 ? (
-                            <div className={styles.empty}>
-                                <div className={styles.emptyIcon}>📦</div>
-                                <h3 className={styles.emptyTitle}>Start Building</h3>
-                                <p className={styles.emptyText}>
-                                    Drag components from the sidebar to get started
-                                </p>
-                            </div>
-                        ) : (
-                            <div className={styles.componentList}>
-                                {components.map((component) => (
-                                    <div
-                                        key={component.id}
-                                        className={`${styles.componentWrapper} ${selectedId === component.id ? styles.isSelected : ''
-                                            }`}
-                                        onClick={(e) => handleComponentClick(e, component.id)}
-                                    >
-                                        <ComponentRenderer
-                                            component={component}
-                                            context="editor"
-                                        />
-                                        {selectedId === component.id && (
-                                            <div className={styles.selectedOverlay}>
-                                                <span className={styles.componentLabel}>
-                                                    {component.type}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </SortableContext>
-                </DndContext>
+                    {components.length === 0 ? (
+                        <div className={styles.empty}>
+                            <div className={styles.emptyIcon}>📦</div>
+                            <h3 className={styles.emptyTitle}>Start Building</h3>
+                            <p className={styles.emptyText}>
+                                Drag components from the sidebar or click to add
+                            </p>
+                        </div>
+                    ) : (
+                        <div className={styles.componentList}>
+                            {components.map((component) => (
+                                <SortableComponent
+                                    key={component.id}
+                                    component={component}
+                                    isSelected={selectedId === component.id}
+                                    onSelect={selectComponent}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </SortableContext>
             </div>
         </div>
     );
 };
 
 export default Canvas;
-
