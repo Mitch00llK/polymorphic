@@ -2,6 +2,7 @@
  * Section Renderer
  *
  * A full-width layout container that spans the entire viewport.
+ * Supports all PropertyPanel controls: layout, boxStyle, size, spacing.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -14,19 +15,49 @@ import { ComponentRenderer } from '../../ComponentRenderer';
 import styles from '../organisms.module.css';
 
 interface SectionProps {
-    width?: 'full' | 'boxed';
-    minHeight?: string;
-    verticalAlign?: 'start' | 'center' | 'end' | 'stretch';
-    horizontalAlign?: 'start' | 'center' | 'end' | 'stretch';
+    // Layout
+    display?: string;
+    flexDirection?: string;
+    justifyContent?: string;
+    alignItems?: string;
     gap?: string;
+    flexWrap?: string;
+    // Legacy layout props (from templates)
+    direction?: string;
+    verticalAlign?: string;
+    horizontalAlign?: string;
+    
+    // Box Style
     backgroundColor?: string;
     backgroundImage?: string;
+    backgroundSize?: string;
+    backgroundPosition?: string;
+    backgroundRepeat?: string;
+    borderWidth?: string;
+    borderStyle?: string;
+    borderColor?: string;
+    borderRadius?: string;
+    boxShadow?: string;
+    opacity?: string;
+    
+    // Size
+    width?: string;
+    height?: string;
+    minWidth?: string;
+    maxWidth?: string;
+    minHeight?: string;
+    maxHeight?: string;
+    overflow?: string;
+    
+    // Spacing
     paddingTop?: string;
+    paddingRight?: string;
     paddingBottom?: string;
     paddingLeft?: string;
-    paddingRight?: string;
     marginTop?: string;
+    marginRight?: string;
     marginBottom?: string;
+    marginLeft?: string;
 }
 
 interface SectionRendererProps {
@@ -35,7 +66,7 @@ interface SectionRendererProps {
 }
 
 /**
- * Maps vertical/horizontal align to CSS flexbox properties.
+ * Maps align values to CSS flexbox.
  */
 const mapAlignToFlex = (align?: string): string => {
     switch (align) {
@@ -43,7 +74,10 @@ const mapAlignToFlex = (align?: string): string => {
         case 'center': return 'center';
         case 'end': return 'flex-end';
         case 'stretch': return 'stretch';
-        default: return 'center';
+        case 'between': return 'space-between';
+        case 'around': return 'space-around';
+        case 'evenly': return 'space-evenly';
+        default: return align || 'flex-start';
     }
 };
 
@@ -57,26 +91,62 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     const props = (component.props || {}) as SectionProps;
     const children = component.children || [];
 
-    // Build section styles
+    // Build section styles - supporting both PropertyPanel props and legacy template props
     const style: React.CSSProperties = {
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        minHeight: props.minHeight || undefined,
-        justifyContent: mapAlignToFlex(props.verticalAlign),
-        alignItems: mapAlignToFlex(props.horizontalAlign),
+        // Layout
+        display: props.display || 'flex',
+        flexDirection: (props.flexDirection || props.direction || 'column') as React.CSSProperties['flexDirection'],
+        justifyContent: mapAlignToFlex(props.justifyContent || props.verticalAlign),
+        alignItems: mapAlignToFlex(props.alignItems || props.horizontalAlign),
         gap: props.gap || undefined,
+        flexWrap: (props.flexWrap || 'nowrap') as React.CSSProperties['flexWrap'],
+        
+        // Size
+        width: props.width === 'full' ? '100%' : props.width || '100%',
+        height: props.height || undefined,
+        minWidth: props.minWidth || undefined,
+        maxWidth: props.maxWidth || undefined,
+        minHeight: props.minHeight || undefined,
+        maxHeight: props.maxHeight || undefined,
+        overflow: props.overflow as React.CSSProperties['overflow'] || undefined,
+        
+        // Box Style - Background
         backgroundColor: props.backgroundColor || undefined,
-        backgroundImage: props.backgroundImage || undefined,
-        backgroundSize: props.backgroundImage ? 'cover' : undefined,
-        backgroundPosition: props.backgroundImage ? 'center' : undefined,
+        backgroundSize: props.backgroundSize || (props.backgroundImage ? 'cover' : undefined),
+        backgroundPosition: props.backgroundPosition || (props.backgroundImage ? 'center' : undefined),
+        backgroundRepeat: props.backgroundRepeat || undefined,
+        
+        // Box Style - Border
+        borderWidth: props.borderWidth || undefined,
+        borderStyle: props.borderStyle as React.CSSProperties['borderStyle'] || (props.borderWidth ? 'solid' : undefined),
+        borderColor: props.borderColor || undefined,
+        borderRadius: props.borderRadius || undefined,
+        
+        // Box Style - Effects
+        boxShadow: props.boxShadow || undefined,
+        opacity: props.opacity ? parseFloat(props.opacity) : undefined,
+        
+        // Spacing
         paddingTop: props.paddingTop || '60px',
+        paddingRight: props.paddingRight || '20px',
         paddingBottom: props.paddingBottom || '60px',
         paddingLeft: props.paddingLeft || '20px',
-        paddingRight: props.paddingRight || '20px',
         marginTop: props.marginTop || undefined,
+        marginRight: props.marginRight || undefined,
         marginBottom: props.marginBottom || undefined,
+        marginLeft: props.marginLeft || undefined,
     };
+
+    // Handle background image (supports gradients and URLs)
+    if (props.backgroundImage) {
+        if (props.backgroundImage.startsWith('linear-gradient') || 
+            props.backgroundImage.startsWith('radial-gradient') ||
+            props.backgroundImage.startsWith('url(')) {
+            style.backgroundImage = props.backgroundImage;
+        } else {
+            style.backgroundImage = `url(${props.backgroundImage})`;
+        }
+    }
 
     return (
         <section
