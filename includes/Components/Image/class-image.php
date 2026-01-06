@@ -93,17 +93,18 @@ class Image extends Component_Base {
     /**
      * Render the component.
      *
-     * @param array  $component Component data.
-     * @param string $context   Render context (frontend|preview|editor).
+     * @param array        $component Component data.
+     * @param string|array $context   Render context (frontend|preview|editor).
      * @return string Rendered HTML.
      */
-    public function render( array $component, string $context = 'frontend' ): string {
+    public function render( array $component, $context = 'frontend' ): string {
         $props = $this->merge_defaults( $component['props'] ?? [] );
         $id    = $component['id'] ?? '';
+        $ctx   = $this->normalize_context( $context );
 
         // Return placeholder if no image.
         if ( empty( $props['src'] ) ) {
-            if ( 'editor' === $context || 'preview' === $context ) {
+            if ( 'editor' === $ctx['mode'] || 'preview' === $ctx['mode'] ) {
                 return '<figure class="poly-image poly-image--placeholder" data-component-id="' . esc_attr( $id ) . '"><div class="poly-image__placeholder">Select an image</div></figure>';
             }
             return '';
@@ -124,28 +125,16 @@ class Image extends Component_Base {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build CSS variables for figure.
-        $css_vars = $this->build_css_variables( $props, [
-            'marginTop'    => 'margin-top',
-            'marginBottom' => 'margin-bottom',
-            'maxWidth'     => 'max-width',
-        ]);
-
-        // Build CSS variables for img element.
-        $img_css_vars = $this->build_css_variables( $props, [
-            'objectFit'      => 'object-fit',
-            'objectPosition' => 'object-position',
-            'borderRadius'   => 'border-radius',
-        ]);
+        // Add generated class for frontend (zero inline styles).
+        $generated_class = $this->get_generated_class( $component, $context );
+        if ( ! empty( $generated_class ) ) {
+            $classes[] = $generated_class;
+        }
 
         // Build figure attributes.
         $figure_attrs = [
             'class' => implode( ' ', $classes ),
         ];
-
-        if ( ! empty( $css_vars ) ) {
-            $figure_attrs['style'] = $css_vars;
-        }
 
         if ( ! empty( $props['htmlId'] ) ) {
             $figure_attrs['id'] = sanitize_html_class( $props['htmlId'] );
@@ -159,10 +148,6 @@ class Image extends Component_Base {
             'alt'   => esc_attr( $props['alt'] ),
             'class' => 'poly-image__img',
         ];
-
-        if ( ! empty( $img_css_vars ) ) {
-            $img_attrs['style'] = $img_css_vars;
-        }
 
         if ( ! empty( $props['width'] ) ) {
             $img_attrs['width'] = esc_attr( $props['width'] );

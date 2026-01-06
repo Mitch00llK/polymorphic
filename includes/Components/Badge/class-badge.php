@@ -85,11 +85,11 @@ class Badge extends Component_Base {
     /**
      * Render the component.
      *
-     * @param array  $component Component data.
-     * @param string $context   Render context.
+     * @param array        $component Component data.
+     * @param string|array $context   Render context.
      * @return string Rendered HTML.
      */
-    public function render( array $component, string $context = 'frontend' ): string {
+    public function render( array $component, $context = 'frontend' ): string {
         $props = $this->merge_defaults( $component['props'] ?? [] );
         $id    = $component['id'] ?? '';
 
@@ -100,24 +100,10 @@ class Badge extends Component_Base {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build CSS variables.
-        $css_vars = $this->build_css_variables( $props, [
-            'backgroundColor' => 'background-color',
-            'textColor'       => 'color',
-            'borderRadius'    => 'border-radius',
-            'fontSize'        => 'font-size',
-            'fontWeight'      => 'font-weight',
-        ]);
-
-        // Handle padding separately.
-        if ( ! empty( $props['paddingX'] ) ) {
-            $css_vars .= ( ! empty( $css_vars ) ? '; ' : '' ) . '--poly-padding-left: ' . esc_attr( $props['paddingX'] );
-            $css_vars .= '; --poly-padding-right: ' . esc_attr( $props['paddingX'] );
-        }
-
-        if ( ! empty( $props['paddingY'] ) ) {
-            $css_vars .= ( ! empty( $css_vars ) ? '; ' : '' ) . '--poly-padding-top: ' . esc_attr( $props['paddingY'] );
-            $css_vars .= '; --poly-padding-bottom: ' . esc_attr( $props['paddingY'] );
+        // Add generated class for frontend (zero inline styles).
+        $generated_class = $this->get_generated_class( $component, $context );
+        if ( ! empty( $generated_class ) ) {
+            $classes[] = $generated_class;
         }
 
         // Build attributes.
@@ -125,10 +111,6 @@ class Badge extends Component_Base {
             'class'             => implode( ' ', $classes ),
             'data-component-id' => esc_attr( $id ),
         ];
-
-        if ( ! empty( $css_vars ) ) {
-            $attrs['style'] = $css_vars;
-        }
 
         return '<span ' . $this->build_attributes( $attrs ) . '>' . esc_html( $props['text'] ) . '</span>';
     }

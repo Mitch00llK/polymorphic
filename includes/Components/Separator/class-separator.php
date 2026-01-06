@@ -83,11 +83,11 @@ class Separator extends Component_Base {
     /**
      * Render the component.
      *
-     * @param array  $component Component data.
-     * @param string $context   Render context.
+     * @param array        $component Component data.
+     * @param string|array $context   Render context.
      * @return string Rendered HTML.
      */
-    public function render( array $component, string $context = 'frontend' ): string {
+    public function render( array $component, $context = 'frontend' ): string {
         $props = $this->merge_defaults( $component['props'] ?? [] );
         $id    = $component['id'] ?? '';
 
@@ -98,19 +98,11 @@ class Separator extends Component_Base {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build CSS variables (support both 'color' and 'backgroundColor' for the line color).
-        $bg_color = ! empty( $props['backgroundColor'] ) ? $props['backgroundColor'] : $props['color'];
-        if ( ! empty( $bg_color ) ) {
-            $props['backgroundColor'] = $bg_color;
+        // Add generated class for frontend (zero inline styles).
+        $generated_class = $this->get_generated_class( $component, $context );
+        if ( ! empty( $generated_class ) ) {
+            $classes[] = $generated_class;
         }
-
-        $css_vars = $this->build_css_variables( $props, [
-            'backgroundColor' => 'background-color',
-            'width'           => 'width',
-            'height'          => 'height',
-            'marginTop'       => 'margin-top',
-            'marginBottom'    => 'margin-bottom',
-        ]);
 
         // Build attributes.
         $attrs = [
@@ -119,10 +111,6 @@ class Separator extends Component_Base {
             'aria-orientation'  => esc_attr( $props['orientation'] ),
             'data-component-id' => esc_attr( $id ),
         ];
-
-        if ( ! empty( $css_vars ) ) {
-            $attrs['style'] = $css_vars;
-        }
 
         return '<div ' . $this->build_attributes( $attrs ) . '></div>';
     }

@@ -81,11 +81,11 @@ abstract class Component_Base {
      *
      * @since 1.0.0
      *
-     * @param array  $data    Component data.
-     * @param string $context Render context.
+     * @param array        $data    Component data.
+     * @param string|array $context Render context or context array.
      * @return string Rendered HTML.
      */
-    abstract public function render( array $data, string $context = 'frontend' ): string;
+    abstract public function render( array $data, $context = 'frontend' ): string;
 
     /**
      * Whether this component supports children.
@@ -146,6 +146,76 @@ abstract class Component_Base {
     }
 
     /**
+     * Normalize context to array format.
+     *
+     * @since 1.0.0
+     *
+     * @param string|array $context Context string or array.
+     * @return array Normalized context.
+     */
+    protected function normalize_context( $context ): array {
+        if ( is_string( $context ) ) {
+            return [
+                'mode'      => $context,
+                'class_map' => [],
+            ];
+        }
+
+        return wp_parse_args(
+            $context,
+            [
+                'mode'      => 'frontend',
+                'class_map' => [],
+            ]
+        );
+    }
+
+    /**
+     * Check if rendering for frontend (not builder/preview).
+     *
+     * @since 1.0.0
+     *
+     * @param string|array $context Render context.
+     * @return bool
+     */
+    protected function is_frontend( $context ): bool {
+        $ctx = $this->normalize_context( $context );
+        return 'frontend' === $ctx['mode'];
+    }
+
+    /**
+     * Get the generated CSS class for a component.
+     *
+     * @since 1.0.0
+     *
+     * @param array        $data    Component data.
+     * @param string|array $context Render context.
+     * @return string Generated class name or empty string.
+     */
+    protected function get_generated_class( array $data, $context ): string {
+        $ctx = $this->normalize_context( $context );
+
+        // Only use generated classes on frontend.
+        if ( 'frontend' !== $ctx['mode'] ) {
+            return '';
+        }
+
+        $id = $data['id'] ?? '';
+
+        // Check class map in context.
+        if ( ! empty( $ctx['class_map'][ $id ] ) ) {
+            return sanitize_html_class( $ctx['class_map'][ $id ] );
+        }
+
+        // Check class map injected into data.
+        if ( ! empty( $data['_class_map'][ $id ] ) ) {
+            return sanitize_html_class( $data['_class_map'][ $id ] );
+        }
+
+        return '';
+    }
+
+    /**
      * Build HTML attributes string from array.
      *
      * @since 1.0.0
@@ -174,11 +244,11 @@ abstract class Component_Base {
      *
      * @since 1.0.0
      *
-     * @param array  $children Children component data.
-     * @param string $context  Render context.
+     * @param array        $children Children component data.
+     * @param string|array $context  Render context.
      * @return string Rendered HTML.
      */
-    protected function render_children( array $children, string $context = 'frontend' ): string {
+    protected function render_children( array $children, $context = 'frontend' ): string {
         $html = '';
 
         foreach ( $children as $child ) {
@@ -186,55 +256,6 @@ abstract class Component_Base {
         }
 
         return $html;
-    }
-
-    /**
-     * Build inline styles from props.
-     *
-     * @since 1.0.0
-     *
-     * @param array $props         Properties.
-     * @param array $style_mapping Map of prop keys to CSS properties.
-     * @return string Inline style string.
-     */
-    protected function build_styles( array $props, array $style_mapping ): string {
-        $styles = [];
-
-        foreach ( $style_mapping as $prop_key => $css_property ) {
-            if ( ! empty( $props[ $prop_key ] ) ) {
-                $value = esc_attr( $props[ $prop_key ] );
-                $styles[] = "{$css_property}: {$value}";
-            }
-        }
-
-        return implode( '; ', $styles );
-    }
-
-    /**
-     * Build CSS custom properties (variables) from props.
-     *
-     * This outputs --poly-* CSS variables instead of direct CSS properties,
-     * keeping the DOM clean and allowing styles to be controlled via CSS.
-     *
-     * @since 1.0.0
-     *
-     * @param array $props         Properties.
-     * @param array $style_mapping Map of prop keys to CSS properties.
-     * @return string CSS variables string.
-     */
-    protected function build_css_variables( array $props, array $style_mapping ): string {
-        $variables = [];
-
-        foreach ( $style_mapping as $prop_key => $css_property ) {
-            if ( ! empty( $props[ $prop_key ] ) ) {
-                $value = esc_attr( $props[ $prop_key ] );
-                // Convert CSS property to variable name: font-size -> --poly-font-size
-                $var_name = '--poly-' . $css_property;
-                $variables[] = "{$var_name}: {$value}";
-            }
-        }
-
-        return implode( '; ', $variables );
     }
 
     /**

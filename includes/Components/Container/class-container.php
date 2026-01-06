@@ -92,11 +92,11 @@ class Container extends Component_Base {
     /**
      * Render the component.
      *
-     * @param array  $component Component data.
-     * @param string $context   Render context (frontend|preview|editor).
+     * @param array        $component Component data.
+     * @param string|array $context   Render context (frontend|preview|editor).
      * @return string Rendered HTML.
      */
-    public function render( array $component, string $context = 'frontend' ): string {
+    public function render( array $component, $context = 'frontend' ): string {
         $props    = $this->merge_defaults( $component['props'] ?? [] );
         $id       = $component['id'] ?? '';
         $children = $component['children'] ?? [];
@@ -112,36 +112,16 @@ class Container extends Component_Base {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build CSS variables for clean DOM.
-        $css_vars = $this->build_css_variables( $props, [
-            'maxWidth'        => 'max-width',
-            'backgroundColor' => 'background-color',
-            'paddingTop'      => 'padding-top',
-            'paddingBottom'   => 'padding-bottom',
-            'paddingLeft'     => 'padding-left',
-            'paddingRight'    => 'padding-right',
-            'marginTop'       => 'margin-top',
-            'marginBottom'    => 'margin-bottom',
-            'textAlign'       => 'text-align',
-            'gap'             => 'gap',
-        ]);
-
-        // Add display/flex properties if display is flex.
-        if ( 'flex' === $props['display'] ) {
-            $css_vars .= ( ! empty( $css_vars ) ? '; ' : '' ) . '--poly-display: flex';
-            $css_vars .= '; --poly-flex-direction: ' . esc_attr( $props['flexDirection'] );
-            $css_vars .= '; --poly-justify-content: ' . esc_attr( $props['justifyContent'] );
-            $css_vars .= '; --poly-align-items: ' . esc_attr( $props['alignItems'] );
+        // Add generated class for frontend (zero inline styles).
+        $generated_class = $this->get_generated_class( $component, $context );
+        if ( ! empty( $generated_class ) ) {
+            $classes[] = $generated_class;
         }
 
         // Build attributes.
         $attrs = [
             'class' => implode( ' ', $classes ),
         ];
-
-        if ( ! empty( $css_vars ) ) {
-            $attrs['style'] = $css_vars;
-        }
 
         if ( ! empty( $props['htmlId'] ) ) {
             $attrs['id'] = sanitize_html_class( $props['htmlId'] );

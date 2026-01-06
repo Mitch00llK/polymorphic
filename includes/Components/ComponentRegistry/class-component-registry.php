@@ -103,13 +103,17 @@ class Component_Registry {
     /**
      * Render a component.
      *
+     * Context can be:
+     * - A string: 'frontend', 'preview', 'builder'
+     * - An array with 'mode' and optional 'class_map' for generated CSS classes
+     *
      * @since 1.0.0
      *
-     * @param array  $data    Component data.
-     * @param string $context Render context ('frontend', 'preview', 'builder').
+     * @param array        $data    Component data.
+     * @param string|array $context Render context or context array.
      * @return string Rendered HTML.
      */
-    public function render( array $data, string $context = 'frontend' ): string {
+    public function render( array $data, $context = 'frontend' ): string {
         $type = $data['type'] ?? '';
 
         if ( ! $this->has( $type ) ) {
@@ -122,13 +126,26 @@ class Component_Registry {
             return '';
         }
 
+        // Normalize context to array format.
+        if ( is_string( $context ) ) {
+            $context = [
+                'mode'      => $context,
+                'class_map' => [],
+            ];
+        }
+
+        // Inject class map into component data for rendering.
+        if ( ! empty( $context['class_map'] ) ) {
+            $data['_class_map'] = $context['class_map'];
+        }
+
         /**
          * Fires before a component is rendered.
          *
          * @since 1.0.0
          *
-         * @param array  $data    Component data.
-         * @param string $context Render context.
+         * @param array $data    Component data.
+         * @param array $context Render context.
          */
         do_action( 'polymorphic/render/component/before', $data, $context );
 
@@ -141,7 +158,7 @@ class Component_Registry {
          *
          * @param string $html    Rendered HTML.
          * @param array  $data    Component data.
-         * @param string $context Render context.
+         * @param array  $context Render context.
          */
         $html = apply_filters( 'polymorphic/render/component', $html, $data, $context );
 

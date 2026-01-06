@@ -92,11 +92,11 @@ class Section extends Component_Base {
     /**
      * Render the component.
      *
-     * @param array  $component Component data.
-     * @param string $context   Render context (frontend|preview|editor).
+     * @param array        $component Component data.
+     * @param string|array $context   Render context (frontend|preview|editor).
      * @return string Rendered HTML.
      */
-    public function render( array $component, string $context = 'frontend' ): string {
+    public function render( array $component, $context = 'frontend' ): string {
         $props    = $this->merge_defaults( $component['props'] ?? [] );
         $id       = $component['id'] ?? '';
         $children = $component['children'] ?? [];
@@ -112,35 +112,16 @@ class Section extends Component_Base {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build CSS variables for clean DOM.
-        $css_vars = $this->build_css_variables( $props, [
-            'backgroundColor'    => 'background-color',
-            'backgroundSize'     => 'background-size',
-            'backgroundPosition' => 'background-position',
-            'paddingTop'         => 'padding-top',
-            'paddingBottom'      => 'padding-bottom',
-            'paddingLeft'        => 'padding-left',
-            'paddingRight'       => 'padding-right',
-            'marginTop'          => 'margin-top',
-            'marginBottom'       => 'margin-bottom',
-            'minHeight'          => 'min-height',
-            'maxWidth'           => 'max-width',
-            'overflow'           => 'overflow',
-        ]);
-
-        // Handle background image separately (needs url() wrapper).
-        if ( ! empty( $props['backgroundImage'] ) ) {
-            $css_vars .= ( ! empty( $css_vars ) ? '; ' : '' ) . '--poly-background-image: url(' . esc_url( $props['backgroundImage'] ) . ')';
+        // Add generated class for frontend (zero inline styles).
+        $generated_class = $this->get_generated_class( $component, $context );
+        if ( ! empty( $generated_class ) ) {
+            $classes[] = $generated_class;
         }
 
         // Build attributes.
         $attrs = [
             'class' => implode( ' ', $classes ),
         ];
-
-        if ( ! empty( $css_vars ) ) {
-            $attrs['style'] = $css_vars;
-        }
 
         if ( ! empty( $props['htmlId'] ) ) {
             $attrs['id'] = sanitize_html_class( $props['htmlId'] );

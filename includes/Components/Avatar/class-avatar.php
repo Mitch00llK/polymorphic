@@ -87,11 +87,11 @@ class Avatar extends Component_Base {
     /**
      * Render the component.
      *
-     * @param array  $component Component data.
-     * @param string $context   Render context.
+     * @param array        $component Component data.
+     * @param string|array $context   Render context.
      * @return string Rendered HTML.
      */
-    public function render( array $component, string $context = 'frontend' ): string {
+    public function render( array $component, $context = 'frontend' ): string {
         $props = $this->merge_defaults( $component['props'] ?? [] );
         $id    = $component['id'] ?? '';
 
@@ -102,26 +102,17 @@ class Avatar extends Component_Base {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build CSS variables.
-        $css_vars = $this->build_css_variables( $props, [
-            'width'           => 'width',
-            'height'          => 'height',
-            'borderRadius'    => 'border-radius',
-            'backgroundColor' => 'background-color',
-            'textColor'       => 'color',
-            'fontSize'        => 'font-size',
-            'fontWeight'      => 'font-weight',
-        ]);
+        // Add generated class for frontend (zero inline styles).
+        $generated_class = $this->get_generated_class( $component, $context );
+        if ( ! empty( $generated_class ) ) {
+            $classes[] = $generated_class;
+        }
 
         // Build attributes.
         $attrs = [
             'class'             => implode( ' ', $classes ),
             'data-component-id' => esc_attr( $id ),
         ];
-
-        if ( ! empty( $css_vars ) ) {
-            $attrs['style'] = $css_vars;
-        }
 
         // Build HTML.
         $html = '<div ' . $this->build_attributes( $attrs ) . '>';

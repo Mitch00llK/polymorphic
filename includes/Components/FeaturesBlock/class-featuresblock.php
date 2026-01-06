@@ -89,11 +89,11 @@ class FeaturesBlock extends Component_Base {
     /**
      * Render the component.
      *
-     * @param array  $component Component data.
-     * @param string $context   Render context.
+     * @param array        $component Component data.
+     * @param string|array $context   Render context.
      * @return string Rendered HTML.
      */
-    public function render( array $component, string $context = 'frontend' ): string {
+    public function render( array $component, $context = 'frontend' ): string {
         $props    = $this->merge_defaults( $component['props'] ?? [] );
         $id       = $component['id'] ?? '';
         $features = $props['features'] ?? [];
@@ -106,14 +106,11 @@ class FeaturesBlock extends Component_Base {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build CSS variables.
-        $css_vars = $this->build_css_variables( $props, [
-            'backgroundColor' => 'background-color',
-            'textColor'       => 'color',
-            'paddingTop'      => 'padding-top',
-            'paddingBottom'   => 'padding-bottom',
-            'gap'             => 'gap',
-        ]);
+        // Add generated class for frontend (zero inline styles).
+        $generated_class = $this->get_generated_class( $component, $context );
+        if ( ! empty( $generated_class ) ) {
+            $classes[] = $generated_class;
+        }
 
         // Build attributes.
         $attrs = [
@@ -121,16 +118,12 @@ class FeaturesBlock extends Component_Base {
             'data-component-id' => esc_attr( $id ),
         ];
 
-        if ( ! empty( $css_vars ) ) {
-            $attrs['style'] = $css_vars;
-        }
-
         $html  = '<section ' . $this->build_attributes( $attrs ) . '>';
         $html .= '<div class="poly-features-block__header">';
         $html .= '<h2 class="poly-features-block__title">' . esc_html( $props['title'] ) . '</h2>';
         $html .= '<p class="poly-features-block__subtitle">' . esc_html( $props['subtitle'] ) . '</p>';
         $html .= '</div>';
-        $html .= '<div class="poly-features-block__grid" style="--poly-columns: ' . esc_attr( $columns ) . ';">';
+        $html .= '<div class="poly-features-block__grid" data-columns="' . esc_attr( $columns ) . '">';
 
         foreach ( $features as $feature ) {
             $html .= '<div class="poly-features-block__card">';

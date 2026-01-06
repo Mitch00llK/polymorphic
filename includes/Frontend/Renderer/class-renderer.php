@@ -327,6 +327,9 @@ class Renderer {
             return '';
         }
 
+        // Extract class map for generated CSS classes.
+        $class_map = $data['classMap'] ?? [];
+
         /**
          * Fires before rendering begins.
          *
@@ -339,8 +342,14 @@ class Renderer {
 
         $html = '';
 
+        // Create render context with class map.
+        $context = [
+            'mode'      => 'frontend',
+            'class_map' => $class_map,
+        ];
+
         foreach ( $data['components'] as $component ) {
-            $html .= $this->registry->render( $component, 'frontend' );
+            $html .= $this->registry->render( $component, $context );
         }
 
         /**

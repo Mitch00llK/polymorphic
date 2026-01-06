@@ -90,11 +90,11 @@ class Text extends Component_Base {
     /**
      * Render the component.
      *
-     * @param array  $component Component data.
-     * @param string $context   Render context (frontend|preview|editor).
+     * @param array        $component Component data.
+     * @param string|array $context   Render context (frontend|preview|editor).
      * @return string Rendered HTML.
      */
-    public function render( array $component, string $context = 'frontend' ): string {
+    public function render( array $component, $context = 'frontend' ): string {
         $props = $this->merge_defaults( $component['props'] ?? [] );
         $id    = $component['id'] ?? '';
 
@@ -113,28 +113,16 @@ class Text extends Component_Base {
             $classes[] = sanitize_html_class( $props['className'] );
         }
 
-        // Build CSS variables for clean DOM.
-        $css_vars = $this->build_css_variables( $props, [
-            'textAlign'     => 'text-align',
-            'fontSize'      => 'font-size',
-            'fontWeight'    => 'font-weight',
-            'fontFamily'    => 'font-family',
-            'lineHeight'    => 'line-height',
-            'letterSpacing' => 'letter-spacing',
-            'textTransform' => 'text-transform',
-            'color'         => 'color',
-            'marginTop'     => 'margin-top',
-            'marginBottom'  => 'margin-bottom',
-        ]);
+        // Add generated class for frontend (zero inline styles).
+        $generated_class = $this->get_generated_class( $component, $context );
+        if ( ! empty( $generated_class ) ) {
+            $classes[] = $generated_class;
+        }
 
         // Build attributes.
         $attrs = [
             'class' => implode( ' ', $classes ),
         ];
-
-        if ( ! empty( $css_vars ) ) {
-            $attrs['style'] = $css_vars;
-        }
 
         if ( ! empty( $props['htmlId'] ) ) {
             $attrs['id'] = sanitize_html_class( $props['htmlId'] );

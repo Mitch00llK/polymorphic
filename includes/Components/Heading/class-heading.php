@@ -85,36 +85,25 @@ class Heading extends Component_Base {
      *
      * @since 1.0.0
      *
-     * @param array  $data    Component data.
-     * @param string $context Render context.
+     * @param array        $data    Component data.
+     * @param string|array $context Render context.
      * @return string Rendered HTML.
      */
-    public function render( array $data, string $context = 'frontend' ): string {
+    public function render( array $data, $context = 'frontend' ): string {
         $props = $this->parse_props( $data['props'] ?? [] );
         $id    = esc_attr( $data['id'] ?? '' );
 
         // Sanitize heading tag (support both 'tag' and 'level' props).
         $tag = Sanitizer::sanitize_heading_tag( $props['tag'] ?: $props['level'] );
 
-        // Build CSS variables for clean DOM.
-        $css_vars = $this->build_css_variables( $props, [
-            'textAlign'     => 'text-align',
-            'color'         => 'color',
-            'fontSize'      => 'font-size',
-            'fontWeight'    => 'font-weight',
-            'fontFamily'    => 'font-family',
-            'lineHeight'    => 'line-height',
-            'letterSpacing' => 'letter-spacing',
-            'textTransform' => 'text-transform',
-            'marginTop'     => 'margin-top',
-            'marginBottom'  => 'margin-bottom',
-        ]);
-
         // Build classes using poly-* naming convention.
-        $classes = $this->build_classes(
-            [ 'poly-heading', "poly-heading--{$tag}" ],
-            []
-        );
+        $classes = [ 'poly-heading', "poly-heading--{$tag}" ];
+
+        // Add generated class for frontend (zero inline styles).
+        $generated_class = $this->get_generated_class( $data, $context );
+        if ( ! empty( $generated_class ) ) {
+            $classes[] = $generated_class;
+        }
 
         // Escape content.
         $content = esc_html( $props['content'] );
@@ -130,15 +119,11 @@ class Heading extends Component_Base {
             );
         }
 
-        // Build style attribute (only if we have CSS variables).
-        $style_attr = ! empty( $css_vars ) ? sprintf( ' style="%s"', esc_attr( $css_vars ) ) : '';
-
         return sprintf(
-            '<%1$s class="%2$s" data-component-id="%3$s"%4$s>%5$s</%1$s>',
+            '<%1$s class="%2$s" data-component-id="%3$s">%4$s</%1$s>',
             $tag,
-            $classes,
+            $this->build_classes( $classes ),
             $id,
-            $style_attr,
             $content
         );
     }
