@@ -1,0 +1,187 @@
+/**
+ * Layer Panel Styles
+ *
+ * Styles for the component hierarchy tree view.
+ */
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--polymorphic-color-surface);
+    border-top: 1px solid var(--polymorphic-color-border);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 12px 8px;
+    border-bottom: 1px solid var(--polymorphic-color-border);
+}
+
+.headerTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--polymorphic-color-text);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.headerActions {
+    display: flex;
+    gap: 4px;
+}
+
+.actionButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--polymorphic-border-radius-sm);
+    color: var(--polymorphic-color-text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.actionButton:hover {
+    background-color: var(--polymorphic-color-hover);
+    color: var(--polymorphic-color-text);
+}
+
+.layerList {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.layerItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+    user-select: none;
+}
+
+.layerItem:hover {
+    background-color: var(--polymorphic-color-hover);
+}
+
+.layerItem.selected {
+    background-color: rgba(99, 102, 241, 0.15);
+}
+
+.layerItem.selected::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--polymorphic-color-primary);
+}
+
+.expandToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 2px;
+    color: var(--polymorphic-color-text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.expandToggle:hover:not(:disabled) {
+    background-color: var(--polymorphic-color-hover);
+    color: var(--polymorphic-color-text);
+}
+
+.expandToggle:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.spacer {
+    display: block;
+    width: 12px;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--polymorphic-color-text-muted);
+    flex-shrink: 0;
+}
+
+.layerItem.selected .icon {
+    color: var(--polymorphic-color-primary);
+}
+
+.label {
+    flex: 1;
+    font-size: 12px;
+    color: var(--polymorphic-color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.layerItem.selected .label {
+    color: var(--polymorphic-color-primary);
+    font-weight: 500;
+}
+
+.typeBadge {
+    font-size: 10px;
+    padding: 1px 6px;
+    background-color: var(--polymorphic-color-hover);
+    border-radius: 10px;
+    color: var(--polymorphic-color-text-muted);
+    text-transform: lowercase;
+    flex-shrink: 0;
+}
+
+.layerItem.selected .typeBadge {
+    background-color: rgba(99, 102, 241, 0.2);
+    color: var(--polymorphic-color-primary);
+}
+
+.children {
+    /* Children are rendered flat but indented via paddingLeft */
+}
+
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    color: var(--polymorphic-color-text-muted);
+    text-align: center;
+}
+
+.empty p {
+    margin: 0;
+    font-size: 13px;
+}
+
+.emptyHint {
+    font-size: 11px;
+    margin-top: 4px;
+    opacity: 0.7;
+}

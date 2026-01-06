@@ -17,6 +17,7 @@ import { PanelLeftOpen, PanelRightOpen } from 'lucide-react';
 
 import { Canvas } from './components/builder/Canvas';
 import { Sidebar } from './components/builder/Sidebar';
+import { LayerPanel } from './components/builder/LayerPanel';
 import { Toolbar } from './components/builder/Toolbar';
 import { PropertyPanel } from './components/builder/PropertyPanel';
 import { useBuilderStore, useBuilderKeyboardShortcuts } from './store/builderStore';
@@ -210,11 +211,14 @@ const App: React.FC = () => {
                         </button>
                     )}
 
-                    {/* Left Sidebar - Component Library */}
-                    <Sidebar
-                        isCollapsed={leftPanelCollapsed}
-                        onToggle={() => setLeftPanelCollapsed(!leftPanelCollapsed)}
-                    />
+                    {/* Left Panel - Sidebar + Layers */}
+                    <div className={styles.leftPanel}>
+                        <Sidebar
+                            isCollapsed={leftPanelCollapsed}
+                            onToggle={() => setLeftPanelCollapsed(!leftPanelCollapsed)}
+                        />
+                        {!leftPanelCollapsed && <LayerPanel />}
+                    </div>
 
                     {/* Center - Canvas */}
                     <Canvas />
