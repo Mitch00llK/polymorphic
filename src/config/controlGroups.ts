@@ -2,7 +2,7 @@
  * Control Groups Configuration
  *
  * Defines which control groups are available for each component type.
- * This creates a consistent set of controls across all components.
+ * All components get FULL control access for maximum customization.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -52,147 +52,102 @@ export interface ComponentControlConfig {
 }
 
 /**
+ * Full control options - all features enabled.
+ */
+const FULL_OPTIONS = {
+    typography: { showColor: true, showAlign: true },
+    boxStyle: { showBackground: true, showBorder: true, showShadow: true },
+    size: { showMinMax: true, showOverflow: true, showObjectFit: true, showAspectRatio: true },
+    spacing: { showMargin: true, showPadding: true },
+};
+
+/**
  * Control group configuration for all component types.
- * Every component gets these standard control groups unless explicitly excluded.
+ * Every component gets ALL control groups for maximum customization.
  */
 export const componentControlGroups: Record<ComponentType, ComponentControlConfig> = {
-    // Layout Components
+    // Layout Components - Full controls
     section: {
-        groups: ['layout', 'boxStyle', 'size', 'spacing'],
-        options: {
-            boxStyle: { showBackground: true, showBorder: true, showShadow: true },
-            size: { showMinMax: true, showOverflow: false },
-        },
+        groups: ['layout', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     container: {
-        groups: ['layout', 'boxStyle', 'size', 'spacing'],
-        options: {
-            boxStyle: { showBackground: true, showBorder: true, showShadow: true },
-            size: { showMinMax: true, showOverflow: true },
-        },
+        groups: ['layout', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
 
-    // Text Components
+    // Text Components - Full controls
     heading: {
-        groups: ['typography', 'boxStyle', 'spacing', 'position'],
-        options: {
-            typography: { showColor: true, showAlign: true },
-            boxStyle: { showBackground: true, showBorder: false, showShadow: false },
-        },
+        groups: ['typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     text: {
-        groups: ['typography', 'boxStyle', 'spacing', 'position'],
-        options: {
-            typography: { showColor: true, showAlign: true },
-            boxStyle: { showBackground: true, showBorder: false, showShadow: false },
-        },
+        groups: ['typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
 
-    // Media Components
+    // Media Components - Full controls
     image: {
         groups: ['size', 'boxStyle', 'spacing', 'position'],
-        options: {
-            size: { showMinMax: true, showOverflow: false, showObjectFit: true, showAspectRatio: true },
-            boxStyle: { showBackground: false, showBorder: true, showShadow: true },
-        },
+        options: FULL_OPTIONS,
     },
 
-    // Action Components
+    // Action Components - Full controls
     button: {
         groups: ['typography', 'boxStyle', 'size', 'spacing', 'position'],
-        options: {
-            typography: { showColor: true, showAlign: false },
-            boxStyle: { showBackground: true, showBorder: true, showShadow: true },
-            size: { showMinMax: false, showOverflow: false },
-        },
+        options: FULL_OPTIONS,
     },
 
-    // UI Components
+    // UI Components - Full controls
     card: {
-        groups: ['boxStyle', 'size', 'spacing', 'position'],
-        options: {
-            boxStyle: { showBackground: true, showBorder: true, showShadow: true },
-            size: { showMinMax: true, showOverflow: true },
-        },
+        groups: ['layout', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     accordion: {
-        groups: ['typography', 'boxStyle', 'spacing', 'position'],
-        options: {
-            typography: { showColor: true, showAlign: false },
-            boxStyle: { showBackground: true, showBorder: true, showShadow: false },
-        },
+        groups: ['typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     tabs: {
-        groups: ['typography', 'boxStyle', 'spacing', 'position'],
-        options: {
-            typography: { showColor: true, showAlign: false },
-            boxStyle: { showBackground: true, showBorder: true, showShadow: false },
-        },
+        groups: ['typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     alert: {
-        groups: ['typography', 'boxStyle', 'spacing', 'position'],
-        options: {
-            typography: { showColor: true, showAlign: false },
-            boxStyle: { showBackground: true, showBorder: true, showShadow: false },
-        },
+        groups: ['typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     badge: {
-        groups: ['typography', 'boxStyle', 'spacing', 'position'],
-        options: {
-            typography: { showColor: true, showAlign: false },
-            boxStyle: { showBackground: true, showBorder: true, showShadow: false },
-        },
+        groups: ['typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     avatar: {
         groups: ['size', 'boxStyle', 'spacing', 'position'],
-        options: {
-            size: { showMinMax: false, showOverflow: false, showObjectFit: true, showAspectRatio: false },
-            boxStyle: { showBackground: true, showBorder: true, showShadow: true },
-        },
+        options: FULL_OPTIONS,
     },
     separator: {
-        groups: ['boxStyle', 'spacing', 'position'],
-        options: {
-            boxStyle: { showBackground: true, showBorder: false, showShadow: false },
-        },
+        groups: ['boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
 
-    // Marketing Blocks
+    // Marketing Blocks - Full controls
     heroBlock: {
-        groups: ['layout', 'typography', 'boxStyle', 'size', 'spacing'],
-        options: {
-            typography: { showColor: true, showAlign: true },
-            boxStyle: { showBackground: true, showBorder: false, showShadow: false },
-            size: { showMinMax: true, showOverflow: false },
-        },
+        groups: ['layout', 'typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     featuresBlock: {
-        groups: ['layout', 'typography', 'boxStyle', 'spacing'],
-        options: {
-            typography: { showColor: true, showAlign: true },
-            boxStyle: { showBackground: true, showBorder: false, showShadow: false },
-        },
+        groups: ['layout', 'typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     pricingBlock: {
-        groups: ['layout', 'typography', 'boxStyle', 'spacing'],
-        options: {
-            typography: { showColor: true, showAlign: true },
-            boxStyle: { showBackground: true, showBorder: false, showShadow: false },
-        },
+        groups: ['layout', 'typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     faqBlock: {
-        groups: ['layout', 'typography', 'boxStyle', 'spacing'],
-        options: {
-            typography: { showColor: true, showAlign: true },
-            boxStyle: { showBackground: true, showBorder: false, showShadow: false },
-        },
+        groups: ['layout', 'typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
     ctaBlock: {
-        groups: ['layout', 'typography', 'boxStyle', 'spacing'],
-        options: {
-            typography: { showColor: true, showAlign: true },
-            boxStyle: { showBackground: true, showBorder: true, showShadow: true },
-        },
+        groups: ['layout', 'typography', 'boxStyle', 'size', 'spacing', 'position'],
+        options: FULL_OPTIONS,
     },
 };
 
@@ -201,7 +156,8 @@ export const componentControlGroups: Record<ComponentType, ComponentControlConfi
  */
 export function getComponentControls(type: ComponentType): ComponentControlConfig {
     return componentControlGroups[type] || {
-        groups: ['typography', 'boxStyle', 'size', 'spacing', 'position'],
+        groups: ['typography', 'boxStyle', 'size', 'spacing', 'layout', 'position'],
+        options: FULL_OPTIONS,
     };
 }
 
@@ -228,4 +184,3 @@ export const controlGroupIcons: Record<ControlGroupType, string> = {
     layout: 'LayoutGrid',
     position: 'Move',
 };
-

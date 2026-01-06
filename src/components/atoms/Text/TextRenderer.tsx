@@ -1,13 +1,15 @@
 /**
  * Text Renderer
  *
+ * Supports ALL control groups for maximum customization.
+ *
  * @package Polymorphic
  * @since   1.0.0
  */
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
-import { buildStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import { buildAllStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../atoms.module.css';
 
@@ -27,16 +29,16 @@ export const TextRenderer: React.FC<TextRendererProps> = ({
     const content = (props.content as string) || '<p>Enter your text here...</p>';
     const columns = props.columns as number;
 
-    // Build styles from shared control groups (same as marketing blocks)
-    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
+    // Build ALL styles from ALL control groups
+    const allStyles = buildAllStyles(props);
 
     const style: React.CSSProperties = {
-        ...sharedStyles,
+        ...allStyles,
         // Multi-column support
         columnCount: columns && columns > 1 ? columns : undefined,
         // Reset default browser margins if no margin set
-        margin: (!sharedStyles.marginTop && !sharedStyles.marginBottom && 
-                 !sharedStyles.marginLeft && !sharedStyles.marginRight) ? 0 : undefined,
+        margin: (!allStyles.marginTop && !allStyles.marginBottom && 
+                 !allStyles.marginLeft && !allStyles.marginRight) ? 0 : undefined,
     };
 
     return (

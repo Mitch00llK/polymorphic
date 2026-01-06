@@ -2,6 +2,7 @@
  * Container Renderer
  *
  * A width-constrained layout container for centering content.
+ * Supports ALL control groups for maximum customization.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -10,7 +11,7 @@
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
-import { buildStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import { buildAllStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../organisms.module.css';
 
@@ -62,13 +63,13 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
     const props = (component.props || {}) as StyleableProps;
     const children = component.children || [];
 
-    // Build styles from shared control groups (same as marketing blocks)
-    const sharedStyles = buildStyles(props, ['layout', 'box', 'size', 'spacing', 'position']);
+    // Build ALL styles from ALL control groups
+    const allStyles = buildAllStyles(props);
 
     // Legacy padding support (object format from templates)
     const legacyPadding = props.padding as PaddingObject | string | undefined;
     let paddingStyles: React.CSSProperties = {};
-    if (!sharedStyles.paddingTop && !sharedStyles.paddingRight && !sharedStyles.paddingBottom && !sharedStyles.paddingLeft) {
+    if (!allStyles.paddingTop && !allStyles.paddingRight && !allStyles.paddingBottom && !allStyles.paddingLeft) {
         if (legacyPadding) {
             if (typeof legacyPadding === 'object') {
                 paddingStyles = {
@@ -92,7 +93,7 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
 
     // Handle width
     const widthProp = props.width as string;
-    let widthValue: string | undefined = sharedStyles.width;
+    let widthValue: string | undefined = allStyles.width;
     if (!widthValue) {
         if (widthProp === 'full') {
             widthValue = '100%';
@@ -107,7 +108,7 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
 
     // Handle alignment (container centering)
     let marginStyles: React.CSSProperties = {};
-    if (!sharedStyles.marginLeft && !sharedStyles.marginRight) {
+    if (!allStyles.marginLeft && !allStyles.marginRight) {
         switch (alignment) {
             case 'left':
                 marginStyles = { marginRight: 'auto' };
@@ -122,18 +123,18 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
         }
     }
 
-    // Build container styles
+    // Build container styles with defaults
     const style: React.CSSProperties = {
-        ...sharedStyles,
-        // Layout
-        display: sharedStyles.display || 'flex',
-        flexDirection: sharedStyles.flexDirection || direction || 'column',
-        flexWrap: sharedStyles.flexWrap || wrap || 'nowrap',
-        justifyContent: sharedStyles.justifyContent || mapJustifyContent(legacyJustify),
-        alignItems: sharedStyles.alignItems || mapAlignItems(legacyAlign),
-        gap: sharedStyles.gap || (props.gap as string) || undefined,
-        // Size
-        maxWidth: sharedStyles.maxWidth || (props.maxWidth as string) || '1200px',
+        ...allStyles,
+        // Layout defaults
+        display: allStyles.display || 'flex',
+        flexDirection: allStyles.flexDirection || direction || 'column',
+        flexWrap: allStyles.flexWrap || wrap || 'nowrap',
+        justifyContent: allStyles.justifyContent || mapJustifyContent(legacyJustify),
+        alignItems: allStyles.alignItems || mapAlignItems(legacyAlign),
+        gap: allStyles.gap || (props.gap as string) || undefined,
+        // Size defaults
+        maxWidth: allStyles.maxWidth || (props.maxWidth as string) || '1200px',
         width: widthValue,
         // Spacing
         ...paddingStyles,

@@ -1,6 +1,8 @@
 /**
  * Card Renderer
  *
+ * Supports ALL control groups for maximum customization.
+ *
  * @package Polymorphic
  * @since   1.0.0
  */
@@ -8,7 +10,7 @@
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import { buildAllStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../molecules.module.css';
 
@@ -41,8 +43,8 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
     const showFooter = props.showFooter !== false;
     const variant = (props.variant as string) || 'default';
 
-    // Build styles from shared control groups (same as marketing blocks)
-    const sharedStyles = buildStyles(props, ['box', 'size', 'spacing', 'position']);
+    // Build ALL styles from ALL control groups
+    const allStyles = buildAllStyles(props);
 
     // Build element-specific styles
     const titleStyle = buildElementStyles(props, 'title');
@@ -52,8 +54,8 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
     // Legacy padding support (object format from templates)
     const legacyPadding = props.padding as PaddingObject | string | undefined;
     let paddingStyles: React.CSSProperties = {};
-    if (!sharedStyles.paddingTop && !sharedStyles.paddingRight && 
-        !sharedStyles.paddingBottom && !sharedStyles.paddingLeft) {
+    if (!allStyles.paddingTop && !allStyles.paddingRight && 
+        !allStyles.paddingBottom && !allStyles.paddingLeft) {
         if (legacyPadding) {
             if (typeof legacyPadding === 'object') {
                 paddingStyles = {
@@ -72,16 +74,16 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
 
     // Card styles
     const cardStyle: React.CSSProperties = {
-        ...sharedStyles,
+        ...allStyles,
         boxSizing: 'border-box',
         // Defaults
-        backgroundColor: sharedStyles.backgroundColor || '#ffffff',
-        borderRadius: sharedStyles.borderRadius || '8px',
+        backgroundColor: allStyles.backgroundColor || '#ffffff',
+        borderRadius: allStyles.borderRadius || '8px',
         ...paddingStyles,
     };
 
     // Handle border default
-    if (!sharedStyles.borderWidth && !sharedStyles.borderColor && variant !== 'ghost') {
+    if (!allStyles.borderWidth && !allStyles.borderColor && variant !== 'ghost') {
         cardStyle.border = '1px solid #e5e7eb';
     }
 
@@ -93,7 +95,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
             cardStyle.boxShadow = 'none';
             break;
         case 'elevated':
-            cardStyle.boxShadow = sharedStyles.boxShadow || '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+            cardStyle.boxShadow = allStyles.boxShadow || '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
             break;
     }
 

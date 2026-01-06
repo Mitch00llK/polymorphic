@@ -1,13 +1,15 @@
 /**
  * Button Renderer
  *
+ * Supports ALL control groups for maximum customization.
+ *
  * @package Polymorphic
  * @since   1.0.0
  */
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
-import { buildStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import { buildAllStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../atoms.module.css';
 
@@ -34,48 +36,48 @@ export const ButtonRenderer: React.FC<ButtonRendererProps> = ({
     const textColor = props.textColor as string;
     const borderColorProp = props.borderColor as string;
 
-    // Build styles from shared control groups (same as marketing blocks)
-    const sharedStyles = buildStyles(props, ['typography', 'box', 'size', 'spacing', 'position']);
+    // Build ALL styles from ALL control groups
+    const allStyles = buildAllStyles(props);
 
     // Base styles
     const style: React.CSSProperties = {
-        ...sharedStyles,
+        ...allStyles,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        textDecoration: 'none',
+        textDecoration: allStyles.textDecoration || 'none',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         // Font weight default
-        fontWeight: sharedStyles.fontWeight || '500',
+        fontWeight: allStyles.fontWeight || '500',
         // Border radius default
-        borderRadius: sharedStyles.borderRadius || '6px',
+        borderRadius: allStyles.borderRadius || '6px',
         // Width handling
-        width: widthProp === 'full' ? '100%' : (widthProp === 'auto' ? 'auto' : sharedStyles.width) || undefined,
+        width: widthProp === 'full' ? '100%' : (widthProp === 'auto' ? 'auto' : allStyles.width) || undefined,
     };
 
     // Size-based padding (if no explicit padding set)
-    if (!sharedStyles.paddingTop && !sharedStyles.paddingRight && 
-        !sharedStyles.paddingBottom && !sharedStyles.paddingLeft) {
+    if (!allStyles.paddingTop && !allStyles.paddingRight && 
+        !allStyles.paddingBottom && !allStyles.paddingLeft) {
         switch (size) {
             case 'small':
             case 'sm':
                 style.padding = '8px 16px';
-                if (!sharedStyles.fontSize) style.fontSize = '14px';
+                if (!allStyles.fontSize) style.fontSize = '14px';
                 break;
             case 'large':
             case 'lg':
                 style.padding = '14px 28px';
-                if (!sharedStyles.fontSize) style.fontSize = '16px';
+                if (!allStyles.fontSize) style.fontSize = '16px';
                 break;
             default: // medium
                 style.padding = '10px 20px';
-                if (!sharedStyles.fontSize) style.fontSize = '15px';
+                if (!allStyles.fontSize) style.fontSize = '15px';
         }
     }
 
     // Variant-based styles (can be overridden by explicit props)
-    if (!sharedStyles.backgroundColor && !sharedStyles.color && !sharedStyles.borderColor) {
+    if (!allStyles.backgroundColor && !allStyles.color && !allStyles.borderColor) {
         switch (variant) {
             case 'outline':
                 style.backgroundColor = 'transparent';
@@ -95,7 +97,7 @@ export const ButtonRenderer: React.FC<ButtonRendererProps> = ({
                 style.textDecoration = 'underline';
                 break;
             default: // solid
-                style.backgroundColor = sharedStyles.backgroundColor || '#6366f1';
+                style.backgroundColor = allStyles.backgroundColor || '#6366f1';
                 style.color = textColor || '#ffffff';
                 style.border = borderColorProp ? `1px solid ${borderColorProp}` : 'none';
         }

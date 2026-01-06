@@ -2,6 +2,7 @@
  * Section Renderer
  *
  * A full-width layout container that spans the entire viewport.
+ * Supports ALL control groups for maximum customization.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -10,7 +11,7 @@
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
-import { buildStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import { buildAllStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../organisms.module.css';
 
@@ -44,31 +45,32 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     const props = (component.props || {}) as StyleableProps;
     const children = component.children || [];
 
-    // Build styles from shared control groups (same as marketing blocks)
-    const sharedStyles = buildStyles(props, ['layout', 'box', 'size', 'spacing', 'position']);
+    // Build ALL styles from ALL control groups
+    const allStyles = buildAllStyles(props);
 
     // Section-specific props (legacy support)
     const verticalAlign = props.verticalAlign as string;
     const horizontalAlign = props.horizontalAlign as string;
+    const direction = props.direction as string;
 
-    // Build section styles
+    // Build section styles with defaults
     const style: React.CSSProperties = {
-        ...sharedStyles,
-        // Layout defaults
-        display: sharedStyles.display || 'flex',
-        flexDirection: sharedStyles.flexDirection || (props.direction as string) || 'column',
-        justifyContent: sharedStyles.justifyContent || mapAlignToFlex(verticalAlign),
-        alignItems: sharedStyles.alignItems || mapAlignToFlex(horizontalAlign),
-        gap: sharedStyles.gap || (props.gap as string) || undefined,
-        flexWrap: sharedStyles.flexWrap || 'nowrap',
+        ...allStyles,
+        // Layout defaults (if not set via PropertyPanel)
+        display: allStyles.display || 'flex',
+        flexDirection: allStyles.flexDirection || direction || 'column',
+        justifyContent: allStyles.justifyContent || mapAlignToFlex(verticalAlign),
+        alignItems: allStyles.alignItems || mapAlignToFlex(horizontalAlign),
+        gap: allStyles.gap || (props.gap as string) || undefined,
+        flexWrap: allStyles.flexWrap || 'nowrap',
         // Size defaults
-        width: sharedStyles.width || '100%',
-        minHeight: sharedStyles.minHeight || (props.minHeight as string) || undefined,
+        width: allStyles.width || '100%',
+        minHeight: allStyles.minHeight || (props.minHeight as string) || undefined,
         // Spacing defaults
-        paddingTop: sharedStyles.paddingTop || '60px',
-        paddingRight: sharedStyles.paddingRight || '20px',
-        paddingBottom: sharedStyles.paddingBottom || '60px',
-        paddingLeft: sharedStyles.paddingLeft || '20px',
+        paddingTop: allStyles.paddingTop || '60px',
+        paddingRight: allStyles.paddingRight || '20px',
+        paddingBottom: allStyles.paddingBottom || '60px',
+        paddingLeft: allStyles.paddingLeft || '20px',
     };
 
     return (

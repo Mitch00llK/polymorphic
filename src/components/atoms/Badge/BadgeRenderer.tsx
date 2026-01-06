@@ -1,5 +1,7 @@
 /**
- * Badge Renderer Component
+ * Badge Renderer
+ *
+ * Supports ALL control groups for maximum customization.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -7,7 +9,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
-import { buildStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import { buildAllStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../atoms.module.css';
 
@@ -25,29 +27,29 @@ export const BadgeRenderer: React.FC<BadgeRendererProps> = ({
     const variant = (props.variant as string) || 'default';
     const textColor = props.textColor as string;
 
-    // Build styles from shared control groups (same as marketing blocks)
-    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
+    // Build ALL styles from ALL control groups
+    const allStyles = buildAllStyles(props);
 
     const badgeStyle: React.CSSProperties = {
-        ...sharedStyles,
+        ...allStyles,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
         // Defaults
-        fontSize: sharedStyles.fontSize || '12px',
-        fontWeight: sharedStyles.fontWeight || '500',
-        borderRadius: sharedStyles.borderRadius || '9999px',
-        lineHeight: '1.4',
+        fontSize: allStyles.fontSize || '12px',
+        fontWeight: allStyles.fontWeight || '500',
+        borderRadius: allStyles.borderRadius || '9999px',
+        lineHeight: allStyles.lineHeight || '1.4',
     };
 
     // Padding default if not set
-    if (!sharedStyles.paddingTop && !sharedStyles.paddingRight && 
-        !sharedStyles.paddingBottom && !sharedStyles.paddingLeft) {
+    if (!allStyles.paddingTop && !allStyles.paddingRight && 
+        !allStyles.paddingBottom && !allStyles.paddingLeft) {
         badgeStyle.padding = '4px 12px';
     }
 
     // Apply colors - explicit props override variant defaults
-    if (!sharedStyles.backgroundColor && !sharedStyles.color) {
+    if (!allStyles.backgroundColor && !allStyles.color) {
         switch (variant) {
             case 'success':
                 badgeStyle.backgroundColor = '#22c55e';
@@ -68,14 +70,14 @@ export const BadgeRenderer: React.FC<BadgeRendererProps> = ({
                 break;
             case 'secondary':
             case 'outline':
-                badgeStyle.backgroundColor = sharedStyles.backgroundColor || 'transparent';
+                badgeStyle.backgroundColor = allStyles.backgroundColor || 'transparent';
                 badgeStyle.color = textColor || '#374151';
                 if (variant === 'outline') {
-                    badgeStyle.border = `1px solid ${sharedStyles.borderColor || '#d1d5db'}`;
+                    badgeStyle.border = `1px solid ${allStyles.borderColor || '#d1d5db'}`;
                 }
                 break;
             default: // default
-                badgeStyle.backgroundColor = sharedStyles.backgroundColor || '#f3f4f6';
+                badgeStyle.backgroundColor = allStyles.backgroundColor || '#f3f4f6';
                 badgeStyle.color = textColor || '#374151';
         }
     } else {

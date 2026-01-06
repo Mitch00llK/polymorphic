@@ -1,13 +1,15 @@
 /**
  * Image Renderer
  *
+ * Supports ALL control groups for maximum customization.
+ *
  * @package Polymorphic
  * @since   1.0.0
  */
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import { buildAllStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../atoms.module.css';
 
@@ -33,21 +35,21 @@ export const ImageRenderer: React.FC<ImageRendererProps> = ({
     const objectFit = (props.objectFit as string) || 'cover';
     const aspectRatio = props.aspectRatio as string;
 
-    // Build styles from shared control groups (same as marketing blocks)
-    const sharedStyles = buildStyles(props, ['size', 'box', 'spacing', 'position']);
+    // Build ALL styles from ALL control groups
+    const allStyles = buildAllStyles(props);
 
     // Build caption-specific styles
     const captionStyle = buildElementStyles(props, 'caption');
 
     // Figure styles (wrapper)
     const figureStyle: React.CSSProperties = {
-        ...sharedStyles,
+        ...allStyles,
         display: 'block',
-        maxWidth: sharedStyles.maxWidth || '100%',
-        width: sharedStyles.width || '100%',
+        maxWidth: allStyles.maxWidth || '100%',
+        width: allStyles.width || '100%',
         // Reset margin if not set
-        margin: (!sharedStyles.marginTop && !sharedStyles.marginRight && 
-                 !sharedStyles.marginBottom && !sharedStyles.marginLeft) ? 0 : undefined,
+        margin: (!allStyles.marginTop && !allStyles.marginRight && 
+                 !allStyles.marginBottom && !allStyles.marginLeft) ? 0 : undefined,
     };
 
     // Handle alignment
@@ -61,11 +63,11 @@ export const ImageRenderer: React.FC<ImageRendererProps> = ({
     // Image styles
     const imgStyle: React.CSSProperties = {
         width: '100%',
-        height: sharedStyles.height || 'auto',
-        aspectRatio: aspectRatio || sharedStyles.aspectRatio || undefined,
-        objectFit: objectFit as React.CSSProperties['objectFit'],
-        borderRadius: sharedStyles.borderRadius || undefined,
-        boxShadow: sharedStyles.boxShadow || undefined,
+        height: allStyles.height || 'auto',
+        aspectRatio: aspectRatio || allStyles.aspectRatio || undefined,
+        objectFit: (allStyles.objectFit || objectFit) as React.CSSProperties['objectFit'],
+        borderRadius: allStyles.borderRadius || undefined,
+        boxShadow: allStyles.boxShadow || undefined,
         display: 'block',
     };
 
