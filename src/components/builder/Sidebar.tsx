@@ -5,7 +5,7 @@
  * @since   1.0.0
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import {
@@ -30,9 +30,12 @@ import {
     DollarSign,
     HelpCircle,
     Megaphone,
+    // Template library
+    LayoutTemplate,
 } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
+import { TemplateLibrary } from './TemplateLibrary';
 import type { ComponentType } from '../../types/components';
 
 import styles from './Sidebar.module.css';
@@ -127,6 +130,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggle }) => {
+    const [showTemplates, setShowTemplates] = useState(false);
     const { addComponent } = useBuilderStore();
 
     const handleAddComponent = (type: ComponentType) => {
@@ -156,42 +160,61 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggle 
     ].filter(Boolean).join(' ');
 
     return (
-        <aside className={sidebarClasses}>
-            <div className={styles.header}>
-                <div>
-                    <h2 className={styles.title}>Components</h2>
-                    <p className={styles.hint}>Drag or click to add</p>
-                </div>
-                {onToggle && (
-                    <button
-                        className={styles.collapseButton}
-                        onClick={onToggle}
-                        title="Collapse panel"
-                    >
-                        <ChevronLeft size={16} />
-                    </button>
-                )}
-            </div>
-
-            <div className={styles.content}>
-                {Object.entries(groupedComponents).map(([category, components]) => (
-                    <div key={category} className={styles.category}>
-                        <h3 className={styles.categoryTitle}>
-                            {categoryLabels[category] || category}
-                        </h3>
-                        <div className={styles.componentGrid}>
-                            {components.map((comp) => (
-                                <DraggableComponent
-                                    key={comp.type}
-                                    definition={comp}
-                                    onAdd={handleAddComponent}
-                                />
-                            ))}
-                        </div>
+        <>
+            <aside className={sidebarClasses}>
+                <div className={styles.header}>
+                    <div>
+                        <h2 className={styles.title}>Components</h2>
+                        <p className={styles.hint}>Drag or click to add</p>
                     </div>
-                ))}
-            </div>
-        </aside>
+                    {onToggle && (
+                        <button
+                            className={styles.collapseButton}
+                            onClick={onToggle}
+                            title="Collapse panel"
+                        >
+                            <ChevronLeft size={16} />
+                        </button>
+                    )}
+                </div>
+
+                {/* Template Library Button */}
+                <div className={styles.templateSection}>
+                    <button
+                        className={styles.templateButton}
+                        onClick={() => setShowTemplates(true)}
+                    >
+                        <LayoutTemplate size={18} />
+                        <span>Template Library</span>
+                    </button>
+                </div>
+
+                <div className={styles.content}>
+                    {Object.entries(groupedComponents).map(([category, components]) => (
+                        <div key={category} className={styles.category}>
+                            <h3 className={styles.categoryTitle}>
+                                {categoryLabels[category] || category}
+                            </h3>
+                            <div className={styles.componentGrid}>
+                                {components.map((comp) => (
+                                    <DraggableComponent
+                                        key={comp.type}
+                                        definition={comp}
+                                        onAdd={handleAddComponent}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </aside>
+
+            {/* Template Library Modal */}
+            <TemplateLibrary
+                isOpen={showTemplates}
+                onClose={() => setShowTemplates(false)}
+            />
+        </>
     );
 };
 

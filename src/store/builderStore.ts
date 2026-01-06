@@ -30,11 +30,18 @@ interface BuilderState {
     // Selection.
     selectedId: string | null;
 
+    // Clipboard for copy/paste.
+    clipboard: ComponentData | null;
+
     // UI state.
     isLoading: boolean;
     isSaving: boolean;
     isDirty: boolean;
     currentBreakpoint: Breakpoint;
+
+    // Auto-save.
+    autoSaveEnabled: boolean;
+    lastSaved: string | null;
 
     // History for undo/redo.
     past: HistoryEntry[];
@@ -49,11 +56,18 @@ interface BuilderActions {
     // Component management.
     setComponents: (components: ComponentData[], skipHistory?: boolean) => void;
     addComponent: (type: ComponentType, parentId?: string, index?: number) => string;
+    addComponentData: (component: ComponentData, parentId?: string, index?: number) => string;
     updateComponent: (id: string, updates: Partial<ComponentData>) => void;
     removeComponent: (id: string) => void;
     deleteComponent: (id: string) => void;
     moveComponent: (id: string, newParentId: string | null, newIndex: number) => void;
     duplicateComponent: (id: string) => string | null;
+
+    // Copy/Paste.
+    copyComponent: (id: string) => void;
+    cutComponent: (id: string) => void;
+    pasteComponent: (parentId?: string) => string | null;
+    hasClipboard: () => boolean;
 
     // Selection.
     selectComponent: (id: string | null) => void;
@@ -65,12 +79,22 @@ interface BuilderActions {
     setDirty: (dirty: boolean) => void;
     setBreakpoint: (breakpoint: Breakpoint) => void;
 
+    // Auto-save.
+    setAutoSave: (enabled: boolean) => void;
+    setLastSaved: (timestamp: string) => void;
+
     // History (Undo/Redo).
     undo: () => void;
     redo: () => void;
     canUndo: () => boolean;
     canRedo: () => boolean;
     clearHistory: () => void;
+
+    // Import/Export.
+    exportLayout: () => string;
+    importLayout: (json: string) => boolean;
+    exportComponent: (id: string) => string | null;
+    importComponent: (json: string, parentId?: string) => string | null;
 
     // Utilities.
     findComponentById: (id: string) => ComponentData | null;
@@ -348,10 +372,13 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
                 // Initial state.
                 components: [],
                 selectedId: null,
+                clipboard: null,
                 isLoading: true,
                 isSaving: false,
                 isDirty: false,
                 currentBreakpoint: 'desktop',
+                autoSaveEnabled: true,
+                lastSaved: null,
                 past: [],
                 future: [],
                 maxHistorySize: 50,
@@ -408,6 +435,58 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
                     });
 
                     return id;
+                },
+
+                // Add component from data (for paste/import).
+                addComponentData: (component, parentId, index) => {
+                    pushToHistory('Add component');
+
+                    // Generate new IDs for the component and all children
+                    const assignNewIds = (comp: ComponentData): ComponentData => {
+                        const newComp: ComponentData = {
+                            ...comp,
+                            id: generateId(comp.type),
+                        };
+                        if (newComp.children) {
+                            newComp.children = newComp.children.map(assignNewIds);
+                        }
+                        return newComp;
+                    };
+
+                    const newComponent = assignNewIds(component);
+
+                    set((state) => {
+                        let newComponents: ComponentData[];
+
+                        if (parentId) {
+                            const parent = findInTree(state.components, parentId);
+                            const children = parent?.children || [];
+                            const insertIndex = index ?? children.length;
+
+                            newComponents = updateInTree(state.components, parentId, {
+                                children: [
+                                    ...children.slice(0, insertIndex),
+                                    newComponent,
+                                    ...children.slice(insertIndex),
+                                ],
+                            });
+                        } else {
+                            const insertIndex = index ?? state.components.length;
+                            newComponents = [
+                                ...state.components.slice(0, insertIndex),
+                                newComponent,
+                                ...state.components.slice(insertIndex),
+                            ];
+                        }
+
+                        return {
+                            components: newComponents,
+                            isDirty: true,
+                            selectedId: newComponent.id,
+                        };
+                    });
+
+                    return newComponent.id;
                 },
 
                 // Update component properties.
@@ -533,6 +612,100 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
                     return newId;
                 },
 
+                // Copy component to clipboard.
+                copyComponent: (id) => {
+                    const component = findInTree(get().components, id);
+                    if (component) {
+                        // Deep clone to clipboard
+                        set({ clipboard: cloneComponents([component])[0] });
+                    }
+                },
+
+                // Cut component (copy + delete).
+                cutComponent: (id) => {
+                    const component = findInTree(get().components, id);
+                    if (component) {
+                        // Copy to clipboard
+                        set({ clipboard: cloneComponents([component])[0] });
+                        // Then delete
+                        pushToHistory('Cut component');
+                        set((state) => ({
+                            components: removeFromTree(state.components, id),
+                            selectedId: state.selectedId === id ? null : state.selectedId,
+                            isDirty: true,
+                        }));
+                    }
+                },
+
+                // Paste component from clipboard.
+                pasteComponent: (parentId) => {
+                    const state = get();
+                    if (!state.clipboard) return null;
+
+                    pushToHistory('Paste component');
+
+                    // Generate new IDs for pasted component
+                    const assignNewIds = (comp: ComponentData): ComponentData => {
+                        const newComp: ComponentData = {
+                            ...JSON.parse(JSON.stringify(comp)),
+                            id: generateId(comp.type),
+                        };
+                        if (newComp.children) {
+                            newComp.children = newComp.children.map(assignNewIds);
+                        }
+                        return newComp;
+                    };
+
+                    const pastedComponent = assignNewIds(state.clipboard);
+
+                    set((currentState) => {
+                        let newComponents: ComponentData[];
+
+                        if (parentId) {
+                            const parent = findInTree(currentState.components, parentId);
+                            const children = parent?.children || [];
+                            newComponents = updateInTree(currentState.components, parentId, {
+                                children: [...children, pastedComponent],
+                            });
+                        } else {
+                            // Paste after selected component or at end
+                            if (currentState.selectedId) {
+                                const location = findParentAndIndex(currentState.components, currentState.selectedId);
+                                if (location?.parent) {
+                                    const parentChildren = location.parent.children || [];
+                                    newComponents = updateInTree(currentState.components, location.parent.id, {
+                                        children: [
+                                            ...parentChildren.slice(0, location.index + 1),
+                                            pastedComponent,
+                                            ...parentChildren.slice(location.index + 1),
+                                        ],
+                                    });
+                                } else {
+                                    const insertIndex = location ? location.index + 1 : currentState.components.length;
+                                    newComponents = [
+                                        ...currentState.components.slice(0, insertIndex),
+                                        pastedComponent,
+                                        ...currentState.components.slice(insertIndex),
+                                    ];
+                                }
+                            } else {
+                                newComponents = [...currentState.components, pastedComponent];
+                            }
+                        }
+
+                        return {
+                            components: newComponents,
+                            isDirty: true,
+                            selectedId: pastedComponent.id,
+                        };
+                    });
+
+                    return pastedComponent.id;
+                },
+
+                // Check if clipboard has content.
+                hasClipboard: () => get().clipboard !== null,
+
                 // Selection.
                 selectComponent: (id) => set({ selectedId: id }),
                 getSelectedComponent: () => {
@@ -547,6 +720,10 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
                 setSaving: (isSaving) => set({ isSaving }),
                 setDirty: (isDirty) => set({ isDirty }),
                 setBreakpoint: (currentBreakpoint) => set({ currentBreakpoint }),
+
+                // Auto-save.
+                setAutoSave: (enabled) => set({ autoSaveEnabled: enabled }),
+                setLastSaved: (timestamp) => set({ lastSaved: timestamp }),
 
                 // Undo - restore previous state.
                 undo: () => {
@@ -603,6 +780,120 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
                 // Clear all history.
                 clearHistory: () => set({ past: [], future: [] }),
 
+                // Export entire layout as JSON.
+                exportLayout: () => {
+                    const state = get();
+                    const exportData = {
+                        version: '1.0',
+                        type: 'layout',
+                        timestamp: new Date().toISOString(),
+                        components: state.components,
+                    };
+                    return JSON.stringify(exportData, null, 2);
+                },
+
+                // Import layout from JSON.
+                importLayout: (json) => {
+                    try {
+                        const data = JSON.parse(json);
+                        if (!data.components || !Array.isArray(data.components)) {
+                            console.error('Invalid layout format: missing components array');
+                            return false;
+                        }
+
+                        pushToHistory('Import layout');
+
+                        // Assign new IDs to all imported components
+                        const assignNewIds = (comp: ComponentData): ComponentData => {
+                            const newComp: ComponentData = {
+                                ...comp,
+                                id: generateId(comp.type),
+                            };
+                            if (newComp.children) {
+                                newComp.children = newComp.children.map(assignNewIds);
+                            }
+                            return newComp;
+                        };
+
+                        const importedComponents = data.components.map(assignNewIds);
+                        set({
+                            components: importedComponents,
+                            isDirty: true,
+                            selectedId: null,
+                        });
+                        return true;
+                    } catch (error) {
+                        console.error('Failed to import layout:', error);
+                        return false;
+                    }
+                },
+
+                // Export single component as JSON.
+                exportComponent: (id) => {
+                    const component = findInTree(get().components, id);
+                    if (!component) return null;
+
+                    const exportData = {
+                        version: '1.0',
+                        type: 'component',
+                        timestamp: new Date().toISOString(),
+                        component: cloneComponents([component])[0],
+                    };
+                    return JSON.stringify(exportData, null, 2);
+                },
+
+                // Import component from JSON.
+                importComponent: (json, parentId) => {
+                    try {
+                        const data = JSON.parse(json);
+                        if (!data.component) {
+                            console.error('Invalid component format: missing component');
+                            return null;
+                        }
+
+                        pushToHistory('Import component');
+
+                        // Assign new IDs
+                        const assignNewIds = (comp: ComponentData): ComponentData => {
+                            const newComp: ComponentData = {
+                                ...comp,
+                                id: generateId(comp.type),
+                            };
+                            if (newComp.children) {
+                                newComp.children = newComp.children.map(assignNewIds);
+                            }
+                            return newComp;
+                        };
+
+                        const importedComponent = assignNewIds(data.component);
+
+                        set((state) => {
+                            let newComponents: ComponentData[];
+
+                            if (parentId) {
+                                const parent = findInTree(state.components, parentId);
+                                const children = parent?.children || [];
+                                newComponents = updateInTree(state.components, parentId, {
+                                    children: [...children, importedComponent],
+                                });
+                            } else {
+                                newComponents = [...state.components, importedComponent];
+                            }
+
+                            return {
+                                components: newComponents,
+                                isDirty: true,
+                                selectedId: importedComponent.id,
+                            };
+                        });
+
+                        return importedComponent.id;
+                    } catch (error) {
+                        console.error('Failed to import component:', error);
+                        return null;
+                    }
+                },
+
                 // Utilities.
                 findComponentById: (id) => findInTree(get().components, id),
                 getComponentPath: (id) => {
@@ -635,7 +926,19 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
  * Hook for keyboard shortcuts.
  */
 export const useBuilderKeyboardShortcuts = () => {
-    const { undo, redo, canUndo, canRedo, selectedId, deleteComponent, duplicateComponent } = useBuilderStore();
+    const {
+        undo,
+        redo,
+        canUndo,
+        canRedo,
+        selectedId,
+        deleteComponent,
+        duplicateComponent,
+        copyComponent,
+        cutComponent,
+        pasteComponent,
+        hasClipboard,
+    } = useBuilderStore();
 
     const handleKeyDown = (e: KeyboardEvent) => {
         // Don't trigger if user is typing in an input
@@ -661,6 +964,24 @@ export const useBuilderKeyboardShortcuts = () => {
             if (canRedo()) {
                 redo();
             }
+        }
+
+        // Copy: Cmd/Ctrl + C
+        if (modKey && e.key === 'c' && selectedId) {
+            e.preventDefault();
+            copyComponent(selectedId);
+        }
+
+        // Cut: Cmd/Ctrl + X
+        if (modKey && e.key === 'x' && selectedId) {
+            e.preventDefault();
+            cutComponent(selectedId);
+        }
+
+        // Paste: Cmd/Ctrl + V
+        if (modKey && e.key === 'v' && hasClipboard()) {
+            e.preventDefault();
+            pasteComponent();
         }
 
         // Delete: Delete or Backspace
