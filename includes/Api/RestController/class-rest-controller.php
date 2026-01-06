@@ -444,12 +444,14 @@ class Rest_Controller extends WP_REST_Controller {
      */
     private function sanitize_builder_data( array $data ) {
         $sanitized = [
-            'version'    => POLYMORPHIC_VERSION,
-            'created'    => $data['created'] ?? '',
-            'modified'   => '',
-            'settings'   => $this->sanitize_settings( $data['settings'] ?? [] ),
-            'components' => [],
-            'customCss'  => $this->sanitize_custom_css( $data['customCss'] ?? '' ),
+            'version'      => POLYMORPHIC_VERSION,
+            'created'      => $data['created'] ?? '',
+            'modified'     => '',
+            'settings'     => $this->sanitize_settings( $data['settings'] ?? [] ),
+            'components'   => [],
+            'customCss'    => $this->sanitize_custom_css( $data['customCss'] ?? '' ),
+            'generatedCss' => $this->sanitize_custom_css( $data['generatedCss'] ?? '' ),
+            'classMap'     => [],
         ];
 
         // Sanitize components recursively.
@@ -459,6 +461,13 @@ class Rest_Controller extends WP_REST_Controller {
                 if ( $sanitized_component ) {
                     $sanitized['components'][] = $sanitized_component;
                 }
+            }
+        }
+
+        // Sanitize class map.
+        if ( ! empty( $data['classMap'] ) && is_array( $data['classMap'] ) ) {
+            foreach ( $data['classMap'] as $id => $class ) {
+                $sanitized['classMap'][ preg_replace( '/[^a-zA-Z0-9_-]/', '', $id ) ] = preg_replace( '/[^a-zA-Z0-9_-]/', '', $class );
             }
         }
 

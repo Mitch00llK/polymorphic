@@ -8,6 +8,7 @@
 import apiFetch from '@wordpress/api-fetch';
 
 import type { BuilderData, ComponentData } from '../types/components';
+import { generateStyles } from './styleExtractor';
 
 /**
  * API base path.
@@ -57,6 +58,7 @@ interface MediaResponse {
 
 /**
  * Save builder data for a post.
+ * Automatically generates and includes optimized CSS.
  *
  * @param postId - Post ID.
  * @param data   - Builder data to save.
@@ -66,10 +68,21 @@ export const saveBuilderData = async (
     postId: number,
     data: Partial<BuilderData>
 ): Promise<SaveResponse> => {
+    // Generate optimized CSS from components
+    const components = data.components || [];
+    const { minified: generatedCss, classMap } = generateStyles(components);
+
+    // Include generated CSS and class map in the save data
+    const saveData = {
+        ...data,
+        generatedCss,
+        classMap: Object.fromEntries(classMap),
+    };
+
     const response = await apiFetch<ApiResponse<SaveResponse>>({
         path: `${API_BASE}/posts/${postId}/builder`,
         method: 'POST',
-        data: { data },
+        data: { data: saveData },
     });
 
     if (!response.success) {
