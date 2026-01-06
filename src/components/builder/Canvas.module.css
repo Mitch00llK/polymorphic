@@ -112,3 +112,102 @@
     opacity: 0.5;
     cursor: grabbing;
 }
+
+/* Floating Toolbar */
+.floatingToolbar {
+    position: absolute;
+    top: -36px;
+    right: 0;
+    display: flex;
+    gap: 2px;
+    padding: 4px;
+    background: var(--polymorphic-color-white);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    box-shadow: var(--polymorphic-shadow-md);
+    z-index: 10;
+}
+
+.toolbarButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: transparent;
+    color: var(--polymorphic-color-gray-600);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.toolbarButton:hover {
+    background: var(--polymorphic-color-gray-100);
+    color: var(--polymorphic-color-gray-900);
+}
+
+.deleteButton:hover {
+    background: var(--polymorphic-color-error);
+    color: white;
+}
+
+/* Context Menu */
+.contextMenu {
+    position: fixed;
+    min-width: 160px;
+    background: var(--polymorphic-color-white);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    box-shadow: var(--polymorphic-shadow-lg);
+    z-index: var(--polymorphic-z-dropdown);
+    padding: 4px;
+}
+
+.contextMenuItem {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-2);
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: transparent;
+    font-size: var(--polymorphic-font-size-sm);
+    color: var(--polymorphic-color-gray-700);
+    cursor: pointer;
+    transition: background-color var(--polymorphic-transition-fast);
+}
+
+.contextMenuItem:hover {
+    background: var(--polymorphic-color-gray-100);
+}
+
+.contextMenuItem span {
+    flex: 1;
+    text-align: left;
+}
+
+.contextMenuItem kbd {
+    font-family: var(--polymorphic-font-family-mono);
+    font-size: 11px;
+    color: var(--polymorphic-color-gray-400);
+    background: var(--polymorphic-color-gray-100);
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.contextMenuDanger {
+    color: var(--polymorphic-color-error);
+}
+
+.contextMenuDanger:hover {
+    background: var(--polymorphic-color-error);
+    color: white;
+}
+
+.contextMenuDanger:hover kbd {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}

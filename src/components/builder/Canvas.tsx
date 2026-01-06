@@ -5,7 +5,7 @@
  * @since   1.0.0
  */
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
     SortableContext,
@@ -13,6 +13,7 @@ import {
     useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Trash2, Copy, GripVertical } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
 import { ComponentRenderer } from '../renderers/ComponentRenderer';
@@ -21,18 +22,34 @@ import type { ComponentData } from '../../types/components';
 import styles from './Canvas.module.css';
 
 /**
+ * Context menu state.
+ */
+interface ContextMenuState {
+    visible: boolean;
+    x: number;
+    y: number;
+    componentId: string | null;
+}
+
+/**
  * Sortable wrapper for each component.
  */
 interface SortableComponentProps {
     component: ComponentData;
     isSelected: boolean;
     onSelect: (id: string) => void;
+    onDelete: (id: string) => void;
+    onDuplicate: (id: string) => void;
+    onContextMenu: (e: React.MouseEvent, id: string) => void;
 }
 
 const SortableComponent: React.FC<SortableComponentProps> = ({
     component,
     isSelected,
     onSelect,
+    onDelete,
+    onDuplicate,
+    onContextMenu,
 }) => {
     const {
         attributes,
@@ -55,6 +72,22 @@ const SortableComponent: React.FC<SortableComponentProps> = ({
         opacity: isDragging ? 0.5 : 1,
     };
 
+    const handleDelete = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onDelete(component.id);
+    };
+
+    const handleDuplicate = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onDuplicate(component.id);
+    };
+
+    const handleContextMenu = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onContextMenu(e, component.id);
+    };
+
     return (
         <div
             ref={setNodeRef}
@@ -64,10 +97,39 @@ const SortableComponent: React.FC<SortableComponentProps> = ({
                 e.stopPropagation();
                 onSelect(component.id);
             }}
-            {...attributes}
-            {...listeners}
+            onContextMenu={handleContextMenu}
         >
             <ComponentRenderer component={component} context="editor" />
+
+            {/* Floating toolbar */}
+            {isSelected && (
+                <div className={styles.floatingToolbar}>
+                    <button
+                        className={styles.toolbarButton}
+                        {...attributes}
+                        {...listeners}
+                        title="Drag to move"
+                    >
+                        <GripVertical size={14} />
+                    </button>
+                    <button
+                        className={styles.toolbarButton}
+                        onClick={handleDuplicate}
+                        title="Duplicate"
+                    >
+                        <Copy size={14} />
+                    </button>
+                    <button
+                        className={`${styles.toolbarButton} ${styles.deleteButton}`}
+                        onClick={handleDelete}
+                        title="Delete"
+                    >
+                        <Trash2 size={14} />
+                    </button>
+                </div>
+            )}
+
+            {/* Selection overlay with label */}
             {isSelected && (
                 <div className={styles.selectedOverlay}>
                     <span className={styles.componentLabel}>{component.type}</span>
@@ -81,15 +143,100 @@ const SortableComponent: React.FC<SortableComponentProps> = ({
  * Main canvas component where components are rendered and arranged.
  */
 export const Canvas: React.FC = () => {
-    const { components, selectedId, selectComponent, currentBreakpoint } =
-        useBuilderStore();
+    const {
+        components,
+        selectedId,
+        selectComponent,
+        currentBreakpoint,
+        removeComponent,
+        duplicateComponent,
+    } = useBuilderStore();
+
+    const [contextMenu, setContextMenu] = useState<ContextMenuState>({
+        visible: false,
+        x: 0,
+        y: 0,
+        componentId: null,
+    });
+
+    const canvasRef = useRef<HTMLDivElement>(null);
 
     const { setNodeRef, isOver } = useDroppable({
         id: 'canvas-drop-zone',
     });
 
+    // Handle keyboard shortcuts.
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (!selectedId) return;
+
+            // Don't delete if user is typing in an input.
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                e.preventDefault();
+                handleDelete(selectedId);
+            }
+
+            if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+                e.preventDefault();
+                duplicateComponent(selectedId);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedId, duplicateComponent]);
+
+    // Close context menu on click outside.
+    useEffect(() => {
+        const handleClick = () => {
+            if (contextMenu.visible) {
+                setContextMenu({ ...contextMenu, visible: false });
+            }
+        };
+
+        window.addEventListener('click', handleClick);
+        return () => window.removeEventListener('click', handleClick);
+    }, [contextMenu]);
+
     const handleCanvasClick = () => {
         selectComponent(null);
+    };
+
+    const handleDelete = (id: string) => {
+        if (window.confirm('Delete this component?')) {
+            removeComponent(id);
+        }
+    };
+
+    const handleDuplicate = (id: string) => {
+        duplicateComponent(id);
+    };
+
+    const handleContextMenu = (e: React.MouseEvent, id: string) => {
+        selectComponent(id);
+        setContextMenu({
+            visible: true,
+            x: e.clientX,
+            y: e.clientY,
+            componentId: id,
+        });
+    };
+
+    const handleContextMenuAction = (action: 'delete' | 'duplicate') => {
+        if (!contextMenu.componentId) return;
+
+        if (action === 'delete') {
+            handleDelete(contextMenu.componentId);
+        } else if (action === 'duplicate') {
+            handleDuplicate(contextMenu.componentId);
+        }
+
+        setContextMenu({ ...contextMenu, visible: false });
     };
 
     // Determine viewport width based on breakpoint.
@@ -100,7 +247,7 @@ export const Canvas: React.FC = () => {
     }[currentBreakpoint];
 
     return (
-        <div className={styles.canvas} onClick={handleCanvasClick}>
+        <div ref={canvasRef} className={styles.canvas} onClick={handleCanvasClick}>
             <div
                 ref={setNodeRef}
                 className={`${styles.viewport} ${isOver ? styles.isDropTarget : ''}`}
@@ -126,14 +273,43 @@ export const Canvas: React.FC = () => {
                                     component={component}
                                     isSelected={selectedId === component.id}
                                     onSelect={selectComponent}
+                                    onDelete={handleDelete}
+                                    onDuplicate={handleDuplicate}
+                                    onContextMenu={handleContextMenu}
                                 />
                             ))}
                         </div>
                     )}
                 </SortableContext>
             </div>
+
+            {/* Context Menu */}
+            {contextMenu.visible && (
+                <div
+                    className={styles.contextMenu}
+                    style={{ left: contextMenu.x, top: contextMenu.y }}
+                >
+                    <button
+                        className={styles.contextMenuItem}
+                        onClick={() => handleContextMenuAction('duplicate')}
+                    >
+                        <Copy size={14} />
+                        <span>Duplicate</span>
+                        <kbd>⌘D</kbd>
+                    </button>
+                    <button
+                        className={`${styles.contextMenuItem} ${styles.contextMenuDanger}`}
+                        onClick={() => handleContextMenuAction('delete')}
+                    >
+                        <Trash2 size={14} />
+                        <span>Delete</span>
+                        <kbd>⌫</kbd>
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
 
 export default Canvas;
+
