@@ -40,10 +40,10 @@ import {
     PricingBlockRenderer,
     FaqBlockRenderer,
     CtaBlockRenderer,
-    TestimonialBlock,
-    StatsBlock,
-    LogoCloud,
 } from './organisms';
+
+// Auto-discovered components
+import { GENERATED_RENDERERS } from '../generated/componentRegistry.generated';
 
 /**
  * Context type - 'editor' for builder, 'preview' or 'frontend' for read-only.
@@ -59,9 +59,9 @@ interface RendererProps {
 }
 
 /**
- * Component renderer map.
+ * Core component renderers (manually defined).
  */
-const renderers: Record<string, React.FC<RendererProps>> = {
+const CORE_RENDERERS: Record<string, React.FC<RendererProps>> = {
     // Layout (Organisms)
     section: SectionRenderer as React.FC<RendererProps>,
     container: ContainerRenderer as React.FC<RendererProps>,
@@ -87,11 +87,14 @@ const renderers: Record<string, React.FC<RendererProps>> = {
     pricingBlock: PricingBlockRenderer as React.FC<RendererProps>,
     faqBlock: FaqBlockRenderer as React.FC<RendererProps>,
     ctaBlock: CtaBlockRenderer as React.FC<RendererProps>,
+};
 
-    // SaaS Blocks
-    testimonialBlock: TestimonialBlock as React.FC<RendererProps>,
-    statsBlock: StatsBlock as React.FC<RendererProps>,
-    logoCloud: LogoCloud as React.FC<RendererProps>,
+/**
+ * Merged renderers: core + auto-discovered.
+ */
+const renderers: Record<string, React.FC<RendererProps>> = {
+    ...CORE_RENDERERS,
+    ...GENERATED_RENDERERS,
 };
 
 /**

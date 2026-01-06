@@ -42,6 +42,7 @@ import {
 import { useBuilderStore } from '../../store/builderStore';
 import { TemplateLibrary } from './TemplateLibrary';
 import type { ComponentType } from '../../types/components';
+import { GENERATED_COMPONENTS } from '../../generated/sidebarComponents.generated';
 
 import styles from './Sidebar.module.css';
 
@@ -56,9 +57,9 @@ interface ComponentDefinition {
 }
 
 /**
- * Available components to drag onto the canvas.
+ * Core components (manually defined, not auto-discovered).
  */
-const COMPONENTS: ComponentDefinition[] = [
+const CORE_COMPONENTS: ComponentDefinition[] = [
     // Layout
     { type: 'section', label: 'Section', icon: <Layout size={20} />, category: 'layout' },
     { type: 'container', label: 'Container', icon: <Box size={20} />, category: 'layout' },
@@ -77,16 +78,20 @@ const COMPONENTS: ComponentDefinition[] = [
     { type: 'badge', label: 'Badge', icon: <Tag size={20} />, category: 'ui' },
     { type: 'avatar', label: 'Avatar', icon: <User size={20} />, category: 'ui' },
     { type: 'separator', label: 'Separator', icon: <Minus size={20} />, category: 'ui' },
-    // Marketing Blocks
+    // Marketing Blocks (core)
     { type: 'heroBlock', label: 'Hero', icon: <Star size={20} />, category: 'blocks' },
     { type: 'featuresBlock', label: 'Features', icon: <Grid3X3 size={20} />, category: 'blocks' },
     { type: 'pricingBlock', label: 'Pricing', icon: <DollarSign size={20} />, category: 'blocks' },
     { type: 'faqBlock', label: 'FAQ', icon: <HelpCircle size={20} />, category: 'blocks' },
     { type: 'ctaBlock', label: 'CTA', icon: <Megaphone size={20} />, category: 'blocks' },
-    // SaaS Blocks
-    { type: 'testimonialBlock', label: 'Testimonials', icon: <Quote size={20} />, category: 'blocks' },
-    { type: 'statsBlock', label: 'Stats Grid', icon: <BarChart3 size={20} />, category: 'blocks' },
-    { type: 'logoCloud', label: 'Logo Cloud', icon: <LayoutGrid size={20} />, category: 'blocks' },
+];
+
+/**
+ * Merged components: core + auto-discovered.
+ */
+const COMPONENTS: ComponentDefinition[] = [
+    ...CORE_COMPONENTS,
+    ...GENERATED_COMPONENTS as ComponentDefinition[],
 ];
 
 /**

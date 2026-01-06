@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "wp-scripts start",
-    "build": "wp-scripts build && npm run copy-assets",
-    "build:dev": "wp-scripts build --mode=development && npm run copy-assets",
+    "generate": "node scripts/generate-registries.js",
+    "build": "npm run generate && wp-scripts build && npm run copy-assets",
+    "build:dev": "npm run generate && wp-scripts build --mode=development && npm run copy-assets",
     "copy-assets": "cp build/index.js assets/admin/builder.js && cp build/index.css assets/admin/builder.css && cp build/index.asset.php assets/admin/builder.asset.php",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "wp-scripts lint-js src/",
@@ -24,9 +25,13 @@
   "author": "Your Company",
   "license": "GPL-2.0-or-later",
   "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@wordpress/scripts": "^28.0.0",
+    "glob": "^10.3.0",
+    "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
   },
   "dependencies": {
