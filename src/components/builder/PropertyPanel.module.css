@@ -104,11 +104,137 @@
     min-height: 80px;
 }
 
-.placeholder {
-    padding: var(--polymorphic-spacing-4);
-    background-color: var(--polymorphic-color-gray-50);
-    border-radius: var(--polymorphic-border-radius-md);
+/* Empty state */
+.emptyIcon {
+    font-size: 32px;
+    margin-bottom: var(--polymorphic-spacing-2);
+}
+
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: var(--polymorphic-spacing-8);
     text-align: center;
-    color: var(--polymorphic-color-gray-500);
+    color: var(--polymorphic-color-gray-400);
     font-size: var(--polymorphic-font-size-sm);
+}
+
+/* Control Groups */
+.controlGroup {
+    margin-bottom: var(--polymorphic-spacing-4);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    overflow: hidden;
+}
+
+.controlGroupHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-2);
+    width: 100%;
+    padding: var(--polymorphic-spacing-3);
+    background: var(--polymorphic-color-gray-50);
+    border: none;
+    font-size: var(--polymorphic-font-size-xs);
+    font-weight: var(--polymorphic-font-weight-semibold);
+    color: var(--polymorphic-color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background-color var(--polymorphic-transition-fast);
+}
+
+.controlGroupHeader:hover {
+    background: var(--polymorphic-color-gray-100);
+}
+
+.controlGroupContent {
+    padding: var(--polymorphic-spacing-3);
+}
+
+/* Color Picker */
+.colorWrapper {
+    display: flex;
+    gap: var(--polymorphic-spacing-2);
+}
+
+.colorPicker {
+    width: 40px;
+    height: 36px;
+    padding: 2px;
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    cursor: pointer;
+}
+
+.colorPicker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.colorPicker::-webkit-color-swatch {
+    border-radius: 2px;
+    border: none;
+}
+
+.colorText {
+    flex: 1;
+    padding: var(--polymorphic-spacing-2) var(--polymorphic-spacing-3);
+    font-family: monospace;
+    font-size: var(--polymorphic-font-size-sm);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+}
+
+.colorText:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+    box-shadow: 0 0 0 3px var(--polymorphic-color-primary-light);
+}
+
+/* Checkbox */
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-2);
+    font-size: var(--polymorphic-font-size-sm);
+    color: var(--polymorphic-color-gray-700);
+    cursor: pointer;
+}
+
+.checkboxLabel input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--polymorphic-color-primary);
+    cursor: pointer;
+}
+
+/* Footer */
+.footer {
+    padding: var(--polymorphic-spacing-4);
+    border-top: 1px solid var(--polymorphic-border-color);
+}
+
+.deleteButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--polymorphic-spacing-2);
+    width: 100%;
+    padding: var(--polymorphic-spacing-2) var(--polymorphic-spacing-3);
+    background: transparent;
+    border: 1px solid var(--polymorphic-color-error);
+    border-radius: var(--polymorphic-border-radius-md);
+    color: var(--polymorphic-color-error);
+    font-size: var(--polymorphic-font-size-sm);
+    font-weight: var(--polymorphic-font-weight-medium);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.deleteButton:hover {
+    background: var(--polymorphic-color-error);
+    color: white;
 }
