@@ -438,12 +438,12 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ isCollapsed = fals
         return (
             <FlexLayoutControl
                 value={{
-                    display: (props.display as FlexLayoutValue['display']) || 'block',
-                    flexDirection: (props.flexDirection as FlexLayoutValue['flexDirection']) || 'column',
-                    justifyContent: (props.justifyContent as FlexLayoutValue['justifyContent']) || 'flex-start',
-                    alignItems: (props.alignItems as FlexLayoutValue['alignItems']) || 'stretch',
-                    gap: (props.gap as string) || '',
-                    flexWrap: (props.flexWrap as FlexLayoutValue['flexWrap']) || 'nowrap',
+                    display: props.display as FlexLayoutValue['display'],
+                    flexDirection: props.flexDirection as FlexLayoutValue['flexDirection'],
+                    justifyContent: props.justifyContent as FlexLayoutValue['justifyContent'],
+                    alignItems: props.alignItems as FlexLayoutValue['alignItems'],
+                    gap: props.gap as string,
+                    flexWrap: props.flexWrap as FlexLayoutValue['flexWrap'],
                 }}
                 onChange={(v) => handleMultiPropChange(v)}
             />
@@ -483,7 +483,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ isCollapsed = fals
      */
     const renderControlGroup = (group: ControlGroupType, index: number) => {
         const isFirst = index === 0;
-        
+
         switch (group) {
             case 'typography':
                 return (

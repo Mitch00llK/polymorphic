@@ -2,6 +2,7 @@
  * Flex Layout Control Component
  *
  * Controls for flexbox layout: display, direction, justify, align, gap.
+ * Only sends changed values to avoid overriding CSS defaults.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -24,12 +25,12 @@ import {
 import styles from './controls.module.css';
 
 export interface FlexLayoutValue {
-    display: 'block' | 'flex' | 'grid';
-    flexDirection: 'row' | 'column' | 'row-reverse' | 'column-reverse';
-    justifyContent: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
-    alignItems: 'flex-start' | 'center' | 'flex-end' | 'stretch';
-    gap: string;
-    flexWrap: 'nowrap' | 'wrap';
+    display?: 'block' | 'flex' | 'grid';
+    flexDirection?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
+    justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
+    alignItems?: 'flex-start' | 'center' | 'flex-end' | 'stretch';
+    gap?: string;
+    flexWrap?: 'nowrap' | 'wrap';
 }
 
 interface FlexLayoutControlProps {
@@ -37,8 +38,12 @@ interface FlexLayoutControlProps {
     onChange: (value: Partial<FlexLayoutValue>) => void;
 }
 
-const DEFAULT_FLEX: FlexLayoutValue = {
-    display: 'block',
+/**
+ * Visual defaults for UI display only (not saved to component).
+ * CSS defaults handle actual rendering.
+ */
+const UI_DEFAULTS: Required<FlexLayoutValue> = {
+    display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'stretch',
@@ -50,13 +55,22 @@ export const FlexLayoutControl: React.FC<FlexLayoutControlProps> = ({
     value,
     onChange,
 }) => {
-    const layout = { ...DEFAULT_FLEX, ...value };
+    // For display purposes only - merge with UI defaults
+    const layout: Required<FlexLayoutValue> = {
+        display: value.display ?? UI_DEFAULTS.display,
+        flexDirection: value.flexDirection ?? UI_DEFAULTS.flexDirection,
+        justifyContent: value.justifyContent ?? UI_DEFAULTS.justifyContent,
+        alignItems: value.alignItems ?? UI_DEFAULTS.alignItems,
+        gap: value.gap ?? UI_DEFAULTS.gap,
+        flexWrap: value.flexWrap ?? UI_DEFAULTS.flexWrap,
+    };
 
+    // Only send the changed property, not all defaults
     const handleChange = <K extends keyof FlexLayoutValue>(
         key: K,
         newValue: FlexLayoutValue[K]
     ) => {
-        onChange({ ...value, [key]: newValue });
+        onChange({ [key]: newValue });
     };
 
     const displayOptions = [
