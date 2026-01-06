@@ -164,6 +164,11 @@ final class Plugin {
             'pricingBlock'  => \Polymorphic\Components\PricingBlock\PricingBlock::class,
             'faqBlock'      => \Polymorphic\Components\FaqBlock\FaqBlock::class,
             'ctaBlock'      => \Polymorphic\Components\CtaBlock\CtaBlock::class,
+
+            // SaaS Blocks.
+            'testimonialBlock' => \Polymorphic\Components\TestimonialBlock\Testimonial_Block::class,
+            'statsBlock'       => \Polymorphic\Components\StatsBlock\Stats_Block::class,
+            'logoCloud'        => \Polymorphic\Components\LogoCloud\Logo_Cloud::class,
         ];
 
         /**

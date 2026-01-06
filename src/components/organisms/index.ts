@@ -18,3 +18,7 @@ export { PricingBlockRenderer } from './PricingBlock/PricingBlockRenderer';
 export { FaqBlockRenderer } from './FaqBlock/FaqBlockRenderer';
 export { CtaBlockRenderer } from './CtaBlock/CtaBlockRenderer';
 
+// SaaS blocks
+export { TestimonialBlock } from './TestimonialBlock/TestimonialBlock';
+export { StatsBlock } from './StatsBlock/StatsBlock';
+export { LogoCloud } from './LogoCloud/LogoCloud';

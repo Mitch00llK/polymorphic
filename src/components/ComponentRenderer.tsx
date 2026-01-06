@@ -40,6 +40,9 @@ import {
     PricingBlockRenderer,
     FaqBlockRenderer,
     CtaBlockRenderer,
+    TestimonialBlock,
+    StatsBlock,
+    LogoCloud,
 } from './organisms';
 
 /**
@@ -84,6 +87,11 @@ const renderers: Record<string, React.FC<RendererProps>> = {
     pricingBlock: PricingBlockRenderer as React.FC<RendererProps>,
     faqBlock: FaqBlockRenderer as React.FC<RendererProps>,
     ctaBlock: CtaBlockRenderer as React.FC<RendererProps>,
+
+    // SaaS Blocks
+    testimonialBlock: TestimonialBlock as React.FC<RendererProps>,
+    statsBlock: StatsBlock as React.FC<RendererProps>,
+    logoCloud: LogoCloud as React.FC<RendererProps>,
 };
 
 /**

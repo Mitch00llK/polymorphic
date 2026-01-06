@@ -484,5 +484,66 @@ registerComponentCSS('ctaBlock', `
 .poly-cta-block--light .poly-cta-block__btn { background: #6366f1; color: #fff; }
 @media (max-width: 768px) { .poly-cta-block__title { font-size: 1.75rem; } }
 `);
+// Testimonial Block
+registerComponentCSS('testimonialBlock', `
+.poly-testimonial-block {
+    width: 100%;
+    padding-top: var(--poly-padding-top, 80px);
+    padding-bottom: var(--poly-padding-bottom, 80px);
+    padding-left: var(--poly-padding-left, 20px);
+    padding-right: var(--poly-padding-right, 20px);
+    background-color: var(--poly-background-color, #f9fafb);
+}
+.poly-testimonial-block__header { text-align: center; margin-bottom: 3rem; }
+.poly-testimonial-block__title { margin: 0 0 1rem 0; font-size: 2rem; font-weight: 700; color: var(--poly-color, #111827); }
+.poly-testimonial-block__subtitle { margin: 0; font-size: 1.125rem; color: #6b7280; }
+.poly-testimonial-block__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+.poly-testimonial-card { background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 1.5rem; }
+.poly-testimonial-card__content { font-size: 1.125rem; line-height: 1.6; color: #374151; font-style: italic; }
+.poly-testimonial-card__author { display: flex; align-items: center; gap: 1rem; margin-top: auto; }
+.poly-testimonial-card__avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: #e5e7eb; }
+.poly-testimonial-card__info { display: flex; flex-direction: column; }
+.poly-testimonial-card__name { font-weight: 600; color: #111827; }
+.poly-testimonial-card__role { font-size: 0.875rem; color: #6b7280; }
+.poly-testimonial-card__rating { display: flex; gap: 2px; color: #f59e0b; }
+@media (max-width: 768px) { .poly-testimonial-block__grid { grid-template-columns: 1fr; } }
+`);
+
+// Stats Block
+registerComponentCSS('statsBlock', `
+.poly-stats-block {
+    width: 100%;
+    padding-top: var(--poly-padding-top, 60px);
+    padding-bottom: var(--poly-padding-bottom, 60px);
+    padding-left: var(--poly-padding-left, 20px);
+    padding-right: var(--poly-padding-right, 20px);
+    background-color: var(--poly-background-color, #fff);
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+.poly-stats-block__grid { display: grid; grid-template-columns: repeat(var(--poly-columns, 4), 1fr); gap: 2rem; max-width: 1200px; margin: 0 auto; text-align: center; }
+.poly-stats-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.poly-stats-item__value { font-size: 3rem; font-weight: 800; color: var(--poly-primary-color, #6366f1); line-height: 1; }
+.poly-stats-item__label { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+@media (max-width: 1024px) { .poly-stats-block__grid { grid-template-columns: repeat(2, 1fr); gap: 3rem; } }
+@media (max-width: 640px) { .poly-stats-block__grid { grid-template-columns: 1fr; gap: 3rem; } }
+`);
+
+// Logo Cloud
+registerComponentCSS('logoCloud', `
+.poly-logo-cloud {
+    width: 100%;
+    padding-top: var(--poly-padding-top, 60px);
+    padding-bottom: var(--poly-padding-bottom, 60px);
+    padding-left: var(--poly-padding-left, 20px);
+    padding-right: var(--poly-padding-right, 20px);
+    background-color: var(--poly-background-color, #fff);
+}
+.poly-logo-cloud__title { text-align: center; font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; margin-bottom: 2rem; }
+.poly-logo-cloud__grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--poly-gap, 3rem); max-width: 1200px; margin: 0 auto; }
+.poly-logo-item { display: flex; align-items: center; justify-content: center; }
+.poly-logo-item img { max-height: 48px; width: auto; max-width: 160px; filter: grayscale(100%); opacity: 0.6; transition: all 0.3s ease; }
+.poly-logo-item:hover img { filter: grayscale(0%); opacity: 1; transform: scale(1.05); }
+`);
 
 export default componentCSS;
