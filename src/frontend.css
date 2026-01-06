@@ -1,0 +1,12 @@
+/**
+ * Polymorphic Frontend Styles
+ *
+ * Base component styles for the frontend.
+ * This file is loaded on published pages that use the builder.
+ *
+ * @package Polymorphic
+ * @since   1.0.0
+ */
+
+@import './styles/components.css';
+

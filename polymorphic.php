@@ -116,7 +116,10 @@ if ( file_exists( POLYMORPHIC_PATH . 'vendor/autoload.php' ) ) {
     require_once POLYMORPHIC_PATH . 'includes/Admin/Assets/class-assets.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/EditorIntegration/class-editor-integration.php';
     require_once POLYMORPHIC_PATH . 'includes/Api/RestController/class-rest-controller.php';
+    require_once POLYMORPHIC_PATH . 'includes/Api/GlobalSettingsController/class-global-settings-controller.php';
     require_once POLYMORPHIC_PATH . 'includes/Frontend/Renderer/class-renderer.php';
+    require_once POLYMORPHIC_PATH . 'includes/Frontend/Assets/class-frontend-assets.php';
+    require_once POLYMORPHIC_PATH . 'includes/Settings/GlobalSettings/class-global-settings.php';
     require_once POLYMORPHIC_PATH . 'includes/Cache/TransientCache/class-transient-cache.php';
     require_once POLYMORPHIC_PATH . 'includes/Helpers/Sanitizer/class-sanitizer.php';
 }

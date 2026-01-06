@@ -15,6 +15,7 @@ use Polymorphic\Api\Rest_Controller;
 use Polymorphic\Api\Global_Settings_Controller;
 use Polymorphic\Components\Component_Registry;
 use Polymorphic\Frontend\Renderer;
+use Polymorphic\Frontend\Frontend_Assets;
 use Polymorphic\Settings\Global_Settings;
 
 /**
@@ -110,8 +111,13 @@ final class Plugin {
      * @since 1.0.0
      */
     private function init_frontend(): void {
+        // Frontend renderer.
         $renderer = new Renderer( $this->component_registry );
         $renderer->init();
+
+        // Frontend assets (CSS/JS).
+        $frontend_assets = new Frontend_Assets();
+        $frontend_assets->init();
     }
 
     /**

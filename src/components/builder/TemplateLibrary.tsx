@@ -9,6 +9,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { X, Search, Layout, Layers, FileText, ShoppingBag, Briefcase, File, Plus, Sparkles } from 'lucide-react';
+import { nanoid } from 'nanoid';
 
 import { useBuilderStore } from '../../store/builderStore';
 import { TemplatePreview } from './TemplatePreview';
@@ -20,8 +21,25 @@ import {
     type Template,
     type TemplateCategory,
 } from '../../data/templates/index';
+import type { ComponentData } from '../../types/components';
 
 import styles from './TemplateLibrary.module.css';
+
+/**
+ * Deep clone components and assign new unique IDs.
+ * This ensures templates get unique IDs for the CSS generation system.
+ */
+function cloneWithNewIds(component: ComponentData): ComponentData {
+    const newId = `${component.type}-${nanoid(8)}`;
+    const cloned: ComponentData = {
+        ...JSON.parse(JSON.stringify(component)),
+        id: newId,
+    };
+    if (cloned.children) {
+        cloned.children = cloned.children.map(cloneWithNewIds);
+    }
+    return cloned;
+}
 
 interface TemplateLibraryProps {
     isOpen: boolean;
@@ -61,12 +79,15 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ isOpen, onClos
     if (!isOpen) return null;
 
     const handleInsertTemplate = (template: Template, replaceAll = false) => {
+        // Clone components with new unique IDs for CSS generation
+        const clonedComponents = template.components.map(cloneWithNewIds);
+
         if (replaceAll) {
-            // Replace entire page with template
-            setComponents(template.components);
+            // Replace entire page with template (cloned with new IDs)
+            setComponents(clonedComponents);
         } else {
             // Add template components to existing page
-            template.components.forEach((component) => {
+            clonedComponents.forEach((component) => {
                 addComponentData(component);
             });
         }
