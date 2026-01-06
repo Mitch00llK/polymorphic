@@ -12,7 +12,7 @@ import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { ChevronDown } from 'lucide-react';
 
 import type { ComponentData } from '../../types/components';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -42,6 +42,10 @@ export const AccordionRenderer: React.FC<AccordionRendererProps> = ({
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
 
+    // Build element-specific styles
+    const triggerStyle = buildElementStyles(props, 'trigger');
+    const contentStyle = buildElementStyles(props, 'content');
+
     const accordionStyle: React.CSSProperties = {
         ...sharedStyles,
     };
@@ -61,13 +65,13 @@ export const AccordionRenderer: React.FC<AccordionRendererProps> = ({
                     className={styles.accordionItem}
                 >
                     <AccordionPrimitive.Header className={styles.accordionHeader}>
-                        <AccordionPrimitive.Trigger className={styles.accordionTrigger}>
+                        <AccordionPrimitive.Trigger className={styles.accordionTrigger} style={triggerStyle}>
                             <span>{item.title}</span>
                             <ChevronDown className={styles.accordionChevron} size={16} />
                         </AccordionPrimitive.Trigger>
                     </AccordionPrimitive.Header>
                     <AccordionPrimitive.Content className={styles.accordionContent}>
-                        <div className={styles.accordionContentInner}>
+                        <div className={styles.accordionContentInner} style={contentStyle}>
                             {item.content}
                         </div>
                     </AccordionPrimitive.Content>

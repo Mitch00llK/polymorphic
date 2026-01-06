@@ -6,7 +6,7 @@
  */
 
 import React, { useState } from 'react';
-import { X, Trash2, ChevronDown, ChevronRight, ChevronLeft, Type, Palette, Maximize2, Space, LayoutGrid, Move } from 'lucide-react';
+import { X, Trash2, ChevronDown, ChevronRight, Type, Palette, Maximize2, Space, LayoutGrid, Move, Plus, Minus } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
 import {
@@ -16,8 +16,9 @@ import {
     BoxStyleControl,
     SizeControl,
     PositionControl,
+    ElementStyleControl,
 } from '../controls';
-import type { SpacingValue, FlexLayoutValue, TypographyValue, BoxStyleValue, SizeValue, PositionValue } from '../controls';
+import type { SpacingValue, FlexLayoutValue, TypographyValue, BoxStyleValue, SizeValue, PositionValue, ElementStyleValue } from '../controls';
 import type { ComponentType } from '../../types/components';
 import { getComponentControls, controlGroupLabels, type ControlGroupType } from '../../config/controlGroups';
 
@@ -195,6 +196,36 @@ const getControlGroupIcon = (group: ControlGroupType): React.ReactNode => {
         default:
             return null;
     }
+};
+
+/**
+ * Helper to get element style value from props with prefix
+ */
+const getElementStyle = (props: Record<string, unknown>, prefix: string): Partial<ElementStyleValue> => ({
+    fontSize: props[`${prefix}FontSize`] as string,
+    fontWeight: props[`${prefix}FontWeight`] as string,
+    lineHeight: props[`${prefix}LineHeight`] as string,
+    letterSpacing: props[`${prefix}LetterSpacing`] as string,
+    color: props[`${prefix}Color`] as string,
+    backgroundColor: props[`${prefix}BackgroundColor`] as string,
+    marginTop: props[`${prefix}MarginTop`] as string,
+    marginBottom: props[`${prefix}MarginBottom`] as string,
+});
+
+/**
+ * Helper to set element style values with prefix
+ */
+const setElementStyle = (prefix: string, style: Partial<ElementStyleValue>): Record<string, unknown> => {
+    const updates: Record<string, unknown> = {};
+    if (style.fontSize !== undefined) updates[`${prefix}FontSize`] = style.fontSize;
+    if (style.fontWeight !== undefined) updates[`${prefix}FontWeight`] = style.fontWeight;
+    if (style.lineHeight !== undefined) updates[`${prefix}LineHeight`] = style.lineHeight;
+    if (style.letterSpacing !== undefined) updates[`${prefix}LetterSpacing`] = style.letterSpacing;
+    if (style.color !== undefined) updates[`${prefix}Color`] = style.color;
+    if (style.backgroundColor !== undefined) updates[`${prefix}BackgroundColor`] = style.backgroundColor;
+    if (style.marginTop !== undefined) updates[`${prefix}MarginTop`] = style.marginTop;
+    if (style.marginBottom !== undefined) updates[`${prefix}MarginBottom`] = style.marginBottom;
+    return updates;
 };
 
 /**
@@ -434,7 +465,6 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ isCollapsed = fals
                     zIndex: props.zIndex as string,
                 }}
                 onChange={(v) => {
-                    // Map position values to props with 'position' prefix to avoid conflicts
                     const updates: Record<string, unknown> = {};
                     if (v.position !== undefined) updates.position = v.position;
                     if (v.top !== undefined) updates.positionTop = v.top;
@@ -580,36 +610,48 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ isCollapsed = fals
 
             case 'image':
                 return (
-                    <ControlGroup title="Content" defaultOpen={true}>
-                        <TextControl
-                            label="Image URL"
-                            value={(props.src as string) || ''}
-                            onChange={(v) => handlePropChange('src', v)}
-                            placeholder="https://..."
-                        />
-                        <TextControl
-                            label="Alt Text"
-                            value={(props.alt as string) || ''}
-                            onChange={(v) => handlePropChange('alt', v)}
-                            placeholder="Describe the image"
-                        />
-                        <TextControl
-                            label="Caption"
-                            value={(props.caption as string) || ''}
-                            onChange={(v) => handlePropChange('caption', v)}
-                        />
-                        <SelectControl
-                            label="Alignment"
-                            value={(props.align as string) || 'none'}
-                            onChange={(v) => handlePropChange('align', v)}
-                            options={[
-                                { value: 'none', label: 'None' },
-                                { value: 'left', label: 'Left' },
-                                { value: 'center', label: 'Center' },
-                                { value: 'right', label: 'Right' },
-                            ]}
-                        />
-                    </ControlGroup>
+                    <>
+                        <ControlGroup title="Content" defaultOpen={true}>
+                            <TextControl
+                                label="Image URL"
+                                value={(props.src as string) || ''}
+                                onChange={(v) => handlePropChange('src', v)}
+                                placeholder="https://..."
+                            />
+                            <TextControl
+                                label="Alt Text"
+                                value={(props.alt as string) || ''}
+                                onChange={(v) => handlePropChange('alt', v)}
+                                placeholder="Describe the image"
+                            />
+                            <TextControl
+                                label="Caption"
+                                value={(props.caption as string) || ''}
+                                onChange={(v) => handlePropChange('caption', v)}
+                            />
+                            <SelectControl
+                                label="Alignment"
+                                value={(props.align as string) || 'none'}
+                                onChange={(v) => handlePropChange('align', v)}
+                                options={[
+                                    { value: 'none', label: 'None' },
+                                    { value: 'left', label: 'Left' },
+                                    { value: 'center', label: 'Center' },
+                                    { value: 'right', label: 'Right' },
+                                ]}
+                            />
+                        </ControlGroup>
+                        {props.caption && (
+                            <ControlGroup title="Caption Style" defaultOpen={false}>
+                                <ElementStyleControl
+                                    label="Caption Text"
+                                    value={getElementStyle(props, 'caption')}
+                                    onChange={(v) => handleMultiPropChange(setElementStyle('caption', v))}
+                                    showSpacing={false}
+                                />
+                            </ControlGroup>
+                        )}
+                    </>
                 );
 
             case 'button':
@@ -663,64 +705,97 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ isCollapsed = fals
 
             case 'card':
                 return (
-                    <ControlGroup title="Content" defaultOpen={true}>
-                        <TextControl
-                            label="Title"
-                            value={(props.title as string) || ''}
-                            onChange={(v) => handlePropChange('title', v)}
-                            placeholder="Card Title"
-                        />
-                        <TextareaControl
-                            label="Description"
-                            value={(props.description as string) || ''}
-                            onChange={(v) => handlePropChange('description', v)}
-                            rows={2}
-                        />
-                        <TextControl
-                            label="Footer"
-                            value={(props.footer as string) || ''}
-                            onChange={(v) => handlePropChange('footer', v)}
-                        />
-                        <SelectControl
-                            label="Variant"
-                            value={(props.variant as string) || 'default'}
-                            onChange={(v) => handlePropChange('variant', v)}
-                            options={[
-                                { value: 'default', label: 'Default' },
-                                { value: 'outline', label: 'Outline' },
-                                { value: 'ghost', label: 'Ghost' },
-                            ]}
-                        />
-                    </ControlGroup>
+                    <>
+                        <ControlGroup title="Content" defaultOpen={true}>
+                            <TextControl
+                                label="Title"
+                                value={(props.title as string) || ''}
+                                onChange={(v) => handlePropChange('title', v)}
+                                placeholder="Card Title"
+                            />
+                            <TextareaControl
+                                label="Description"
+                                value={(props.description as string) || ''}
+                                onChange={(v) => handlePropChange('description', v)}
+                                rows={2}
+                            />
+                            <TextControl
+                                label="Footer"
+                                value={(props.footer as string) || ''}
+                                onChange={(v) => handlePropChange('footer', v)}
+                            />
+                            <SelectControl
+                                label="Variant"
+                                value={(props.variant as string) || 'default'}
+                                onChange={(v) => handlePropChange('variant', v)}
+                                options={[
+                                    { value: 'default', label: 'Default' },
+                                    { value: 'outline', label: 'Outline' },
+                                    { value: 'ghost', label: 'Ghost' },
+                                ]}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Element Styles" defaultOpen={false}>
+                            <ElementStyleControl
+                                label="Title"
+                                value={getElementStyle(props, 'title')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('title', v))}
+                            />
+                            <ElementStyleControl
+                                label="Description"
+                                value={getElementStyle(props, 'description')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('description', v))}
+                            />
+                            <ElementStyleControl
+                                label="Footer"
+                                value={getElementStyle(props, 'footer')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('footer', v))}
+                            />
+                        </ControlGroup>
+                    </>
                 );
 
             case 'alert':
                 return (
-                    <ControlGroup title="Content" defaultOpen={true}>
-                        <TextControl
-                            label="Title"
-                            value={(props.title as string) || ''}
-                            onChange={(v) => handlePropChange('title', v)}
-                            placeholder="Alert Title"
-                        />
-                        <TextareaControl
-                            label="Description"
-                            value={(props.description as string) || ''}
-                            onChange={(v) => handlePropChange('description', v)}
-                            rows={2}
-                        />
-                        <SelectControl
-                            label="Variant"
-                            value={(props.variant as string) || 'info'}
-                            onChange={(v) => handlePropChange('variant', v)}
-                            options={[
-                                { value: 'info', label: 'Info' },
-                                { value: 'success', label: 'Success' },
-                                { value: 'warning', label: 'Warning' },
-                                { value: 'error', label: 'Error' },
-                            ]}
-                        />
-                    </ControlGroup>
+                    <>
+                        <ControlGroup title="Content" defaultOpen={true}>
+                            <TextControl
+                                label="Title"
+                                value={(props.title as string) || ''}
+                                onChange={(v) => handlePropChange('title', v)}
+                                placeholder="Alert Title"
+                            />
+                            <TextareaControl
+                                label="Description"
+                                value={(props.description as string) || ''}
+                                onChange={(v) => handlePropChange('description', v)}
+                                rows={2}
+                            />
+                            <SelectControl
+                                label="Variant"
+                                value={(props.variant as string) || 'info'}
+                                onChange={(v) => handlePropChange('variant', v)}
+                                options={[
+                                    { value: 'info', label: 'Info' },
+                                    { value: 'success', label: 'Success' },
+                                    { value: 'warning', label: 'Warning' },
+                                    { value: 'error', label: 'Error' },
+                                ]}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Element Styles" defaultOpen={false}>
+                            <ElementStyleControl
+                                label="Title"
+                                value={getElementStyle(props, 'title')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('title', v))}
+                            />
+                            <ElementStyleControl
+                                label="Description"
+                                value={getElementStyle(props, 'description')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('description', v))}
+                            />
+                        </ControlGroup>
+                    </>
                 );
 
             case 'badge':
@@ -747,34 +822,44 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ isCollapsed = fals
 
             case 'avatar':
                 return (
-                    <ControlGroup title="Content" defaultOpen={true}>
-                        <TextControl
-                            label="Image URL"
-                            value={(props.src as string) || ''}
-                            onChange={(v) => handlePropChange('src', v)}
-                            placeholder="https://..."
-                        />
-                        <TextControl
-                            label="Alt Text"
-                            value={(props.alt as string) || ''}
-                            onChange={(v) => handlePropChange('alt', v)}
-                        />
-                        <TextControl
-                            label="Fallback Initials"
-                            value={(props.fallback as string) || 'U'}
-                            onChange={(v) => handlePropChange('fallback', v)}
-                        />
-                        <SelectControl
-                            label="Size"
-                            value={(props.size as string) || 'medium'}
-                            onChange={(v) => handlePropChange('size', v)}
-                            options={[
-                                { value: 'small', label: 'Small' },
-                                { value: 'medium', label: 'Medium' },
-                                { value: 'large', label: 'Large' },
-                            ]}
-                        />
-                    </ControlGroup>
+                    <>
+                        <ControlGroup title="Content" defaultOpen={true}>
+                            <TextControl
+                                label="Image URL"
+                                value={(props.src as string) || ''}
+                                onChange={(v) => handlePropChange('src', v)}
+                                placeholder="https://..."
+                            />
+                            <TextControl
+                                label="Alt Text"
+                                value={(props.alt as string) || ''}
+                                onChange={(v) => handlePropChange('alt', v)}
+                            />
+                            <TextControl
+                                label="Fallback Initials"
+                                value={(props.fallback as string) || 'U'}
+                                onChange={(v) => handlePropChange('fallback', v)}
+                            />
+                            <SelectControl
+                                label="Size"
+                                value={(props.size as string) || 'medium'}
+                                onChange={(v) => handlePropChange('size', v)}
+                                options={[
+                                    { value: 'small', label: 'Small' },
+                                    { value: 'medium', label: 'Medium' },
+                                    { value: 'large', label: 'Large' },
+                                ]}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Fallback Style" defaultOpen={false}>
+                            <ElementStyleControl
+                                label="Fallback Text"
+                                value={getElementStyle(props, 'fallback')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('fallback', v))}
+                                showSpacing={false}
+                            />
+                        </ControlGroup>
+                    </>
                 );
 
             case 'separator':
@@ -789,58 +874,364 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ isCollapsed = fals
                                 { value: 'vertical', label: 'Vertical' },
                             ]}
                         />
+                        <TextControl
+                            label="Thickness"
+                            value={(props.thickness as string) || ''}
+                            onChange={(v) => handlePropChange('thickness', v)}
+                            placeholder="1px"
+                        />
+                        <ColorControl
+                            label="Color"
+                            value={(props.separatorColor as string) || ''}
+                            onChange={(v) => handlePropChange('separatorColor', v)}
+                        />
                     </ControlGroup>
                 );
 
             case 'accordion':
                 return (
-                    <ControlGroup title="Settings" defaultOpen={true}>
-                        <SelectControl
-                            label="Type"
-                            value={(props.type as string) || 'single'}
-                            onChange={(v) => handlePropChange('type', v)}
-                            options={[
-                                { value: 'single', label: 'Single (one open)' },
-                                { value: 'multiple', label: 'Multiple' },
-                            ]}
-                        />
-                        <p className={styles.hint}>
-                            Edit accordion items in the code props.
-                        </p>
-                    </ControlGroup>
+                    <>
+                        <ControlGroup title="Settings" defaultOpen={true}>
+                            <SelectControl
+                                label="Type"
+                                value={(props.type as string) || 'single'}
+                                onChange={(v) => handlePropChange('type', v)}
+                                options={[
+                                    { value: 'single', label: 'Single (one open)' },
+                                    { value: 'multiple', label: 'Multiple' },
+                                ]}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Element Styles" defaultOpen={false}>
+                            <ElementStyleControl
+                                label="Trigger Text"
+                                value={getElementStyle(props, 'trigger')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('trigger', v))}
+                            />
+                            <ElementStyleControl
+                                label="Content Text"
+                                value={getElementStyle(props, 'content')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('content', v))}
+                            />
+                        </ControlGroup>
+                    </>
                 );
 
             case 'tabs':
                 return (
-                    <ControlGroup title="Settings" defaultOpen={true}>
-                        <TextControl
-                            label="Default Tab ID"
-                            value={(props.defaultTab as string) || 'tab1'}
-                            onChange={(v) => handlePropChange('defaultTab', v)}
-                        />
-                        <p className={styles.hint}>
-                            Edit tab items in the code props.
-                        </p>
-                    </ControlGroup>
+                    <>
+                        <ControlGroup title="Settings" defaultOpen={true}>
+                            <TextControl
+                                label="Default Tab ID"
+                                value={(props.defaultTab as string) || 'tab1'}
+                                onChange={(v) => handlePropChange('defaultTab', v)}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Element Styles" defaultOpen={false}>
+                            <ElementStyleControl
+                                label="Tab Trigger"
+                                value={getElementStyle(props, 'tabTrigger')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('tabTrigger', v))}
+                            />
+                            <ElementStyleControl
+                                label="Tab Content"
+                                value={getElementStyle(props, 'tabContent')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('tabContent', v))}
+                            />
+                        </ControlGroup>
+                    </>
                 );
 
             case 'section':
             case 'container':
-                // Layout components don't have content controls, just use the shared controls
                 return null;
 
-            // Marketing Blocks
+            // Marketing Blocks - Full Content Controls
             case 'heroBlock':
+                return (
+                    <>
+                        <ControlGroup title="Content" defaultOpen={true}>
+                            <TextControl
+                                label="Title"
+                                value={(props.title as string) || ''}
+                                onChange={(v) => handlePropChange('title', v)}
+                                placeholder="Build something amazing"
+                            />
+                            <TextareaControl
+                                label="Subtitle"
+                                value={(props.subtitle as string) || ''}
+                                onChange={(v) => handlePropChange('subtitle', v)}
+                                rows={2}
+                            />
+                            <SelectControl
+                                label="Alignment"
+                                value={(props.alignment as string) || 'center'}
+                                onChange={(v) => handlePropChange('alignment', v)}
+                                options={[
+                                    { value: 'left', label: 'Left' },
+                                    { value: 'center', label: 'Center' },
+                                    { value: 'right', label: 'Right' },
+                                ]}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Primary Button" defaultOpen={false}>
+                            <TextControl
+                                label="Text"
+                                value={(props.primaryButtonText as string) || ''}
+                                onChange={(v) => handlePropChange('primaryButtonText', v)}
+                            />
+                            <TextControl
+                                label="URL"
+                                value={(props.primaryButtonUrl as string) || ''}
+                                onChange={(v) => handlePropChange('primaryButtonUrl', v)}
+                            />
+                            <ElementStyleControl
+                                label="Button Style"
+                                value={getElementStyle(props, 'primaryButton')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('primaryButton', v))}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Secondary Button" defaultOpen={false}>
+                            <div className={styles.control}>
+                                <label className={styles.checkboxLabel}>
+                                    <input
+                                        type="checkbox"
+                                        checked={props.showSecondaryButton !== false}
+                                        onChange={(e) => handlePropChange('showSecondaryButton', e.target.checked)}
+                                    />
+                                    Show Secondary Button
+                                </label>
+                            </div>
+                            <TextControl
+                                label="Text"
+                                value={(props.secondaryButtonText as string) || ''}
+                                onChange={(v) => handlePropChange('secondaryButtonText', v)}
+                            />
+                            <TextControl
+                                label="URL"
+                                value={(props.secondaryButtonUrl as string) || ''}
+                                onChange={(v) => handlePropChange('secondaryButtonUrl', v)}
+                            />
+                            <ElementStyleControl
+                                label="Button Style"
+                                value={getElementStyle(props, 'secondaryButton')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('secondaryButton', v))}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Image" defaultOpen={false}>
+                            <TextControl
+                                label="Image URL"
+                                value={(props.imageUrl as string) || ''}
+                                onChange={(v) => handlePropChange('imageUrl', v)}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Element Styles" defaultOpen={false}>
+                            <ElementStyleControl
+                                label="Title"
+                                value={getElementStyle(props, 'heroTitle')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('heroTitle', v))}
+                            />
+                            <ElementStyleControl
+                                label="Subtitle"
+                                value={getElementStyle(props, 'heroSubtitle')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('heroSubtitle', v))}
+                            />
+                        </ControlGroup>
+                    </>
+                );
+
             case 'featuresBlock':
+                return (
+                    <>
+                        <ControlGroup title="Content" defaultOpen={true}>
+                            <TextControl
+                                label="Title"
+                                value={(props.title as string) || ''}
+                                onChange={(v) => handlePropChange('title', v)}
+                            />
+                            <TextareaControl
+                                label="Subtitle"
+                                value={(props.subtitle as string) || ''}
+                                onChange={(v) => handlePropChange('subtitle', v)}
+                                rows={2}
+                            />
+                            <SelectControl
+                                label="Columns"
+                                value={String((props.columns as number) || 3)}
+                                onChange={(v) => handlePropChange('columns', parseInt(v, 10))}
+                                options={[
+                                    { value: '2', label: '2 Columns' },
+                                    { value: '3', label: '3 Columns' },
+                                    { value: '4', label: '4 Columns' },
+                                ]}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Element Styles" defaultOpen={false}>
+                            <ElementStyleControl
+                                label="Section Title"
+                                value={getElementStyle(props, 'sectionTitle')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('sectionTitle', v))}
+                            />
+                            <ElementStyleControl
+                                label="Section Subtitle"
+                                value={getElementStyle(props, 'sectionSubtitle')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('sectionSubtitle', v))}
+                            />
+                            <ElementStyleControl
+                                label="Feature Title"
+                                value={getElementStyle(props, 'featureTitle')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('featureTitle', v))}
+                            />
+                            <ElementStyleControl
+                                label="Feature Description"
+                                value={getElementStyle(props, 'featureDescription')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('featureDescription', v))}
+                            />
+                        </ControlGroup>
+                    </>
+                );
+
             case 'pricingBlock':
+                return (
+                    <>
+                        <ControlGroup title="Content" defaultOpen={true}>
+                            <TextControl
+                                label="Title"
+                                value={(props.title as string) || ''}
+                                onChange={(v) => handlePropChange('title', v)}
+                            />
+                            <TextareaControl
+                                label="Subtitle"
+                                value={(props.subtitle as string) || ''}
+                                onChange={(v) => handlePropChange('subtitle', v)}
+                                rows={2}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Element Styles" defaultOpen={false}>
+                            <ElementStyleControl
+                                label="Section Title"
+                                value={getElementStyle(props, 'sectionTitle')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('sectionTitle', v))}
+                            />
+                            <ElementStyleControl
+                                label="Section Subtitle"
+                                value={getElementStyle(props, 'sectionSubtitle')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('sectionSubtitle', v))}
+                            />
+                            <ElementStyleControl
+                                label="Plan Name"
+                                value={getElementStyle(props, 'planName')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('planName', v))}
+                            />
+                            <ElementStyleControl
+                                label="Plan Price"
+                                value={getElementStyle(props, 'planPrice')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('planPrice', v))}
+                            />
+                            <ElementStyleControl
+                                label="Plan Description"
+                                value={getElementStyle(props, 'planDescription')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('planDescription', v))}
+                            />
+                        </ControlGroup>
+                    </>
+                );
+
             case 'faqBlock':
+                return (
+                    <>
+                        <ControlGroup title="Content" defaultOpen={true}>
+                            <TextControl
+                                label="Title"
+                                value={(props.title as string) || ''}
+                                onChange={(v) => handlePropChange('title', v)}
+                            />
+                            <TextareaControl
+                                label="Subtitle"
+                                value={(props.subtitle as string) || ''}
+                                onChange={(v) => handlePropChange('subtitle', v)}
+                                rows={2}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Element Styles" defaultOpen={false}>
+                            <ElementStyleControl
+                                label="Section Title"
+                                value={getElementStyle(props, 'sectionTitle')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('sectionTitle', v))}
+                            />
+                            <ElementStyleControl
+                                label="Section Subtitle"
+                                value={getElementStyle(props, 'sectionSubtitle')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('sectionSubtitle', v))}
+                            />
+                            <ElementStyleControl
+                                label="Question"
+                                value={getElementStyle(props, 'question')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('question', v))}
+                            />
+                            <ElementStyleControl
+                                label="Answer"
+                                value={getElementStyle(props, 'answer')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('answer', v))}
+                            />
+                        </ControlGroup>
+                    </>
+                );
+
             case 'ctaBlock':
                 return (
-                    <ControlGroup title="Block Settings" defaultOpen={true}>
-                        <p className={styles.hint}>
-                            Edit block content and settings in the code props.
-                        </p>
-                    </ControlGroup>
+                    <>
+                        <ControlGroup title="Content" defaultOpen={true}>
+                            <TextControl
+                                label="Title"
+                                value={(props.title as string) || ''}
+                                onChange={(v) => handlePropChange('title', v)}
+                            />
+                            <TextareaControl
+                                label="Description"
+                                value={(props.description as string) || ''}
+                                onChange={(v) => handlePropChange('description', v)}
+                                rows={2}
+                            />
+                            <TextControl
+                                label="Button Text"
+                                value={(props.buttonText as string) || ''}
+                                onChange={(v) => handlePropChange('buttonText', v)}
+                            />
+                            <TextControl
+                                label="Button URL"
+                                value={(props.buttonUrl as string) || ''}
+                                onChange={(v) => handlePropChange('buttonUrl', v)}
+                            />
+                            <SelectControl
+                                label="Variant"
+                                value={(props.variant as string) || 'default'}
+                                onChange={(v) => handlePropChange('variant', v)}
+                                options={[
+                                    { value: 'default', label: 'Default' },
+                                    { value: 'dark', label: 'Dark' },
+                                    { value: 'gradient', label: 'Gradient' },
+                                ]}
+                            />
+                        </ControlGroup>
+                        <ControlGroup title="Element Styles" defaultOpen={false}>
+                            <ElementStyleControl
+                                label="Title"
+                                value={getElementStyle(props, 'ctaTitle')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('ctaTitle', v))}
+                            />
+                            <ElementStyleControl
+                                label="Description"
+                                value={getElementStyle(props, 'ctaDescription')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('ctaDescription', v))}
+                            />
+                            <ElementStyleControl
+                                label="Button"
+                                value={getElementStyle(props, 'ctaButton')}
+                                onChange={(v) => handleMultiPropChange(setElementStyle('ctaButton', v))}
+                            />
+                        </ControlGroup>
+                    </>
                 );
 
             default:

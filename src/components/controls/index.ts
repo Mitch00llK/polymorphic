@@ -28,3 +28,7 @@ export type { SizeValue } from './SizeControl';
 // Position Control
 export { PositionControl } from './PositionControl';
 export type { PositionValue } from './PositionControl';
+
+// Element Style Control
+export { ElementStyleControl } from './ElementStyleControl';
+export type { ElementStyleValue } from './ElementStyleControl';

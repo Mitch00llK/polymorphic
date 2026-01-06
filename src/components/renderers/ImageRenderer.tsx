@@ -7,7 +7,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../types/components';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -26,6 +26,9 @@ export const ImageRenderer: React.FC<ImageRendererProps> = ({
 
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['size', 'box', 'spacing', 'position']);
+
+    // Build caption-specific styles
+    const captionStyle = buildElementStyles(props, 'caption');
 
     const figureStyle: React.CSSProperties = {
         ...sharedStyles,
@@ -77,7 +80,7 @@ export const ImageRenderer: React.FC<ImageRendererProps> = ({
                 loading="lazy"
             />
             {props.caption && (
-                <figcaption className={styles.imageCaption}>
+                <figcaption className={styles.imageCaption} style={captionStyle}>
                     {props.caption as string}
                 </figcaption>
             )}

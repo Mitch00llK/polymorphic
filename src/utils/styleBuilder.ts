@@ -284,3 +284,35 @@ export function buildStyles(
     return styles;
 }
 
+/**
+ * Build styles for a specific element within a component.
+ * Element styles are stored with a prefix (e.g., titleFontSize, titleColor).
+ */
+export function buildElementStyles(
+    props: StyleableProps,
+    prefix: string
+): CSSProperties {
+    const styles: CSSProperties = {};
+
+    // Typography
+    const fontSize = props[`${prefix}FontSize`];
+    const fontWeight = props[`${prefix}FontWeight`];
+    const lineHeight = props[`${prefix}LineHeight`];
+    const letterSpacing = props[`${prefix}LetterSpacing`];
+    const color = props[`${prefix}Color`];
+    const backgroundColor = props[`${prefix}BackgroundColor`];
+    const marginTop = props[`${prefix}MarginTop`];
+    const marginBottom = props[`${prefix}MarginBottom`];
+
+    if (fontSize) styles.fontSize = fontSize as string;
+    if (fontWeight) styles.fontWeight = fontWeight as string;
+    if (lineHeight) styles.lineHeight = lineHeight as string;
+    if (letterSpacing) styles.letterSpacing = letterSpacing as string;
+    if (color) styles.color = color as string;
+    if (backgroundColor) styles.backgroundColor = backgroundColor as string;
+    if (marginTop) styles.marginTop = marginTop as string;
+    if (marginBottom) styles.marginBottom = marginBottom as string;
+
+    return styles;
+}
+

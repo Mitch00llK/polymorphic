@@ -9,7 +9,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../types/components';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 import styles from './blocks.module.css';
 
 interface CtaBlockRendererProps {
@@ -31,6 +31,11 @@ export const CtaBlockRenderer: React.FC<CtaBlockRendererProps> = ({
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['layout', 'typography', 'box', 'spacing']);
 
+    // Build element-specific styles
+    const ctaTitleStyle = buildElementStyles(props, 'ctaTitle');
+    const ctaDescriptionStyle = buildElementStyles(props, 'ctaDescription');
+    const ctaButtonStyle = buildElementStyles(props, 'ctaButton');
+
     const ctaClasses = [
         styles.ctaBlock,
         variant !== 'default' && styles[`ctaBlock--${variant}`],
@@ -40,18 +45,12 @@ export const CtaBlockRenderer: React.FC<CtaBlockRendererProps> = ({
         ...sharedStyles,
     };
 
-    // Typography styles for title/description
-    const textStyle: React.CSSProperties = {
-        fontFamily: sharedStyles.fontFamily,
-        color: sharedStyles.color,
-    };
-
     return (
         <section className={ctaClasses} style={ctaStyle} data-component-id={component.id}>
             <div className={styles.ctaContent}>
-                <h2 className={styles.ctaTitle} style={textStyle}>{title}</h2>
-                <p className={styles.ctaDescription} style={{ color: sharedStyles.color }}>{description}</p>
-                <a href={buttonUrl} className={styles.ctaButton}>
+                <h2 className={styles.ctaTitle} style={ctaTitleStyle}>{title}</h2>
+                <p className={styles.ctaDescription} style={ctaDescriptionStyle}>{description}</p>
+                <a href={buttonUrl} className={styles.ctaButton} style={ctaButtonStyle}>
                     {buttonText}
                 </a>
             </div>

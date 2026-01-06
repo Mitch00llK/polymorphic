@@ -11,7 +11,7 @@ import React from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 
 import type { ComponentData } from '../../types/components';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -41,6 +41,10 @@ export const TabsRenderer: React.FC<TabsRendererProps> = ({
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
 
+    // Build element-specific styles
+    const tabTriggerStyle = buildElementStyles(props, 'tabTrigger');
+    const tabContentStyle = buildElementStyles(props, 'tabContent');
+
     const tabsStyle: React.CSSProperties = {
         ...sharedStyles,
     };
@@ -58,6 +62,7 @@ export const TabsRenderer: React.FC<TabsRendererProps> = ({
                         key={tab.id}
                         value={tab.id}
                         className={styles.tabsTrigger}
+                        style={tabTriggerStyle}
                     >
                         {tab.label}
                     </TabsPrimitive.Trigger>
@@ -68,6 +73,7 @@ export const TabsRenderer: React.FC<TabsRendererProps> = ({
                     key={tab.id}
                     value={tab.id}
                     className={styles.tabsContent}
+                    style={tabContentStyle}
                 >
                     {tab.content}
                 </TabsPrimitive.Content>

@@ -459,3 +459,143 @@
     outline: none;
     border-color: var(--polymorphic-color-primary);
 }
+
+/* ===========================
+   Element Style Control
+=========================== */
+
+.elementStyleControl {
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    margin-bottom: var(--polymorphic-spacing-2);
+    overflow: hidden;
+}
+
+.elementStyleHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--polymorphic-spacing-2) var(--polymorphic-spacing-3);
+    background: var(--polymorphic-color-gray-50);
+    border: none;
+    font-size: var(--polymorphic-font-size-xs);
+    font-weight: var(--polymorphic-font-weight-medium);
+    color: var(--polymorphic-color-gray-700);
+    cursor: pointer;
+    transition: background-color var(--polymorphic-transition-fast);
+}
+
+.elementStyleHeader:hover {
+    background: var(--polymorphic-color-gray-100);
+}
+
+.elementStyleLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-2);
+}
+
+.elementStyleContent {
+    padding: var(--polymorphic-spacing-2);
+    background: var(--polymorphic-color-white);
+}
+
+.elementStyleSection {
+    margin-bottom: var(--polymorphic-spacing-2);
+}
+
+.elementStyleSection:last-child {
+    margin-bottom: 0;
+}
+
+.elementStyleSectionHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-1);
+    font-size: 10px;
+    font-weight: var(--polymorphic-font-weight-medium);
+    color: var(--polymorphic-color-gray-500);
+    text-transform: uppercase;
+    margin-bottom: var(--polymorphic-spacing-1);
+}
+
+.elementStyleGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--polymorphic-spacing-2);
+}
+
+.elementStyleField {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.elementStyleFieldWide {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.elementStyleField label,
+.elementStyleFieldWide label {
+    font-size: 9px;
+    font-weight: var(--polymorphic-font-weight-medium);
+    color: var(--polymorphic-color-gray-500);
+    text-transform: uppercase;
+}
+
+.elementStyleField input,
+.elementStyleField select {
+    width: 100%;
+    padding: 4px 6px;
+    font-size: var(--polymorphic-font-size-xs);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+}
+
+.elementStyleField input:focus,
+.elementStyleField select:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+}
+
+.colorInputInline {
+    display: flex;
+    gap: 4px;
+}
+
+.colorInputInline input[type="color"] {
+    width: 28px;
+    height: 26px;
+    padding: 2px;
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    cursor: pointer;
+}
+
+.colorInputInline input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.colorInputInline input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 2px;
+}
+
+.colorInputInline input[type="text"] {
+    flex: 1;
+    padding: 4px 6px;
+    font-size: var(--polymorphic-font-size-xs);
+    font-family: monospace;
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+}
+
+.colorInputInline input[type="text"]:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+}
