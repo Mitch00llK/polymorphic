@@ -1,0 +1,52 @@
+/*
+Theme Name: Polymorphic Theme Child
+Theme URI: https://polymorphic-builder.dev
+Author: Polymorphic
+Author URI: https://polymorphic-builder.dev
+Description: Child theme for Polymorphic Theme. Add your customizations here.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 8.0
+Template: polymorphic-theme
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: polymorphic-theme-child
+*/
+
+/* ===========================
+   Your Custom Styles Below
+=========================== */
+
+/* 
+ * Example: Override primary button color
+ * 
+ * .btn--primary {
+ *     background-color: #10b981;
+ *     border-color: #10b981;
+ * }
+ * 
+ * .btn--primary:hover {
+ *     background-color: #059669;
+ *     border-color: #059669;
+ * }
+ */
+
+/* 
+ * Example: Custom header styles
+ *
+ * .site-header {
+ *     padding: 1rem 2rem;
+ *     background: #ffffff;
+ *     border-bottom: 1px solid #e5e7eb;
+ * }
+ */
+
+/* 
+ * Example: Custom section background
+ *
+ * .section--dark {
+ *     background-color: #1f2937;
+ *     color: #ffffff;
+ * }
+ */
