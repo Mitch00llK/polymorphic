@@ -98,6 +98,14 @@ if ( file_exists( POLYMORPHIC_PATH . 'vendor/autoload.php' ) ) {
     require_once POLYMORPHIC_PATH . 'includes/Components/Text/class-text.php';
     require_once POLYMORPHIC_PATH . 'includes/Components/Image/class-image.php';
     require_once POLYMORPHIC_PATH . 'includes/Components/Button/class-button.php';
+    // UI Components
+    require_once POLYMORPHIC_PATH . 'includes/Components/Card/class-card.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Accordion/class-accordion.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Tabs/class-tabs.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Alert/class-alert.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Badge/class-badge.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Avatar/class-avatar.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/Separator/class-separator.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/AdminMenu/class-admin-menu.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/Assets/class-assets.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/EditorIntegration/class-editor-integration.php';
