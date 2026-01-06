@@ -22,6 +22,7 @@ import {
 } from '@dnd-kit/sortable';
 
 import { useBuilderStore } from '../../store/builderStore';
+import { ComponentRenderer } from '../renderers/ComponentRenderer';
 
 import styles from './Canvas.module.css';
 
@@ -29,8 +30,13 @@ import styles from './Canvas.module.css';
  * Main canvas component where components are rendered and arranged.
  */
 export const Canvas: React.FC = () => {
-    const { components, selectedId, selectComponent, moveComponent } =
-        useBuilderStore();
+    const {
+        components,
+        selectedId,
+        selectComponent,
+        moveComponent,
+        currentBreakpoint,
+    } = useBuilderStore();
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -56,9 +62,24 @@ export const Canvas: React.FC = () => {
         selectComponent(null);
     };
 
+    const handleComponentClick = (e: React.MouseEvent, componentId: string) => {
+        e.stopPropagation();
+        selectComponent(componentId);
+    };
+
+    // Determine viewport width based on breakpoint.
+    const viewportWidth = {
+        desktop: '100%',
+        tablet: '768px',
+        mobile: '375px',
+    }[currentBreakpoint];
+
     return (
         <div className={styles.canvas} onClick={handleCanvasClick}>
-            <div className={styles.viewport}>
+            <div
+                className={styles.viewport}
+                style={{ maxWidth: viewportWidth }}
+            >
                 <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
@@ -83,15 +104,19 @@ export const Canvas: React.FC = () => {
                                         key={component.id}
                                         className={`${styles.componentWrapper} ${selectedId === component.id ? styles.isSelected : ''
                                             }`}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            selectComponent(component.id);
-                                        }}
+                                        onClick={(e) => handleComponentClick(e, component.id)}
                                     >
-                                        {/* Component rendering will go here */}
-                                        <div className={styles.componentPlaceholder}>
-                                            {component.type}: {component.id}
-                                        </div>
+                                        <ComponentRenderer
+                                            component={component}
+                                            context="editor"
+                                        />
+                                        {selectedId === component.id && (
+                                            <div className={styles.selectedOverlay}>
+                                                <span className={styles.componentLabel}>
+                                                    {component.type}
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -104,3 +129,4 @@ export const Canvas: React.FC = () => {
 };
 
 export default Canvas;
+
