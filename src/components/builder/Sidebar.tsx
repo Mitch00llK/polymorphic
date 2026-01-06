@@ -1,6 +1,8 @@
 /**
  * Sidebar Component
  *
+ * Component library with toggle between Components and Layers view.
+ *
  * @package Polymorphic
  * @since   1.0.0
  */
@@ -19,6 +21,7 @@ import {
     CreditCard,
     ChevronDown,
     ChevronLeft,
+    ChevronRight,
     Layers,
     AlertCircle,
     Tag,
@@ -31,17 +34,18 @@ import {
     HelpCircle,
     Megaphone,
     // Template library
-    // Template library
     LayoutTemplate,
     // SaaS Icons
     Quote,
     BarChart3,
     LayoutGrid,
+    // View toggle
+    Component,
 } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
 import { TemplateLibrary } from './TemplateLibrary';
-import type { ComponentType } from '../../types/components';
+import type { ComponentType, ComponentData } from '../../types/components';
 import { GENERATED_COMPONENTS } from '../../generated/sidebarComponents.generated';
 
 import styles from './Sidebar.module.css';
@@ -136,6 +140,113 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({
 };
 
 /**
+ * Get icon for component type.
+ */
+const getLayerIcon = (type: string): React.ReactNode => {
+    const iconSize = 14;
+    switch (type) {
+        case 'section': return <Layout size={iconSize} />;
+        case 'container': return <Box size={iconSize} />;
+        case 'heading': return <Type size={iconSize} />;
+        case 'text': return <AlignLeft size={iconSize} />;
+        case 'image': return <Image size={iconSize} />;
+        case 'button': return <MousePointer2 size={iconSize} />;
+        case 'card': return <CreditCard size={iconSize} />;
+        case 'alert': return <AlertCircle size={iconSize} />;
+        case 'badge': return <Tag size={iconSize} />;
+        case 'avatar': return <User size={iconSize} />;
+        case 'separator': return <Minus size={iconSize} />;
+        case 'heroBlock': return <Star size={iconSize} />;
+        case 'featuresBlock': return <Grid3X3 size={iconSize} />;
+        case 'pricingBlock': return <DollarSign size={iconSize} />;
+        case 'faqBlock': return <HelpCircle size={iconSize} />;
+        case 'ctaBlock': return <Megaphone size={iconSize} />;
+        case 'testimonialBlock': return <Quote size={iconSize} />;
+        case 'statsBlock': return <BarChart3 size={iconSize} />;
+        case 'logoCloud': return <LayoutGrid size={iconSize} />;
+        default: return <Box size={iconSize} />;
+    }
+};
+
+/**
+ * Get display label for component.
+ */
+const getLayerLabel = (component: ComponentData): string => {
+    const props = component.props || {};
+    if (props.content && typeof props.content === 'string') {
+        const content = props.content.slice(0, 18);
+        return content.length < (props.content as string).length ? `${content}...` : content;
+    }
+    if (props.title && typeof props.title === 'string') {
+        const title = props.title.slice(0, 18);
+        return title.length < (props.title as string).length ? `${title}...` : title;
+    }
+    if (props.text && typeof props.text === 'string') {
+        const text = props.text.slice(0, 18);
+        return text.length < (props.text as string).length ? `${text}...` : text;
+    }
+    return component.type.charAt(0).toUpperCase() + component.type.slice(1);
+};
+
+/**
+ * Layer item in the tree.
+ */
+interface LayerItemProps {
+    component: ComponentData;
+    depth: number;
+    selectedId: string | null;
+    onSelect: (id: string) => void;
+    expandedIds: Set<string>;
+    onToggleExpand: (id: string) => void;
+}
+
+const LayerItem: React.FC<LayerItemProps> = ({
+    component,
+    depth,
+    selectedId,
+    onSelect,
+    expandedIds,
+    onToggleExpand,
+}) => {
+    const hasChildren = component.children && component.children.length > 0;
+    const isExpanded = expandedIds.has(component.id);
+    const isSelected = selectedId === component.id;
+
+    return (
+        <>
+            <div
+                className={`${styles.layerItem} ${isSelected ? styles.layerItemSelected : ''}`}
+                style={{ paddingLeft: `${depth * 16 + 8}px` }}
+                onClick={(e) => { e.stopPropagation(); onSelect(component.id); }}
+            >
+                <button
+                    className={styles.layerToggle}
+                    onClick={(e) => { e.stopPropagation(); onToggleExpand(component.id); }}
+                    disabled={!hasChildren}
+                >
+                    {hasChildren ? (
+                        isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />
+                    ) : <span style={{ width: 12 }} />}
+                </button>
+                <span className={styles.layerIcon}>{getLayerIcon(component.type)}</span>
+                <span className={styles.layerLabel}>{getLayerLabel(component)}</span>
+            </div>
+            {hasChildren && isExpanded && component.children!.map((child) => (
+                <LayerItem
+                    key={child.id}
+                    component={child}
+                    depth={depth + 1}
+                    selectedId={selectedId}
+                    onSelect={onSelect}
+                    expandedIds={expandedIds}
+                    onToggleExpand={onToggleExpand}
+                />
+            ))}
+        </>
+    );
+};
+
+/**
  * Sidebar component with draggable component library.
  */
 interface SidebarProps {
@@ -143,18 +254,49 @@ interface SidebarProps {
     onToggle?: () => void;
 }
 
+type ViewMode = 'components' | 'layers';
+
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggle }) => {
     const [showTemplates, setShowTemplates] = useState(false);
-    const { addComponent } = useBuilderStore();
+    const [viewMode, setViewMode] = useState<ViewMode>('components');
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+    const { addComponent, components, selectedId, selectComponent } = useBuilderStore();
+
+    // Auto-expand containers when switching to layers view
+    React.useEffect(() => {
+        if (viewMode === 'layers') {
+            const containerTypes = ['section', 'container'];
+            const findContainerIds = (comps: ComponentData[]): string[] => {
+                const ids: string[] = [];
+                for (const comp of comps) {
+                    if (containerTypes.includes(comp.type)) {
+                        ids.push(comp.id);
+                    }
+                    if (comp.children) {
+                        ids.push(...findContainerIds(comp.children));
+                    }
+                }
+                return ids;
+            };
+            setExpandedIds(new Set(findContainerIds(components)));
+        }
+    }, [viewMode, components.length]);
+
+    const handleToggleExpand = (id: string) => {
+        setExpandedIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
 
     const handleAddComponent = (type: ComponentType) => {
         addComponent(type);
     };
 
     const groupedComponents = COMPONENTS.reduce((acc, comp) => {
-        if (!acc[comp.category]) {
-            acc[comp.category] = [];
-        }
+        if (!acc[comp.category]) acc[comp.category] = [];
         acc[comp.category].push(comp);
         return acc;
     }, {} as Record<string, ComponentDefinition[]>);
@@ -176,11 +318,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggle 
     return (
         <>
             <aside className={sidebarClasses}>
-                <div className={styles.header}>
-                    <div>
-                        <h2 className={styles.title}>Components</h2>
-                        <p className={styles.hint}>Drag or click to add</p>
-                    </div>
+                {/* View Toggle Tabs */}
+                <div className={styles.viewTabs}>
+                    <button
+                        className={`${styles.viewTab} ${viewMode === 'components' ? styles.viewTabActive : ''}`}
+                        onClick={() => setViewMode('components')}
+                        title="Components"
+                    >
+                        <Component size={16} />
+                        <span>Components</span>
+                    </button>
+                    <button
+                        className={`${styles.viewTab} ${viewMode === 'layers' ? styles.viewTabActive : ''}`}
+                        onClick={() => setViewMode('layers')}
+                        title="Layers"
+                    >
+                        <Layers size={16} />
+                        <span>Layers</span>
+                    </button>
                     {onToggle && (
                         <button
                             className={styles.collapseButton}
@@ -192,35 +347,66 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggle 
                     )}
                 </div>
 
-                {/* Template Library Button */}
-                <div className={styles.templateSection}>
-                    <button
-                        className={styles.templateButton}
-                        onClick={() => setShowTemplates(true)}
-                    >
-                        <LayoutTemplate size={18} />
-                        <span>Template Library</span>
-                    </button>
-                </div>
-
-                <div className={styles.content}>
-                    {Object.entries(groupedComponents).map(([category, components]) => (
-                        <div key={category} className={styles.category}>
-                            <h3 className={styles.categoryTitle}>
-                                {categoryLabels[category] || category}
-                            </h3>
-                            <div className={styles.componentGrid}>
-                                {components.map((comp) => (
-                                    <DraggableComponent
-                                        key={comp.type}
-                                        definition={comp}
-                                        onAdd={handleAddComponent}
-                                    />
-                                ))}
-                            </div>
+                {/* Components View */}
+                {viewMode === 'components' && (
+                    <>
+                        {/* Template Library Button */}
+                        <div className={styles.templateSection}>
+                            <button
+                                className={styles.templateButton}
+                                onClick={() => setShowTemplates(true)}
+                            >
+                                <LayoutTemplate size={18} />
+                                <span>Template Library</span>
+                            </button>
                         </div>
-                    ))}
-                </div>
+
+                        <div className={styles.content}>
+                            {Object.entries(groupedComponents).map(([category, comps]) => (
+                                <div key={category} className={styles.category}>
+                                    <h3 className={styles.categoryTitle}>
+                                        {categoryLabels[category] || category}
+                                    </h3>
+                                    <div className={styles.componentGrid}>
+                                        {comps.map((comp) => (
+                                            <DraggableComponent
+                                                key={comp.type}
+                                                definition={comp}
+                                                onAdd={handleAddComponent}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+
+                {/* Layers View */}
+                {viewMode === 'layers' && (
+                    <div className={styles.layersContent}>
+                        {components.length === 0 ? (
+                            <div className={styles.layersEmpty}>
+                                <p>No components yet</p>
+                                <p className={styles.layersEmptyHint}>
+                                    Switch to Components tab to add
+                                </p>
+                            </div>
+                        ) : (
+                            components.map((component) => (
+                                <LayerItem
+                                    key={component.id}
+                                    component={component}
+                                    depth={0}
+                                    selectedId={selectedId}
+                                    onSelect={selectComponent}
+                                    expandedIds={expandedIds}
+                                    onToggleExpand={handleToggleExpand}
+                                />
+                            ))
+                        )}
+                    </div>
+                )}
             </aside>
 
             {/* Template Library Modal */}
