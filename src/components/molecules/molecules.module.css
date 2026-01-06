@@ -13,52 +13,33 @@
 =========================== */
 
 .card {
-    background-color: var(--polymorphic-color-white);
-    border: 1px solid var(--polymorphic-border-color);
-    border-radius: var(--polymorphic-border-radius-lg);
-    box-shadow: var(--polymorphic-shadow-sm);
-    overflow: hidden;
-}
-
-.card--outline {
-    border-width: 2px;
-}
-
-.card--ghost {
-    border: none;
-    box-shadow: none;
-    background-color: transparent;
+    /* Let inline styles control everything */
+    box-sizing: border-box;
 }
 
 .cardHeader {
-    padding: 1.5rem 1.5rem 0;
+    margin-bottom: 1rem;
 }
 
 .cardTitle {
     margin: 0;
     font-size: 1.25rem;
-    font-weight: var(--polymorphic-font-weight-semibold);
+    font-weight: 600;
     line-height: 1.4;
 }
 
 .cardDescription {
     margin: 0.5rem 0 0;
-    font-size: var(--polymorphic-font-size-sm);
-    color: var(--polymorphic-color-gray-500);
+    font-size: 0.875rem;
+    color: #6b7280;
 }
 
 .cardContent {
-    padding: 1.5rem;
-}
-
-.cardFooter {
-    padding: 0 1.5rem 1.5rem;
-    color: var(--polymorphic-color-gray-500);
-    font-size: var(--polymorphic-font-size-sm);
+    /* Let children control their own spacing */
 }
 
 .placeholder {
-    color: var(--polymorphic-color-gray-400);
+    color: #9ca3af;
     font-style: italic;
 }
 

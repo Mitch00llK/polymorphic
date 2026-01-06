@@ -7,9 +7,24 @@
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../atoms.module.css';
+
+interface ImageProps {
+    src?: string;
+    alt?: string;
+    srcset?: string;
+    sizes?: string;
+    width?: string;
+    height?: string;
+    maxWidth?: string;
+    aspectRatio?: string;
+    objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+    borderRadius?: string;
+    boxShadow?: string;
+    align?: 'left' | 'center' | 'right';
+    caption?: string;
+}
 
 interface ImageRendererProps {
     component: ComponentData;
@@ -22,41 +37,38 @@ interface ImageRendererProps {
 export const ImageRenderer: React.FC<ImageRendererProps> = ({
     component,
 }) => {
-    const props = component.props as StyleableProps || {};
-
-    // Build styles from shared control groups
-    const sharedStyles = buildStyles(props, ['size', 'box', 'spacing', 'position']);
-
-    // Build caption-specific styles
-    const captionStyle = buildElementStyles(props, 'caption');
+    const props = (component.props || {}) as ImageProps;
 
     const figureStyle: React.CSSProperties = {
-        ...sharedStyles,
-        // Default margin if not set
-        marginBottom: sharedStyles.marginBottom || '1rem',
-        maxWidth: sharedStyles.maxWidth || '100%',
+        maxWidth: props.maxWidth || '100%',
+        width: props.width || '100%',
+        margin: 0,
+        display: 'block',
     };
+
+    // Handle alignment
+    if (props.align === 'center') {
+        figureStyle.marginLeft = 'auto';
+        figureStyle.marginRight = 'auto';
+    } else if (props.align === 'right') {
+        figureStyle.marginLeft = 'auto';
+    }
 
     const imgStyle: React.CSSProperties = {
-        objectFit: (props.objectFit as React.CSSProperties['objectFit']) || 'cover',
-        objectPosition: (props.objectPosition as string) || 'center',
-        borderRadius: sharedStyles.borderRadius,
         width: '100%',
-        height: 'auto',
-        aspectRatio: sharedStyles.aspectRatio,
+        height: props.height || 'auto',
+        aspectRatio: props.aspectRatio || undefined,
+        objectFit: props.objectFit || 'cover',
+        borderRadius: props.borderRadius || undefined,
+        boxShadow: props.boxShadow || undefined,
+        display: 'block',
     };
 
-    const classNames = [
-        styles.image,
-        props.style && props.style !== 'default' ? styles[`image--${props.style}`] : '',
-        props.align && props.align !== 'none' ? styles[`image--align-${props.align}`] : '',
-    ].filter(Boolean).join(' ');
-
-    // Show placeholder if no image src.
+    // Show placeholder if no image src
     if (!props.src) {
         return (
             <figure
-                className={`${classNames} ${styles['image--placeholder']}`}
+                className={styles.image}
                 style={figureStyle}
                 data-component-id={component.id}
             >
@@ -69,19 +81,21 @@ export const ImageRenderer: React.FC<ImageRendererProps> = ({
 
     return (
         <figure
-            className={classNames}
+            className={styles.image}
             style={figureStyle}
             data-component-id={component.id}
         >
             <img
-                src={props.src as string}
-                alt={(props.alt as string) || ''}
+                src={props.src}
+                alt={props.alt || ''}
+                srcSet={props.srcset || undefined}
+                sizes={props.sizes || undefined}
                 style={imgStyle}
                 loading="lazy"
             />
             {props.caption && (
-                <figcaption className={styles.imageCaption} style={captionStyle}>
-                    {props.caption as string}
+                <figcaption className={styles.imageCaption}>
+                    {props.caption}
                 </figcaption>
             )}
         </figure>
@@ -89,4 +103,3 @@ export const ImageRenderer: React.FC<ImageRendererProps> = ({
 };
 
 export default ImageRenderer;
-
