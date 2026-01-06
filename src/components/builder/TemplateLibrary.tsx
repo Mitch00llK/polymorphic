@@ -1,16 +1,17 @@
 /**
  * Template Library Component
  *
- * Browse and insert pre-built templates.
+ * Browse and insert pre-built templates with live previews.
  *
  * @package Polymorphic
  * @since   1.0.0
  */
 
 import React, { useState, useMemo } from 'react';
-import { X, Search, Layout, Layers, FileText, ShoppingBag, Briefcase, File, Plus } from 'lucide-react';
+import { X, Search, Layout, Layers, FileText, ShoppingBag, Briefcase, File, Plus, Sparkles } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
+import { TemplatePreview } from './TemplatePreview';
 import {
     TEMPLATES,
     TEMPLATE_CATEGORIES,
@@ -81,7 +82,7 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ isOpen, onClos
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
                 <header className={styles.header}>
                     <div className={styles.headerLeft}>
-                        <Layout size={22} />
+                        <Sparkles size={22} />
                         <h2 className={styles.title}>Template Library</h2>
                     </div>
                     <button className={styles.closeButton} onClick={onClose}>
@@ -178,16 +179,11 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ isOpen, onClos
                                 </div>
                                 <div className={styles.previewCanvas}>
                                     <div className={styles.previewFrame}>
-                                        {/* Simple preview - could be enhanced with actual rendering */}
-                                        <div className={styles.previewContent}>
-                                            <div className={styles.previewPlaceholder}>
-                                                <Layout size={48} />
-                                                <span>Preview: {selectedTemplate.name}</span>
-                                                <span className={styles.previewHint}>
-                                                    {selectedTemplate.components.length} component(s)
-                                                </span>
-                                            </div>
-                                        </div>
+                                        <TemplatePreview
+                                            components={selectedTemplate.components}
+                                            scale={0.5}
+                                            maxHeight={500}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -208,13 +204,11 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ isOpen, onClos
                                                 onClick={() => handlePreview(template)}
                                             >
                                                 <div className={styles.templateThumbnail}>
-                                                    {template.thumbnail ? (
-                                                        <img src={template.thumbnail} alt={template.name} />
-                                                    ) : (
-                                                        <div className={styles.thumbnailPlaceholder}>
-                                                            {CATEGORY_ICONS[template.category]}
-                                                        </div>
-                                                    )}
+                                                    <TemplatePreview
+                                                        components={template.components}
+                                                        scale={0.2}
+                                                        maxHeight={160}
+                                                    />
                                                     <div className={styles.templateOverlay}>
                                                         <button
                                                             className={styles.quickInsert}
@@ -246,4 +240,3 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ isOpen, onClos
 };
 
 export default TemplateLibrary;
-
