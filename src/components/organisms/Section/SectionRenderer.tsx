@@ -2,12 +2,14 @@
  * Section Renderer
  *
  * Uses CSS classes + custom properties for clean DOM.
+ * Supports nested drag-and-drop.
  *
  * @package Polymorphic
  * @since   1.0.0
  */
 
 import React from 'react';
+import { useDroppable } from '@dnd-kit/core';
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
 import { buildCSSVariables, type CSSVariableProps } from '../../../utils/cssVariables';
@@ -40,6 +42,7 @@ const mapAlign = (align?: string): string | undefined => {
 
 /**
  * Renders a Section component with CSS variables.
+ * Acts as a drop zone for nested components.
  */
 export const SectionRenderer: React.FC<SectionRendererProps> = ({
     component,
@@ -48,13 +51,23 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     const props = (component.props || {}) as SectionProps;
     const children = component.children || [];
 
+    // Register as drop zone in editor mode
+    const { setNodeRef, isOver } = useDroppable({
+        id: `section-drop-${component.id}`,
+        data: {
+            type: 'container-drop-zone',
+            containerId: component.id,
+        },
+        disabled: context !== 'editor',
+    });
+
     // Build CSS variables from props
     const cssVars = buildCSSVariables(props) as Record<string, string | number | undefined>;
 
     // Map legacy alignment props to CSS variables
     const justifyContent = mapAlign(props.verticalAlign);
     const alignItems = mapAlign(props.horizontalAlign);
-    
+
     if (justifyContent && !cssVars['--poly-justify-content']) {
         cssVars['--poly-justify-content'] = justifyContent;
     }
@@ -65,9 +78,15 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
         cssVars['--poly-flex-direction'] = props.direction;
     }
 
+    const sectionClasses = [
+        'poly-section',
+        context === 'editor' && isOver ? 'poly-section--drop-target' : '',
+    ].filter(Boolean).join(' ');
+
     return (
         <section
-            className="poly-section"
+            ref={context === 'editor' ? setNodeRef : undefined}
+            className={sectionClasses}
             style={cssVars as React.CSSProperties}
             data-component-id={component.id}
         >
@@ -81,9 +100,16 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
                 ))
             ) : context === 'editor' ? (
                 <div className="poly-section__empty">
-                    + Add content to this section
+                    + Drop components here
                 </div>
             ) : null}
+
+            {/* Drop zone indicator overlay */}
+            {context === 'editor' && isOver && (
+                <div className="poly-drop-indicator">
+                    <span className="poly-drop-indicator__label">Drop here</span>
+                </div>
+            )}
         </section>
     );
 };

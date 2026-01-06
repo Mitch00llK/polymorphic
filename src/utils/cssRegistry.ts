@@ -61,6 +61,53 @@ registerComponentCSS('_base', `
 [data-component-id] {
     box-sizing: border-box;
 }
+/* Drop indicator overlay */
+.poly-drop-indicator {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(99, 102, 241, 0.1);
+    border: 2px dashed #6366f1;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 100;
+    animation: poly-pulse 1.5s ease-in-out infinite;
+}
+.poly-drop-indicator__label {
+    background-color: #6366f1;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+@keyframes poly-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+/* Empty state for containers/sections */
+.poly-section__empty,
+.poly-container__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    color: #9ca3af;
+    font-size: 14px;
+    margin: 8px;
+    transition: all 0.2s ease;
+}
+.poly-section__empty:hover,
+.poly-container__empty:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    background-color: rgba(99, 102, 241, 0.05);
+}
 `);
 
 // Section
@@ -87,6 +134,10 @@ registerComponentCSS('section', `
     background-size: var(--poly-background-size, cover);
     background-position: var(--poly-background-position, center);
     background-repeat: var(--poly-background-repeat, no-repeat);
+    transition: box-shadow 0.2s ease;
+}
+.poly-section--drop-target {
+    box-shadow: inset 0 0 0 3px #6366f1;
 }
 .poly-section__inner {
     width: 100%;
@@ -97,6 +148,7 @@ registerComponentCSS('section', `
 // Container
 registerComponentCSS('container', `
 .poly-container {
+    position: relative;
     display: var(--poly-display, flex);
     flex-direction: var(--poly-flex-direction, column);
     justify-content: var(--poly-justify-content, flex-start);
@@ -117,6 +169,10 @@ registerComponentCSS('container', `
     background-color: var(--poly-background-color);
     border-radius: var(--poly-border-radius);
     box-shadow: var(--poly-box-shadow);
+    transition: box-shadow 0.2s ease;
+}
+.poly-container--drop-target {
+    box-shadow: inset 0 0 0 3px #6366f1;
 }
 `);
 

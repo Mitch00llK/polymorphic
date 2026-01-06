@@ -158,9 +158,15 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
                     + Drop components here
                 </div>
             ) : null}
+
+            {/* Drop zone indicator overlay */}
+            {context === 'editor' && isOver && (
+                <div className="poly-drop-indicator">
+                    <span className="poly-drop-indicator__label">Drop here</span>
+                </div>
+            )}
         </div>
     );
 };
 
 export default ContainerRenderer;
-
