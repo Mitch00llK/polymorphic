@@ -6,7 +6,7 @@
  */
 
 import React, { useState } from 'react';
-import { X, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
+import { X, Trash2, ChevronDown, ChevronRight, ChevronLeft } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
 import { SpacingControl, FlexLayoutControl } from '../controls';
@@ -198,7 +198,12 @@ const componentControls: Record<
 /**
  * Right-side property panel for editing selected component.
  */
-export const PropertyPanel: React.FC = () => {
+interface PropertyPanelProps {
+    isCollapsed?: boolean;
+    onToggle?: () => void;
+}
+
+export const PropertyPanel: React.FC<PropertyPanelProps> = ({ isCollapsed = false, onToggle }) => {
     const {
         selectedId,
         getSelectedComponent,
@@ -209,9 +214,26 @@ export const PropertyPanel: React.FC = () => {
 
     const selectedComponent = getSelectedComponent();
 
+    const panelClasses = [
+        styles.panel,
+        isCollapsed && styles.panelCollapsed,
+    ].filter(Boolean).join(' ');
+
     if (!selectedId || !selectedComponent) {
         return (
-            <aside className={styles.panel}>
+            <aside className={panelClasses}>
+                <div className={styles.header}>
+                    <h3 className={styles.title}>Properties</h3>
+                    {onToggle && (
+                        <button
+                            className={styles.collapseButton}
+                            onClick={onToggle}
+                            title="Collapse panel"
+                        >
+                            <ChevronRight size={16} />
+                        </button>
+                    )}
+                </div>
                 <div className={styles.empty}>
                     <div className={styles.emptyIcon}>🎨</div>
                     <p>Select a component to edit its properties</p>
@@ -239,18 +261,29 @@ export const PropertyPanel: React.FC = () => {
     const type = selectedComponent.type;
 
     return (
-        <aside className={styles.panel}>
+        <aside className={panelClasses}>
             <div className={styles.header}>
                 <h3 className={styles.title}>
                     {type.charAt(0).toUpperCase() + type.slice(1)}
                 </h3>
-                <button
-                    className={styles.closeButton}
-                    onClick={() => selectComponent(null)}
-                    title="Close"
-                >
-                    <X size={16} />
-                </button>
+                <div className={styles.headerActions}>
+                    {onToggle && (
+                        <button
+                            className={styles.collapseButton}
+                            onClick={onToggle}
+                            title="Collapse panel"
+                        >
+                            <ChevronRight size={16} />
+                        </button>
+                    )}
+                    <button
+                        className={styles.closeButton}
+                        onClick={() => selectComponent(null)}
+                        title="Close"
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
             </div>
 
             <div className={styles.content}>

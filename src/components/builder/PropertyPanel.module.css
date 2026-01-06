@@ -1,22 +1,37 @@
 /**
- * PropertyPanel styles
+ * PropertyPanel styles - Floating panel
  */
 
 .panel {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    bottom: 16px;
     width: var(--polymorphic-property-panel-width);
     background-color: var(--polymorphic-color-white);
-    border-left: 1px solid var(--polymorphic-border-color);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-lg);
+    box-shadow: var(--polymorphic-shadow-lg);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    z-index: 50;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.panelCollapsed {
+    transform: translateX(calc(100% + 32px));
+    opacity: 0;
+    pointer-events: none;
 }
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--polymorphic-spacing-4);
+    padding: var(--polymorphic-spacing-3) var(--polymorphic-spacing-4);
     border-bottom: 1px solid var(--polymorphic-border-color);
+    background: var(--polymorphic-color-gray-50);
 }
 
 .title {
@@ -26,12 +41,18 @@
     margin: 0;
 }
 
+.headerActions {
+    display: flex;
+    gap: var(--polymorphic-spacing-1);
+}
+
+.collapseButton,
 .closeButton {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     background: transparent;
     border: none;
     border-radius: var(--polymorphic-border-radius-sm);
@@ -40,8 +61,9 @@
     transition: all var(--polymorphic-transition-fast);
 }
 
+.collapseButton:hover,
 .closeButton:hover {
-    background-color: var(--polymorphic-color-gray-100);
+    background-color: var(--polymorphic-color-gray-200);
     color: var(--polymorphic-color-gray-700);
 }
 
@@ -53,6 +75,7 @@
 
 .empty {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
@@ -60,6 +83,11 @@
     text-align: center;
     color: var(--polymorphic-color-gray-400);
     font-size: var(--polymorphic-font-size-sm);
+}
+
+.emptyIcon {
+    font-size: 32px;
+    margin-bottom: var(--polymorphic-spacing-2);
 }
 
 .control {
@@ -102,24 +130,6 @@
 .textarea {
     resize: vertical;
     min-height: 80px;
-}
-
-/* Empty state */
-.emptyIcon {
-    font-size: 32px;
-    margin-bottom: var(--polymorphic-spacing-2);
-}
-
-.empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: var(--polymorphic-spacing-8);
-    text-align: center;
-    color: var(--polymorphic-color-gray-400);
-    font-size: var(--polymorphic-font-size-sm);
 }
 
 /* Control Groups */

@@ -14,7 +14,7 @@
 }
 
 .main {
-    display: flex;
+    position: relative;
     flex: 1;
     overflow: hidden;
 }
@@ -57,4 +57,44 @@
     box-shadow: var(--polymorphic-shadow-lg);
     pointer-events: none;
     text-transform: capitalize;
+}
+
+/* Floating Panel Toggle Buttons */
+.panelToggle {
+    position: fixed;
+    top: 80px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--polymorphic-color-white);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    box-shadow: var(--polymorphic-shadow-md);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.panelToggle:hover {
+    background: var(--polymorphic-color-gray-50);
+    border-color: var(--polymorphic-color-primary);
+}
+
+.panelToggleLeft {
+    left: 16px;
+}
+
+.panelToggleRight {
+    right: 16px;
+}
+
+.panelToggleIcon {
+    color: var(--polymorphic-color-gray-600);
+    transition: transform var(--polymorphic-transition-fast);
+}
+
+.panelToggle:hover .panelToggleIcon {
+    color: var(--polymorphic-color-primary);
 }
