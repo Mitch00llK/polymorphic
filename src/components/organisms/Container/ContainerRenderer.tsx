@@ -2,12 +2,14 @@
  * Container Renderer
  *
  * Uses CSS classes + custom properties for clean DOM.
+ * Supports nested drag-and-drop.
  *
  * @package Polymorphic
  * @since   1.0.0
  */
 
 import React from 'react';
+import { useDroppable } from '@dnd-kit/core';
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
 import { buildCSSVariables, type CSSVariableProps } from '../../../utils/cssVariables';
@@ -61,6 +63,7 @@ const mapAlign = (value?: string): string | undefined => {
 
 /**
  * Renders a Container component with CSS variables.
+ * Acts as a drop zone for nested components.
  */
 export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
     component,
@@ -68,6 +71,16 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
 }) => {
     const props = (component.props || {}) as ContainerProps;
     const children = component.children || [];
+
+    // Register as drop zone in editor mode
+    const { setNodeRef, isOver } = useDroppable({
+        id: `container-drop-${component.id}`,
+        data: {
+            type: 'container-drop-zone',
+            containerId: component.id,
+        },
+        disabled: context !== 'editor',
+    });
 
     // Build CSS variables from props
     const cssVars = buildCSSVariables(props) as Record<string, string | number | undefined>;
@@ -87,10 +100,10 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
     if (props.wrap && !cssVars['--poly-flex-wrap']) {
         cssVars['--poly-flex-wrap'] = props.wrap;
     }
-    
+
     const justifyContent = mapJustify(props.justifyContent);
     const alignItems = mapAlign(props.alignItems);
-    
+
     if (justifyContent && !cssVars['--poly-justify-content']) {
         cssVars['--poly-justify-content'] = justifyContent;
     }
@@ -120,9 +133,15 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
         }
     }
 
+    const containerClasses = [
+        'poly-container',
+        context === 'editor' && isOver ? 'poly-container--drop-target' : '',
+    ].filter(Boolean).join(' ');
+
     return (
         <div
-            className="poly-container"
+            ref={context === 'editor' ? setNodeRef : undefined}
+            className={containerClasses}
             style={cssVars as React.CSSProperties}
             data-component-id={component.id}
         >
@@ -144,3 +163,4 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
 };
 
 export default ContainerRenderer;
+
