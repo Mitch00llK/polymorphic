@@ -12,6 +12,15 @@ import { nanoid } from 'nanoid';
 import type { ComponentData, ComponentType, Breakpoint } from '../types/components';
 
 /**
+ * History entry for undo/redo.
+ */
+interface HistoryEntry {
+    components: ComponentData[];
+    timestamp: number;
+    action: string;
+}
+
+/**
  * Builder state interface.
  */
 interface BuilderState {
@@ -27,9 +36,10 @@ interface BuilderState {
     isDirty: boolean;
     currentBreakpoint: Breakpoint;
 
-    // History.
-    history: ComponentData[][];
-    historyIndex: number;
+    // History for undo/redo.
+    past: HistoryEntry[];
+    future: HistoryEntry[];
+    maxHistorySize: number;
 }
 
 /**
@@ -37,11 +47,11 @@ interface BuilderState {
  */
 interface BuilderActions {
     // Component management.
-    setComponents: (components: ComponentData[]) => void;
+    setComponents: (components: ComponentData[], skipHistory?: boolean) => void;
     addComponent: (type: ComponentType, parentId?: string, index?: number) => string;
     updateComponent: (id: string, updates: Partial<ComponentData>) => void;
     removeComponent: (id: string) => void;
-    deleteComponent: (id: string) => void; // Alias for removeComponent
+    deleteComponent: (id: string) => void;
     moveComponent: (id: string, newParentId: string | null, newIndex: number) => void;
     duplicateComponent: (id: string) => string | null;
 
@@ -55,11 +65,12 @@ interface BuilderActions {
     setDirty: (dirty: boolean) => void;
     setBreakpoint: (breakpoint: Breakpoint) => void;
 
-    // History.
+    // History (Undo/Redo).
     undo: () => void;
     redo: () => void;
     canUndo: () => boolean;
     canRedo: () => boolean;
+    clearHistory: () => void;
 
     // Utilities.
     findComponentById: (id: string) => ComponentData | null;
@@ -84,7 +95,7 @@ const COMPONENT_DEFAULTS: Record<ComponentType, Partial<ComponentData['props']>>
     },
     heading: {
         content: 'New Heading',
-        level: 'h2',
+        tag: 'h2',
         textAlign: 'left',
         fontWeight: '600',
     },
@@ -101,8 +112,8 @@ const COMPONENT_DEFAULTS: Record<ComponentType, Partial<ComponentData['props']>>
     button: {
         text: 'Click me',
         url: '#',
-        variant: 'solid',
-        size: 'medium',
+        variant: 'primary',
+        size: 'default',
     },
     // UI Components (shadcn-style)
     card: {
@@ -116,15 +127,15 @@ const COMPONENT_DEFAULTS: Record<ComponentType, Partial<ComponentData['props']>>
         type: 'single',
         collapsible: true,
         items: [
-            { title: 'Item 1', content: 'Content for item 1' },
-            { title: 'Item 2', content: 'Content for item 2' },
+            { id: '1', title: 'Item 1', content: 'Content for item 1' },
+            { id: '2', title: 'Item 2', content: 'Content for item 2' },
         ],
     },
     tabs: {
-        defaultValue: 'tab1',
+        defaultTab: 'tab1',
         tabs: [
-            { value: 'tab1', label: 'Tab 1', content: 'Content for tab 1' },
-            { value: 'tab2', label: 'Tab 2', content: 'Content for tab 2' },
+            { id: 'tab1', label: 'Tab 1', content: 'Content for tab 1' },
+            { id: 'tab2', label: 'Tab 2', content: 'Content for tab 2' },
         ],
     },
     alert: {
@@ -140,7 +151,7 @@ const COMPONENT_DEFAULTS: Record<ComponentType, Partial<ComponentData['props']>>
         src: '',
         alt: 'Avatar',
         fallback: 'AB',
-        size: 'md',
+        size: 'medium',
     },
     separator: {
         orientation: 'horizontal',
@@ -203,7 +214,6 @@ const generateId = (type: ComponentType): string => {
         text: 'txt',
         image: 'img',
         button: 'btn',
-        // UI Components
         card: 'crd',
         accordion: 'acc',
         tabs: 'tab',
@@ -211,7 +221,6 @@ const generateId = (type: ComponentType): string => {
         badge: 'bdg',
         avatar: 'avt',
         separator: 'sep',
-        // Marketing Blocks
         heroBlock: 'hero',
         featuresBlock: 'feat',
         pricingBlock: 'pric',
@@ -219,6 +228,13 @@ const generateId = (type: ComponentType): string => {
         ctaBlock: 'cta',
     };
     return `${prefixes[type] || type}_${nanoid(8)}`;
+};
+
+/**
+ * Deep clone components for history.
+ */
+const cloneComponents = (components: ComponentData[]): ComponentData[] => {
+    return JSON.parse(JSON.stringify(components));
 };
 
 /**
@@ -283,200 +299,382 @@ const removeFromTree = (
 };
 
 /**
- * Builder store.
+ * Find parent and index of a component.
+ */
+const findParentAndIndex = (
+    components: ComponentData[],
+    id: string,
+    parent: ComponentData | null = null
+): { parent: ComponentData | null; index: number } | null => {
+    for (let i = 0; i < components.length; i++) {
+        if (components[i].id === id) {
+            return { parent, index: i };
+        }
+        if (components[i].children) {
+            const found = findParentAndIndex(components[i].children!, id, components[i]);
+            if (found) return found;
+        }
+    }
+    return null;
+};
+
+/**
+ * Builder store with undo/redo support.
  */
 export const useBuilderStore = create<BuilderState & BuilderActions>()(
     devtools(
-        subscribeWithSelector((set, get) => ({
-            // Initial state.
-            components: [],
-            selectedId: null,
-            isLoading: true,
-            isSaving: false,
-            isDirty: false,
-            currentBreakpoint: 'desktop',
-            history: [],
-            historyIndex: -1,
-
-            // Set all components (e.g., on load).
-            setComponents: (components) => {
-                set({ components, isDirty: false });
-            },
-
-            // Add new component.
-            addComponent: (type, parentId, index) => {
-                const id = generateId(type);
-                const newComponent: ComponentData = {
-                    id,
-                    type,
-                    props: { ...COMPONENT_DEFAULTS[type] },
-                    children: type === 'section' || type === 'container' ? [] : undefined,
+        subscribeWithSelector((set, get) => {
+            /**
+             * Push current state to history before making changes.
+             */
+            const pushToHistory = (action: string) => {
+                const state = get();
+                const entry: HistoryEntry = {
+                    components: cloneComponents(state.components),
+                    timestamp: Date.now(),
+                    action,
                 };
 
-                set((state) => {
-                    let newComponents: ComponentData[];
+                // Limit history size
+                const newPast = [...state.past, entry].slice(-state.maxHistorySize);
 
-                    if (parentId) {
-                        // Add as child of parent.
-                        newComponents = updateInTree(state.components, parentId, {
-                            children: [
-                                ...(findInTree(state.components, parentId)?.children || []).slice(
-                                    0,
-                                    index ?? Infinity
-                                ),
+                set({
+                    past: newPast,
+                    future: [], // Clear future on new action
+                });
+            };
+
+            return {
+                // Initial state.
+                components: [],
+                selectedId: null,
+                isLoading: true,
+                isSaving: false,
+                isDirty: false,
+                currentBreakpoint: 'desktop',
+                past: [],
+                future: [],
+                maxHistorySize: 50,
+
+                // Set all components (e.g., on load).
+                setComponents: (components, skipHistory = false) => {
+                    if (!skipHistory) {
+                        pushToHistory('Set components');
+                    }
+                    set({ components, isDirty: false });
+                },
+
+                // Add new component.
+                addComponent: (type, parentId, index) => {
+                    pushToHistory(`Add ${type}`);
+
+                    const id = generateId(type);
+                    const newComponent: ComponentData = {
+                        id,
+                        type,
+                        props: { ...COMPONENT_DEFAULTS[type] },
+                        children: type === 'section' || type === 'container' || type === 'card' ? [] : undefined,
+                    };
+
+                    set((state) => {
+                        let newComponents: ComponentData[];
+
+                        if (parentId) {
+                            const parent = findInTree(state.components, parentId);
+                            const children = parent?.children || [];
+                            const insertIndex = index ?? children.length;
+
+                            newComponents = updateInTree(state.components, parentId, {
+                                children: [
+                                    ...children.slice(0, insertIndex),
+                                    newComponent,
+                                    ...children.slice(insertIndex),
+                                ],
+                            });
+                        } else {
+                            const insertIndex = index ?? state.components.length;
+                            newComponents = [
+                                ...state.components.slice(0, insertIndex),
                                 newComponent,
-                                ...(findInTree(state.components, parentId)?.children || []).slice(
-                                    index ?? Infinity
-                                ),
+                                ...state.components.slice(insertIndex),
+                            ];
+                        }
+
+                        return {
+                            components: newComponents,
+                            isDirty: true,
+                            selectedId: id,
+                        };
+                    });
+
+                    return id;
+                },
+
+                // Update component properties.
+                updateComponent: (id, updates) => {
+                    pushToHistory('Update component');
+                    set((state) => ({
+                        components: updateInTree(state.components, id, updates),
+                        isDirty: true,
+                    }));
+                },
+
+                // Remove component.
+                removeComponent: (id) => {
+                    pushToHistory('Remove component');
+                    set((state) => ({
+                        components: removeFromTree(state.components, id),
+                        selectedId: state.selectedId === id ? null : state.selectedId,
+                        isDirty: true,
+                    }));
+                },
+
+                // Alias for removeComponent.
+                deleteComponent: (id) => {
+                    pushToHistory('Delete component');
+                    set((state) => ({
+                        components: removeFromTree(state.components, id),
+                        selectedId: state.selectedId === id ? null : state.selectedId,
+                        isDirty: true,
+                    }));
+                },
+
+                // Move component.
+                moveComponent: (id, newParentId, newIndex) => {
+                    const state = get();
+                    const component = findInTree(state.components, id);
+
+                    if (!component) return;
+
+                    pushToHistory('Move component');
+
+                    // Remove from current position.
+                    let newComponents = removeFromTree(state.components, id);
+
+                    if (newParentId) {
+                        const parent = findInTree(newComponents, newParentId);
+                        const children = parent?.children || [];
+
+                        newComponents = updateInTree(newComponents, newParentId, {
+                            children: [
+                                ...children.slice(0, newIndex),
+                                component,
+                                ...children.slice(newIndex),
                             ],
                         });
                     } else {
-                        // Add to root.
-                        const insertIndex = index ?? state.components.length;
                         newComponents = [
-                            ...state.components.slice(0, insertIndex),
-                            newComponent,
-                            ...state.components.slice(insertIndex),
+                            ...newComponents.slice(0, newIndex),
+                            component,
+                            ...newComponents.slice(newIndex),
                         ];
                     }
 
-                    return {
-                        components: newComponents,
-                        isDirty: true,
-                        selectedId: id,
+                    set({ components: newComponents, isDirty: true });
+                },
+
+                // Duplicate component.
+                duplicateComponent: (id) => {
+                    const state = get();
+                    const component = findInTree(state.components, id);
+                    if (!component) return null;
+
+                    pushToHistory('Duplicate component');
+
+                    const newId = generateId(component.type);
+
+                    // Deep clone and assign new IDs recursively
+                    const cloneWithNewIds = (comp: ComponentData): ComponentData => {
+                        const cloned: ComponentData = {
+                            ...JSON.parse(JSON.stringify(comp)),
+                            id: comp === component ? newId : generateId(comp.type),
+                        };
+                        if (cloned.children) {
+                            cloned.children = cloned.children.map(cloneWithNewIds);
+                        }
+                        return cloned;
                     };
-                });
 
-                return id;
-            },
+                    const duplicate = cloneWithNewIds(component);
 
-            // Update component properties.
-            updateComponent: (id, updates) => {
-                set((state) => ({
-                    components: updateInTree(state.components, id, updates),
-                    isDirty: true,
-                }));
-            },
+                    // Find where to insert (after the original)
+                    const location = findParentAndIndex(state.components, id);
 
-            // Remove component.
-            removeComponent: (id) => {
-                set((state) => ({
-                    components: removeFromTree(state.components, id),
-                    selectedId: state.selectedId === id ? null : state.selectedId,
-                    isDirty: true,
-                }));
-            },
+                    set((currentState) => {
+                        let newComponents: ComponentData[];
 
-            // Alias for removeComponent.
-            deleteComponent: (id) => {
-                set((state) => ({
-                    components: removeFromTree(state.components, id),
-                    selectedId: state.selectedId === id ? null : state.selectedId,
-                    isDirty: true,
-                }));
-            },
+                        if (location?.parent) {
+                            // Insert after original in parent's children
+                            const parentChildren = location.parent.children || [];
+                            newComponents = updateInTree(currentState.components, location.parent.id, {
+                                children: [
+                                    ...parentChildren.slice(0, location.index + 1),
+                                    duplicate,
+                                    ...parentChildren.slice(location.index + 1),
+                                ],
+                            });
+                        } else {
+                            // Insert after original at root level
+                            const insertIndex = location ? location.index + 1 : currentState.components.length;
+                            newComponents = [
+                                ...currentState.components.slice(0, insertIndex),
+                                duplicate,
+                                ...currentState.components.slice(insertIndex),
+                            ];
+                        }
 
-            // Move component.
-            moveComponent: (id, newParentId, newIndex) => {
-                const state = get();
-                const component = findInTree(state.components, id);
-
-                if (!component) return;
-
-                // Remove from current position.
-                let newComponents = removeFromTree(state.components, id);
-
-                if (newParentId) {
-                    // Add to new parent.
-                    newComponents = updateInTree(newComponents, newParentId, {
-                        children: [
-                            ...(findInTree(newComponents, newParentId)?.children || []).slice(
-                                0,
-                                newIndex
-                            ),
-                            component,
-                            ...(findInTree(newComponents, newParentId)?.children || []).slice(
-                                newIndex
-                            ),
-                        ],
+                        return {
+                            components: newComponents,
+                            isDirty: true,
+                            selectedId: newId,
+                        };
                     });
-                } else {
-                    // Add to root.
-                    newComponents = [
-                        ...newComponents.slice(0, newIndex),
-                        component,
-                        ...newComponents.slice(newIndex),
-                    ];
-                }
 
-                set({ components: newComponents, isDirty: true });
-            },
+                    return newId;
+                },
 
-            // Duplicate component.
-            duplicateComponent: (id) => {
-                const component = findInTree(get().components, id);
-                if (!component) return null;
+                // Selection.
+                selectComponent: (id) => set({ selectedId: id }),
+                getSelectedComponent: () => {
+                    const state = get();
+                    return state.selectedId
+                        ? findInTree(state.components, state.selectedId)
+                        : null;
+                },
 
-                const newId = generateId(component.type);
-                const duplicate: ComponentData = {
-                    ...JSON.parse(JSON.stringify(component)),
-                    id: newId,
-                };
+                // UI state.
+                setLoading: (isLoading) => set({ isLoading }),
+                setSaving: (isSaving) => set({ isSaving }),
+                setDirty: (isDirty) => set({ isDirty }),
+                setBreakpoint: (currentBreakpoint) => set({ currentBreakpoint }),
 
-                // TODO: Handle insertion next to original.
-                set((state) => ({
-                    components: [...state.components, duplicate],
-                    isDirty: true,
-                    selectedId: newId,
-                }));
+                // Undo - restore previous state.
+                undo: () => {
+                    const state = get();
+                    if (state.past.length === 0) return;
 
-                return newId;
-            },
+                    const previous = state.past[state.past.length - 1];
+                    const newPast = state.past.slice(0, -1);
 
-            // Selection.
-            selectComponent: (id) => set({ selectedId: id }),
-            getSelectedComponent: () => {
-                const state = get();
-                return state.selectedId
-                    ? findInTree(state.components, state.selectedId)
-                    : null;
-            },
+                    // Save current state to future
+                    const currentEntry: HistoryEntry = {
+                        components: cloneComponents(state.components),
+                        timestamp: Date.now(),
+                        action: 'Current state',
+                    };
 
-            // UI state.
-            setLoading: (isLoading) => set({ isLoading }),
-            setSaving: (isSaving) => set({ isSaving }),
-            setDirty: (isDirty) => set({ isDirty }),
-            setBreakpoint: (currentBreakpoint) => set({ currentBreakpoint }),
-
-            // History (simplified).
-            undo: () => {
-                const { history, historyIndex } = get();
-                if (historyIndex > 0) {
                     set({
-                        components: history[historyIndex - 1],
-                        historyIndex: historyIndex - 1,
+                        components: previous.components,
+                        past: newPast,
+                        future: [currentEntry, ...state.future],
+                        isDirty: true,
                     });
-                }
-            },
-            redo: () => {
-                const { history, historyIndex } = get();
-                if (historyIndex < history.length - 1) {
-                    set({
-                        components: history[historyIndex + 1],
-                        historyIndex: historyIndex + 1,
-                    });
-                }
-            },
-            canUndo: () => get().historyIndex > 0,
-            canRedo: () => get().historyIndex < get().history.length - 1,
+                },
 
-            // Utilities.
-            findComponentById: (id) => findInTree(get().components, id),
-            getComponentPath: (id) => {
-                // TODO: Implement path finding.
-                return [id];
-            },
-        })),
+                // Redo - restore future state.
+                redo: () => {
+                    const state = get();
+                    if (state.future.length === 0) return;
+
+                    const next = state.future[0];
+                    const newFuture = state.future.slice(1);
+
+                    // Save current state to past
+                    const currentEntry: HistoryEntry = {
+                        components: cloneComponents(state.components),
+                        timestamp: Date.now(),
+                        action: 'Current state',
+                    };
+
+                    set({
+                        components: next.components,
+                        past: [...state.past, currentEntry],
+                        future: newFuture,
+                        isDirty: true,
+                    });
+                },
+
+                // Check if undo is available.
+                canUndo: () => get().past.length > 0,
+
+                // Check if redo is available.
+                canRedo: () => get().future.length > 0,
+
+                // Clear all history.
+                clearHistory: () => set({ past: [], future: [] }),
+
+                // Utilities.
+                findComponentById: (id) => findInTree(get().components, id),
+                getComponentPath: (id) => {
+                    const path: string[] = [];
+                    const findPath = (components: ComponentData[], targetId: string): boolean => {
+                        for (const comp of components) {
+                            if (comp.id === targetId) {
+                                path.push(comp.id);
+                                return true;
+                            }
+                            if (comp.children) {
+                                if (findPath(comp.children, targetId)) {
+                                    path.unshift(comp.id);
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    };
+                    findPath(get().components, id);
+                    return path;
+                },
+            };
+        }),
         { name: 'polymorphic-builder' }
     )
 );
+
+/**
+ * Hook for keyboard shortcuts.
+ */
+export const useBuilderKeyboardShortcuts = () => {
+    const { undo, redo, canUndo, canRedo, selectedId, deleteComponent, duplicateComponent } = useBuilderStore();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+        // Don't trigger if user is typing in an input
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+            return;
+        }
+
+        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+        const modKey = isMac ? e.metaKey : e.ctrlKey;
+
+        // Undo: Cmd/Ctrl + Z
+        if (modKey && e.key === 'z' && !e.shiftKey) {
+            e.preventDefault();
+            if (canUndo()) {
+                undo();
+            }
+        }
+
+        // Redo: Cmd/Ctrl + Shift + Z or Cmd/Ctrl + Y
+        if ((modKey && e.shiftKey && e.key === 'z') || (modKey && e.key === 'y')) {
+            e.preventDefault();
+            if (canRedo()) {
+                redo();
+            }
+        }
+
+        // Delete: Delete or Backspace
+        if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
+            e.preventDefault();
+            deleteComponent(selectedId);
+        }
+
+        // Duplicate: Cmd/Ctrl + D
+        if (modKey && e.key === 'd' && selectedId) {
+            e.preventDefault();
+            duplicateComponent(selectedId);
+        }
+    };
+
+    return { handleKeyDown };
+};

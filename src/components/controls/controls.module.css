@@ -599,3 +599,278 @@
     outline: none;
     border-color: var(--polymorphic-color-primary);
 }
+
+/* ===========================
+   Media Control
+=========================== */
+
+.mediaControl {
+    display: flex;
+    flex-direction: column;
+    gap: var(--polymorphic-spacing-2);
+}
+
+.mediaPreview {
+    position: relative;
+    border-radius: var(--polymorphic-border-radius-md);
+    overflow: hidden;
+    background: var(--polymorphic-color-gray-100);
+    border: 1px solid var(--polymorphic-border-color);
+}
+
+.mediaPreviewSmall {
+    width: 80px;
+    height: 80px;
+}
+
+.mediaPreviewMedium {
+    width: 100%;
+    height: 120px;
+}
+
+.mediaPreviewLarge {
+    width: 100%;
+    height: 180px;
+}
+
+.mediaImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mediaOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--polymorphic-spacing-2);
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity var(--polymorphic-transition-fast);
+}
+
+.mediaPreview:hover .mediaOverlay {
+    opacity: 1;
+}
+
+.mediaButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+    color: var(--polymorphic-color-gray-700);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.mediaButton:hover {
+    background: var(--polymorphic-color-gray-100);
+}
+
+.mediaButtonDanger:hover {
+    background: var(--polymorphic-color-error);
+    color: white;
+}
+
+.mediaUploadButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--polymorphic-spacing-2);
+    width: 100%;
+    padding: var(--polymorphic-spacing-6);
+    border: 2px dashed var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    background: var(--polymorphic-color-gray-50);
+    color: var(--polymorphic-color-gray-500);
+    font-size: var(--polymorphic-font-size-sm);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.mediaUploadButton:hover {
+    border-color: var(--polymorphic-color-primary);
+    color: var(--polymorphic-color-primary);
+    background: var(--polymorphic-color-primary-light);
+}
+
+.mediaUrlInput {
+    margin-top: var(--polymorphic-spacing-1);
+}
+
+.mediaUrlInput input {
+    font-size: var(--polymorphic-font-size-xs);
+}
+
+/* ===========================
+   Link Control
+=========================== */
+
+.linkControl {
+    display: flex;
+    flex-direction: column;
+    gap: var(--polymorphic-spacing-2);
+}
+
+.linkField {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.linkUrlWrapper {
+    position: relative;
+}
+
+.linkInputGroup {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    background: var(--polymorphic-color-white);
+    overflow: hidden;
+}
+
+.linkInputGroup:focus-within {
+    border-color: var(--polymorphic-color-primary);
+    box-shadow: 0 0 0 2px var(--polymorphic-color-primary-light);
+}
+
+.linkIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--polymorphic-spacing-2);
+    color: var(--polymorphic-color-gray-400);
+}
+
+.linkInput {
+    flex: 1;
+    padding: var(--polymorphic-spacing-2);
+    border: none;
+    background: transparent;
+    font-size: var(--polymorphic-font-size-sm);
+    outline: none;
+}
+
+.linkClearButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--polymorphic-spacing-2);
+    border: none;
+    background: transparent;
+    color: var(--polymorphic-color-gray-400);
+    cursor: pointer;
+}
+
+.linkClearButton:hover {
+    color: var(--polymorphic-color-gray-600);
+}
+
+.linkDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    margin-top: 4px;
+    background: var(--polymorphic-color-white);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    box-shadow: var(--polymorphic-shadow-lg);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.linkDropdownLoading {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-2);
+    padding: var(--polymorphic-spacing-3);
+    color: var(--polymorphic-color-gray-500);
+    font-size: var(--polymorphic-font-size-sm);
+}
+
+.linkDropdownSpinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.linkDropdownItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--polymorphic-spacing-2) var(--polymorphic-spacing-3);
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--polymorphic-transition-fast);
+}
+
+.linkDropdownItem:hover {
+    background: var(--polymorphic-color-gray-50);
+}
+
+.linkDropdownTitle {
+    font-size: var(--polymorphic-font-size-sm);
+    color: var(--polymorphic-color-gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.linkDropdownType {
+    font-size: var(--polymorphic-font-size-xs);
+    color: var(--polymorphic-color-gray-400);
+    text-transform: uppercase;
+}
+
+.linkOptions {
+    display: flex;
+    gap: var(--polymorphic-spacing-3);
+}
+
+.linkOption {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.linkOptionLabel {
+    font-size: 10px;
+    font-weight: var(--polymorphic-font-weight-medium);
+    color: var(--polymorphic-color-gray-500);
+    text-transform: uppercase;
+}
+
+.linkSelect {
+    padding: var(--polymorphic-spacing-1) var(--polymorphic-spacing-2);
+    font-size: var(--polymorphic-font-size-xs);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+}
+
+.linkExternalNote {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-1);
+    font-size: var(--polymorphic-font-size-xs);
+    color: var(--polymorphic-color-gray-500);
+}

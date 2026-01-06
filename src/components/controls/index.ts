@@ -32,3 +32,11 @@ export type { PositionValue } from './PositionControl';
 // Element Style Control
 export { ElementStyleControl } from './ElementStyleControl';
 export type { ElementStyleValue } from './ElementStyleControl';
+
+// Media Control
+export { MediaControl } from './MediaControl';
+export type { MediaValue } from './MediaControl';
+
+// Link Control
+export { LinkControl } from './LinkControl';
+export type { LinkValue } from './LinkControl';
