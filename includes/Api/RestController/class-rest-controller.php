@@ -480,14 +480,14 @@ class Rest_Controller extends WP_REST_Controller {
 
         $sanitized = [
             'id'    => preg_replace( '/[^a-zA-Z0-9_-]/', '', $component['id'] ),
-            'type'  => sanitize_key( $component['type'] ),
+            'type'  => $this->sanitize_component_type( $component['type'] ),
             'props' => [],
         ];
 
         // Sanitize props.
         if ( ! empty( $component['props'] ) && is_array( $component['props'] ) ) {
             foreach ( $component['props'] as $key => $value ) {
-                $sanitized['props'][ sanitize_key( $key ) ] = $this->sanitize_prop_value( $value );
+                $sanitized['props'][ $this->sanitize_prop_key( $key ) ] = $this->sanitize_prop_value( $value );
             }
         }
 
@@ -498,7 +498,7 @@ class Rest_Controller extends WP_REST_Controller {
                 if ( in_array( $breakpoint, [ 'tablet', 'mobile' ], true ) && is_array( $overrides ) ) {
                     $sanitized['responsive'][ $breakpoint ] = [];
                     foreach ( $overrides as $key => $value ) {
-                        $sanitized['responsive'][ $breakpoint ][ sanitize_key( $key ) ] = $this->sanitize_prop_value( $value );
+                        $sanitized['responsive'][ $breakpoint ][ $this->sanitize_prop_key( $key ) ] = $this->sanitize_prop_value( $value );
                     }
                 }
             }
@@ -535,7 +535,7 @@ class Rest_Controller extends WP_REST_Controller {
         if ( is_array( $value ) ) {
             $sanitized = [];
             foreach ( $value as $key => $item ) {
-                $sanitized[ sanitize_key( $key ) ] = $this->sanitize_prop_value( $item );
+                $sanitized[ $this->sanitize_prop_key( $key ) ] = $this->sanitize_prop_value( $item );
             }
             return $sanitized;
         }
@@ -601,5 +601,37 @@ class Rest_Controller extends WP_REST_Controller {
         $css = preg_replace( '/@import/i', '', $css );
 
         return wp_strip_all_tags( $css );
+    }
+
+    /**
+     * Sanitize component type while preserving case.
+     *
+     * Unlike sanitize_key(), this preserves camelCase for component types
+     * like 'heroBlock', 'featuresBlock', etc.
+     *
+     * @since 1.0.0
+     *
+     * @param string $type Raw component type.
+     * @return string Sanitized component type.
+     */
+    private function sanitize_component_type( string $type ): string {
+        // Only allow alphanumeric characters (preserving case).
+        return preg_replace( '/[^a-zA-Z0-9]/', '', $type );
+    }
+
+    /**
+     * Sanitize property key while preserving case.
+     *
+     * Unlike sanitize_key(), this preserves camelCase for property keys
+     * like 'textAlign', 'fontSize', 'backgroundColor', etc.
+     *
+     * @since 1.0.0
+     *
+     * @param string $key Raw property key.
+     * @return string Sanitized property key.
+     */
+    private function sanitize_prop_key( string $key ): string {
+        // Only allow alphanumeric characters and underscores (preserving case).
+        return preg_replace( '/[^a-zA-Z0-9_]/', '', $key );
     }
 }
