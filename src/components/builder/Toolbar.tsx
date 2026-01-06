@@ -5,21 +5,29 @@
  * @since   1.0.0
  */
 
-import React, { useState } from 'react';
-import { ArrowLeft, Undo2, Redo2, Monitor, Tablet, Smartphone, Save, Settings } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { ArrowLeft, Undo2, Redo2, Monitor, Tablet, Smartphone, Save, Settings, FileJson, Check } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
 import { saveBuilderData } from '../../utils/api';
 import { GlobalSettingsPanel } from './GlobalSettingsPanel';
+import { ImportExportModal } from './ImportExportModal';
 import type { Breakpoint } from '../../types/components';
 
 import styles from './Toolbar.module.css';
+
+// Auto-save interval in milliseconds (30 seconds)
+const AUTO_SAVE_INTERVAL = 30000;
 
 /**
  * Top toolbar with save, undo/redo, and responsive controls.
  */
 export const Toolbar: React.FC = () => {
     const [showGlobalSettings, setShowGlobalSettings] = useState(false);
+    const [showImportExport, setShowImportExport] = useState(false);
+    const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+    const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    
     const {
         components,
         currentBreakpoint,
@@ -32,14 +40,18 @@ export const Toolbar: React.FC = () => {
         isSaving,
         setSaving,
         setDirty,
+        autoSaveEnabled,
+        setLastSaved,
     } = useBuilderStore();
 
     const { postId, postTitle, editorUrl, previewUrl } = window.polymorphicSettings;
 
-    const handleSave = async () => {
+    const performSave = useCallback(async (isAutoSave = false) => {
         if (isSaving) return;
 
         setSaving(true);
+        if (isAutoSave) setAutoSaveStatus('saving');
+        
         try {
             await saveBuilderData(postId, {
                 version: '1.0.0',
@@ -56,12 +68,42 @@ export const Toolbar: React.FC = () => {
                 modified: new Date().toISOString(),
             });
             setDirty(false);
+            setLastSaved(new Date().toISOString());
+            
+            if (isAutoSave) {
+                setAutoSaveStatus('saved');
+                setTimeout(() => setAutoSaveStatus('idle'), 2000);
+            }
         } catch (error) {
             console.error('[Polymorphic] Save failed:', error);
+            if (isAutoSave) setAutoSaveStatus('idle');
         } finally {
             setSaving(false);
         }
-    };
+    }, [components, postId, isSaving, setSaving, setDirty, setLastSaved]);
+
+    // Auto-save effect
+    useEffect(() => {
+        if (!autoSaveEnabled || !isDirty) return;
+
+        // Clear existing timeout
+        if (autoSaveTimeoutRef.current) {
+            clearTimeout(autoSaveTimeoutRef.current);
+        }
+
+        // Set new auto-save timeout
+        autoSaveTimeoutRef.current = setTimeout(() => {
+            performSave(true);
+        }, AUTO_SAVE_INTERVAL);
+
+        return () => {
+            if (autoSaveTimeoutRef.current) {
+                clearTimeout(autoSaveTimeoutRef.current);
+            }
+        };
+    }, [isDirty, autoSaveEnabled, performSave]);
+
+    const handleSave = () => performSave(false);
 
     const handleBack = () => {
         if (isDirty) {
@@ -119,7 +161,7 @@ export const Toolbar: React.FC = () => {
                         className={styles.iconButton}
                         onClick={undo}
                         disabled={!canUndo()}
-                        title="Undo"
+                        title="Undo (Cmd+Z)"
                     >
                         <Undo2 size={18} />
                     </button>
@@ -127,19 +169,40 @@ export const Toolbar: React.FC = () => {
                         className={styles.iconButton}
                         onClick={redo}
                         disabled={!canRedo()}
-                        title="Redo"
+                        title="Redo (Cmd+Shift+Z)"
                     >
                         <Redo2 size={18} />
                     </button>
                 </div>
 
                 <button
-                    className={styles.settingsButton}
+                    className={styles.iconButton}
+                    onClick={() => setShowImportExport(true)}
+                    title="Import / Export"
+                >
+                    <FileJson size={18} />
+                </button>
+
+                <button
+                    className={styles.iconButton}
                     onClick={() => setShowGlobalSettings(true)}
                     title="Global Settings"
                 >
                     <Settings size={18} />
                 </button>
+
+                {/* Auto-save indicator */}
+                {autoSaveStatus !== 'idle' && (
+                    <span className={styles.autoSaveIndicator}>
+                        {autoSaveStatus === 'saving' && 'Auto-saving...'}
+                        {autoSaveStatus === 'saved' && (
+                            <>
+                                <Check size={14} />
+                                Saved
+                            </>
+                        )}
+                    </span>
+                )}
 
                 <button
                     className={styles.saveButton}
@@ -155,6 +218,12 @@ export const Toolbar: React.FC = () => {
             <GlobalSettingsPanel
                 isOpen={showGlobalSettings}
                 onClose={() => setShowGlobalSettings(false)}
+            />
+
+            {/* Import/Export Modal */}
+            <ImportExportModal
+                isOpen={showImportExport}
+                onClose={() => setShowImportExport(false)}
             />
         </header>
     );

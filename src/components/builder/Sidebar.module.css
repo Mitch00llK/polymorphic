@@ -135,3 +135,35 @@
     border-color: var(--polymorphic-color-primary);
     background-color: var(--polymorphic-color-primary-light);
 }
+
+/* Template Library Section */
+.templateSection {
+    padding: var(--polymorphic-spacing-3) var(--polymorphic-spacing-4);
+    border-bottom: 1px solid var(--polymorphic-border-color);
+}
+
+.templateButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--polymorphic-spacing-2);
+    width: 100%;
+    padding: var(--polymorphic-spacing-3);
+    background: linear-gradient(135deg, var(--polymorphic-color-primary), #8b5cf6);
+    border: none;
+    border-radius: var(--polymorphic-border-radius-md);
+    color: var(--polymorphic-color-white);
+    font-size: var(--polymorphic-font-size-sm);
+    font-weight: var(--polymorphic-font-weight-medium);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.templateButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.templateButton:active {
+    transform: translateY(0);
+}

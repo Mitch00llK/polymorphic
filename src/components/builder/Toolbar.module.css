@@ -174,3 +174,28 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+.autoSaveIndicator {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-1);
+    font-size: var(--polymorphic-font-size-xs);
+    color: var(--polymorphic-color-gray-500);
+    padding: var(--polymorphic-spacing-1) var(--polymorphic-spacing-2);
+    background: var(--polymorphic-color-gray-100);
+    border-radius: var(--polymorphic-border-radius-sm);
+    animation: fadeIn 0.2s ease;
+}
+
+.autoSaveIndicator svg {
+    color: var(--polymorphic-color-success, #22c55e);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
