@@ -6,10 +6,10 @@
  */
 
 import React from 'react';
-import type { ComponentData } from '../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
+import type { ComponentData } from '../../../types/components';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
-import styles from './renderers.module.css';
+import styles from '../atoms.module.css';
 
 interface ImageRendererProps {
     component: ComponentData;
@@ -89,3 +89,4 @@ export const ImageRenderer: React.FC<ImageRendererProps> = ({
 };
 
 export default ImageRenderer;
+

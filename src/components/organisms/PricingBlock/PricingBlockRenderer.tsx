@@ -9,9 +9,9 @@
 
 import React from 'react';
 import { Check } from 'lucide-react';
-import type { ComponentData } from '../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
-import styles from './blocks.module.css';
+import type { ComponentData } from '../../../types/components';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import styles from '../blocks.module.css';
 
 interface PricingPlan {
     name: string;
@@ -125,3 +125,4 @@ export const PricingBlockRenderer: React.FC<PricingBlockRendererProps> = ({
 };
 
 export default PricingBlockRenderer;
+

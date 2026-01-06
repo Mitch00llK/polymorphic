@@ -7,11 +7,11 @@
 
 import React from 'react';
 
-import type { ComponentData } from '../../types/components';
-import { ComponentRenderer } from './ComponentRenderer';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
+import type { ComponentData } from '../../../types/components';
+import { ComponentRenderer } from '../../ComponentRenderer';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
-import styles from './renderers.module.css';
+import styles from '../molecules.module.css';
 
 interface CardRendererProps {
     component: ComponentData;
@@ -82,3 +82,4 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
 };
 
 export default CardRenderer;
+

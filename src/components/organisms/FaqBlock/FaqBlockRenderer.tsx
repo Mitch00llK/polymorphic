@@ -10,9 +10,9 @@
 import React from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { ChevronDown } from 'lucide-react';
-import type { ComponentData } from '../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
-import styles from './blocks.module.css';
+import type { ComponentData } from '../../../types/components';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import styles from '../blocks.module.css';
 
 interface FaqItem {
     question: string;
@@ -86,3 +86,4 @@ export const FaqBlockRenderer: React.FC<FaqBlockRendererProps> = ({
 };
 
 export default FaqBlockRenderer;
+

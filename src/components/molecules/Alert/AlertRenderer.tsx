@@ -8,10 +8,10 @@
 import React from 'react';
 import { AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 
-import type { ComponentData } from '../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
+import type { ComponentData } from '../../../types/components';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
-import styles from './renderers.module.css';
+import styles from '../molecules.module.css';
 
 interface AlertRendererProps {
     component: ComponentData;
@@ -70,3 +70,4 @@ export const AlertRenderer: React.FC<AlertRendererProps> = ({
 };
 
 export default AlertRenderer;
+

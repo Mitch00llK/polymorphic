@@ -11,10 +11,10 @@ import React from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { ChevronDown } from 'lucide-react';
 
-import type { ComponentData } from '../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
+import type { ComponentData } from '../../../types/components';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
-import styles from './renderers.module.css';
+import styles from '../molecules.module.css';
 
 interface AccordionItem {
     id: string;
@@ -82,3 +82,4 @@ export const AccordionRenderer: React.FC<AccordionRendererProps> = ({
 };
 
 export default AccordionRenderer;
+

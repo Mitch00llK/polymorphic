@@ -1,0 +1,315 @@
+/**
+ * Atoms Styles
+ *
+ * Styles for atomic components (smallest building blocks).
+ * Uses generic class names following BEM methodology.
+ *
+ * @package Polymorphic
+ * @since   1.0.0
+ */
+
+/* ===========================
+   Heading
+=========================== */
+
+.heading {
+    margin: 0;
+    font-family: var(--polymorphic-font-family);
+    font-weight: var(--polymorphic-font-weight-bold);
+}
+
+.heading--h1 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+}
+
+.heading--h2 {
+    font-size: 2rem;
+    line-height: 1.25;
+}
+
+.heading--h3 {
+    font-size: 1.75rem;
+    line-height: 1.3;
+}
+
+.heading--h4 {
+    font-size: 1.5rem;
+    line-height: 1.35;
+}
+
+.heading--h5 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+}
+
+.heading--h6 {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* ===========================
+   Text
+=========================== */
+
+.text {
+    margin: 0;
+    font-family: var(--polymorphic-font-family);
+    line-height: 1.6;
+}
+
+.text--lead {
+    font-size: 1.25rem;
+    color: var(--polymorphic-color-gray-600);
+}
+
+.text--small {
+    font-size: var(--polymorphic-font-size-sm);
+}
+
+/* Text Alignment */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-justify {
+    text-align: justify;
+}
+
+/* ===========================
+   Button
+=========================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: var(--polymorphic-font-weight-medium);
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: var(--polymorphic-border-radius-md);
+    cursor: pointer;
+    transition: all var(--polymorphic-transition-fast);
+}
+
+.btn--primary {
+    background-color: var(--polymorphic-color-primary);
+    color: white;
+    border-color: var(--polymorphic-color-primary);
+}
+
+.btn--primary:hover {
+    background-color: var(--polymorphic-color-primary-hover);
+    border-color: var(--polymorphic-color-primary-hover);
+}
+
+.btn--secondary {
+    background-color: var(--polymorphic-color-gray-600);
+    color: white;
+    border-color: var(--polymorphic-color-gray-600);
+}
+
+.btn--outline {
+    background-color: transparent;
+    color: var(--polymorphic-color-primary);
+    border-color: var(--polymorphic-color-primary);
+}
+
+.btn--outline:hover {
+    background-color: var(--polymorphic-color-primary);
+    color: white;
+}
+
+.btn--ghost {
+    background-color: transparent;
+    color: var(--polymorphic-color-gray-700);
+    border-color: transparent;
+}
+
+.btn--ghost:hover {
+    background-color: var(--polymorphic-color-gray-100);
+}
+
+.btn--sm {
+    padding: 0.5rem 1rem;
+    font-size: var(--polymorphic-font-size-sm);
+}
+
+.btn--lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+}
+
+.btn--full {
+    width: 100%;
+}
+
+.btnText {
+    /* Button text wrapper */
+}
+
+/* ===========================
+   Image
+=========================== */
+
+.image {
+    margin: 0;
+    line-height: 0;
+}
+
+.image img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.image--placeholder {
+    background-color: var(--polymorphic-color-gray-100);
+    border: 2px dashed var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+}
+
+.imagePlaceholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: var(--polymorphic-color-gray-400);
+    font-size: var(--polymorphic-font-size-sm);
+}
+
+.imageCaption {
+    margin-top: 0.5rem;
+    font-size: var(--polymorphic-font-size-sm);
+    color: var(--polymorphic-color-gray-500);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.image--align-center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.image--align-left {
+    margin-right: auto;
+}
+
+.image--align-right {
+    margin-left: auto;
+}
+
+.image--rounded img {
+    border-radius: var(--polymorphic-border-radius-lg);
+}
+
+/* ===========================
+   Badge
+=========================== */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: var(--polymorphic-font-weight-medium);
+    border-radius: 9999px;
+    border: 1px solid transparent;
+}
+
+.badge--default {
+    background-color: var(--polymorphic-color-primary);
+    color: white;
+}
+
+.badge--secondary {
+    background-color: var(--polymorphic-color-gray-100);
+    color: var(--polymorphic-color-gray-700);
+}
+
+.badge--outline {
+    background-color: transparent;
+    border-color: var(--polymorphic-border-color);
+    color: var(--polymorphic-color-gray-700);
+}
+
+.badge--destructive {
+    background-color: var(--polymorphic-color-error);
+    color: white;
+}
+
+/* ===========================
+   Avatar
+=========================== */
+
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: var(--polymorphic-color-gray-100);
+    color: var(--polymorphic-color-gray-600);
+    font-weight: var(--polymorphic-font-weight-medium);
+}
+
+.avatar--small {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+}
+
+.avatar--medium {
+    width: 40px;
+    height: 40px;
+    font-size: 0.875rem;
+}
+
+.avatar--large {
+    width: 56px;
+    height: 56px;
+    font-size: 1rem;
+}
+
+.avatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatarFallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* ===========================
+   Separator
+=========================== */
+
+.separator {
+    background-color: var(--polymorphic-border-color);
+}
+
+.separator--horizontal {
+    width: 100%;
+    height: 1px;
+    margin: 1rem 0;
+}
+
+.separator--vertical {
+    width: 1px;
+    height: 100%;
+    min-height: 20px;
+    margin: 0 1rem;
+}
+

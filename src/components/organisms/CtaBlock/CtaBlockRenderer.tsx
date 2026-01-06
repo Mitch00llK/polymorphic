@@ -8,9 +8,9 @@
  */
 
 import React from 'react';
-import type { ComponentData } from '../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
-import styles from './blocks.module.css';
+import type { ComponentData } from '../../../types/components';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import styles from '../blocks.module.css';
 
 interface CtaBlockRendererProps {
     component: ComponentData;
@@ -59,3 +59,4 @@ export const CtaBlockRenderer: React.FC<CtaBlockRendererProps> = ({
 };
 
 export default CtaBlockRenderer;
+
