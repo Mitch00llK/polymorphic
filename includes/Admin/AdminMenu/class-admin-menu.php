@@ -61,6 +61,16 @@ class Admin_Menu {
             'polymorphic-settings',
             [ $this, 'render_settings_page' ]
         );
+
+        // Hidden builder page (null parent = hidden from menu but accessible).
+        add_submenu_page(
+            null, // No parent - hidden from menu.
+            __( 'Edit with Polymorphic', 'polymorphic' ),
+            __( 'Builder', 'polymorphic' ),
+            'edit_posts',
+            'polymorphic-builder',
+            [ $this, 'render_builder_page_wrapper' ]
+        );
     }
 
     /**
@@ -121,24 +131,88 @@ class Admin_Menu {
      * Handle redirect to builder page.
      *
      * @since 1.0.0
+     * @deprecated Use render_builder_page_wrapper instead.
      */
     public function handle_builder_redirect(): void {
-        // Check if accessing builder.
-        if ( isset( $_GET['page'] ) && 'polymorphic-builder' === $_GET['page'] ) {
-            $post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
+        // No longer needed - WordPress handles page access via registered menu page.
+    }
 
-            if ( $post_id && current_user_can( 'edit_post', $post_id ) ) {
-                // Load the builder page.
-                $this->render_builder_page( $post_id );
-                exit;
-            }
+    /**
+     * Render the builder page wrapper.
+     *
+     * This is called by WordPress when the builder page is accessed.
+     *
+     * @since 1.0.0
+     */
+    public function render_builder_page_wrapper(): void {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
+
+        if ( ! $post_id ) {
+            wp_die( esc_html__( 'No post ID provided. Please select a page to edit.', 'polymorphic' ) );
         }
+
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_die( esc_html__( 'You do not have permission to edit this post.', 'polymorphic' ) );
+        }
+
+        // Mark as enabled when entering builder.
+        update_post_meta( $post_id, '_polymorphic_enabled', true );
+
+        // Enqueue builder assets.
+        $this->enqueue_builder_assets( $post_id );
+
+        // Render the builder template directly (full-screen).
+        include POLYMORPHIC_PATH . 'templates/builder-page.php';
+        exit;
+    }
+
+    /**
+     * Enqueue builder assets.
+     *
+     * @since 1.0.0
+     *
+     * @param int $post_id Post ID.
+     */
+    private function enqueue_builder_assets( int $post_id ): void {
+        $asset_file = POLYMORPHIC_PATH . 'assets/admin/builder.asset.php';
+        $asset      = file_exists( $asset_file )
+            ? require $asset_file
+            : [ 'dependencies' => [ 'wp-element', 'wp-api-fetch' ], 'version' => POLYMORPHIC_VERSION ];
+
+        wp_enqueue_script(
+            'polymorphic-builder',
+            POLYMORPHIC_URL . 'assets/admin/builder.js',
+            $asset['dependencies'],
+            $asset['version'],
+            true
+        );
+
+        wp_enqueue_style(
+            'polymorphic-builder',
+            POLYMORPHIC_URL . 'assets/admin/builder.css',
+            [],
+            $asset['version']
+        );
+
+        wp_localize_script( 'polymorphic-builder', 'polymorphicSettings', [
+            'nonce'      => wp_create_nonce( 'wp_rest' ),
+            'postId'     => $post_id,
+            'postTitle'  => get_the_title( $post_id ),
+            'apiBase'    => rest_url( 'polymorphic/v1/' ),
+            'isNewPost'  => empty( get_post_meta( $post_id, '_polymorphic_data', true ) ),
+            'siteUrl'    => get_site_url(),
+            'adminUrl'   => admin_url(),
+            'editorUrl'  => get_edit_post_link( $post_id, 'raw' ),
+            'previewUrl' => get_preview_post_link( $post_id ),
+        ]);
     }
 
     /**
      * Render the full-screen builder page.
      *
      * @since 1.0.0
+     * @deprecated Use render_builder_page_wrapper instead.
      *
      * @param int $post_id Post ID to edit.
      */
@@ -146,3 +220,4 @@ class Admin_Menu {
         include POLYMORPHIC_PATH . 'templates/builder-page.php';
     }
 }
+
