@@ -7,22 +7,9 @@
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
+import { buildStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../atoms.module.css';
-
-interface TextProps {
-    content?: string;
-    fontSize?: string;
-    fontWeight?: string;
-    fontFamily?: string;
-    lineHeight?: string;
-    letterSpacing?: string;
-    textAlign?: 'left' | 'center' | 'right' | 'justify';
-    color?: string;
-    marginTop?: string;
-    marginBottom?: string;
-    columns?: number;
-}
 
 interface TextRendererProps {
     component: ComponentData;
@@ -35,23 +22,21 @@ interface TextRendererProps {
 export const TextRenderer: React.FC<TextRendererProps> = ({
     component,
 }) => {
-    const props = (component.props || {}) as TextProps;
+    const props = (component.props || {}) as StyleableProps;
 
-    const content = props.content || '<p>Enter your text here...</p>';
+    const content = (props.content as string) || '<p>Enter your text here...</p>';
+    const columns = props.columns as number;
+
+    // Build styles from shared control groups (same as marketing blocks)
+    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
 
     const style: React.CSSProperties = {
-        fontSize: props.fontSize || undefined,
-        fontWeight: props.fontWeight || undefined,
-        fontFamily: props.fontFamily || undefined,
-        lineHeight: props.lineHeight || undefined,
-        letterSpacing: props.letterSpacing || undefined,
-        textAlign: props.textAlign || undefined,
-        color: props.color || undefined,
-        marginTop: props.marginTop || undefined,
-        marginBottom: props.marginBottom || undefined,
-        columnCount: props.columns && props.columns > 1 ? props.columns : undefined,
-        // Reset default browser margins
-        margin: (props.marginTop || props.marginBottom) ? undefined : 0,
+        ...sharedStyles,
+        // Multi-column support
+        columnCount: columns && columns > 1 ? columns : undefined,
+        // Reset default browser margins if no margin set
+        margin: (!sharedStyles.marginTop && !sharedStyles.marginBottom && 
+                 !sharedStyles.marginLeft && !sharedStyles.marginRight) ? 0 : undefined,
     };
 
     return (

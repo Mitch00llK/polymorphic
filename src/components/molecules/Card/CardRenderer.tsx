@@ -1,5 +1,5 @@
 /**
- * Card Renderer Component
+ * Card Renderer
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -8,6 +8,7 @@
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../molecules.module.css';
 
@@ -18,66 +19,111 @@ interface PaddingObject {
     left?: string;
 }
 
-interface CardProps {
-    title?: string;
-    description?: string;
-    showHeader?: boolean;
-    showFooter?: boolean;
-    variant?: 'default' | 'elevated' | 'outlined';
-    backgroundColor?: string;
-    borderColor?: string;
-    borderWidth?: string;
-    borderRadius?: string;
-    boxShadow?: string;
-    padding?: PaddingObject | string;
-    width?: string;
-    minWidth?: string;
-    maxWidth?: string;
-}
-
 interface CardRendererProps {
     component: ComponentData;
     context?: 'editor' | 'preview';
 }
 
+/**
+ * Renders a Card component.
+ */
 export const CardRenderer: React.FC<CardRendererProps> = ({
     component,
     context = 'preview',
 }) => {
-    const props = (component.props || {}) as CardProps;
+    const props = (component.props || {}) as StyleableProps;
     const children = component.children || [];
 
-    // Handle padding
+    const title = props.title as string;
+    const description = props.description as string;
+    const footer = props.footer as string;
+    const showHeader = props.showHeader !== false;
+    const showFooter = props.showFooter !== false;
+    const variant = (props.variant as string) || 'default';
+
+    // Build styles from shared control groups (same as marketing blocks)
+    const sharedStyles = buildStyles(props, ['box', 'size', 'spacing', 'position']);
+
+    // Build element-specific styles
+    const titleStyle = buildElementStyles(props, 'title');
+    const descriptionStyle = buildElementStyles(props, 'description');
+    const footerStyle = buildElementStyles(props, 'footer');
+
+    // Legacy padding support (object format from templates)
+    const legacyPadding = props.padding as PaddingObject | string | undefined;
     let paddingStyles: React.CSSProperties = {};
-    if (props.padding) {
-        if (typeof props.padding === 'object') {
-            paddingStyles = {
-                paddingTop: props.padding.top || '24px',
-                paddingRight: props.padding.right || '24px',
-                paddingBottom: props.padding.bottom || '24px',
-                paddingLeft: props.padding.left || '24px',
-            };
+    if (!sharedStyles.paddingTop && !sharedStyles.paddingRight && 
+        !sharedStyles.paddingBottom && !sharedStyles.paddingLeft) {
+        if (legacyPadding) {
+            if (typeof legacyPadding === 'object') {
+                paddingStyles = {
+                    paddingTop: legacyPadding.top || '24px',
+                    paddingRight: legacyPadding.right || '24px',
+                    paddingBottom: legacyPadding.bottom || '24px',
+                    paddingLeft: legacyPadding.left || '24px',
+                };
+            } else {
+                paddingStyles = { padding: legacyPadding };
+            }
         } else {
-            paddingStyles = { padding: props.padding };
+            paddingStyles = { padding: '24px' };
         }
-    } else {
-        paddingStyles = { padding: '24px' };
     }
 
+    // Card styles
     const cardStyle: React.CSSProperties = {
-        backgroundColor: props.backgroundColor || '#ffffff',
-        borderRadius: props.borderRadius || '8px',
-        boxShadow: props.boxShadow || undefined,
-        width: props.width || undefined,
-        minWidth: props.minWidth || undefined,
-        maxWidth: props.maxWidth || undefined,
+        ...sharedStyles,
+        boxSizing: 'border-box',
+        // Defaults
+        backgroundColor: sharedStyles.backgroundColor || '#ffffff',
+        borderRadius: sharedStyles.borderRadius || '8px',
         ...paddingStyles,
     };
 
-    // Handle border
-    if (props.borderColor || props.borderWidth) {
-        cardStyle.border = `${props.borderWidth || '1px'} solid ${props.borderColor || '#e5e7eb'}`;
+    // Handle border default
+    if (!sharedStyles.borderWidth && !sharedStyles.borderColor && variant !== 'ghost') {
+        cardStyle.border = '1px solid #e5e7eb';
     }
+
+    // Variant-specific styles
+    switch (variant) {
+        case 'ghost':
+            cardStyle.backgroundColor = 'transparent';
+            cardStyle.border = 'none';
+            cardStyle.boxShadow = 'none';
+            break;
+        case 'elevated':
+            cardStyle.boxShadow = sharedStyles.boxShadow || '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+            break;
+    }
+
+    // Title default styles
+    const finalTitleStyle: React.CSSProperties = {
+        margin: 0,
+        fontSize: '1.25rem',
+        fontWeight: '600',
+        lineHeight: '1.4',
+        marginBottom: '0.5rem',
+        ...titleStyle,
+    };
+
+    // Description default styles
+    const finalDescriptionStyle: React.CSSProperties = {
+        margin: 0,
+        fontSize: '0.875rem',
+        lineHeight: '1.5',
+        color: '#6b7280',
+        ...descriptionStyle,
+    };
+
+    // Footer default styles
+    const finalFooterStyle: React.CSSProperties = {
+        fontSize: '0.875rem',
+        lineHeight: '1.5',
+        color: '#6b7280',
+        marginTop: '1rem',
+        ...footerStyle,
+    };
 
     return (
         <div
@@ -85,11 +131,11 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
             style={cardStyle}
             data-component-id={component.id}
         >
-            {props.showHeader && props.title && (
+            {showHeader && title && (
                 <div className={styles.cardHeader}>
-                    <h3 className={styles.cardTitle}>{props.title}</h3>
-                    {props.description && (
-                        <p className={styles.cardDescription}>{props.description}</p>
+                    <h3 className={styles.cardTitle} style={finalTitleStyle}>{title}</h3>
+                    {description && (
+                        <p className={styles.cardDescription} style={finalDescriptionStyle}>{description}</p>
                     )}
                 </div>
             )}
@@ -106,6 +152,11 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
                     <p className={styles.placeholder}>Add content here</p>
                 ) : null}
             </div>
+            {showFooter && footer && (
+                <div className={styles.cardFooter} style={finalFooterStyle}>
+                    <p style={{ margin: 0 }}>{footer}</p>
+                </div>
+            )}
         </div>
     );
 };

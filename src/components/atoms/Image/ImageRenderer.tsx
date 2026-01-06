@@ -7,24 +7,9 @@
 
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../atoms.module.css';
-
-interface ImageProps {
-    src?: string;
-    alt?: string;
-    srcset?: string;
-    sizes?: string;
-    width?: string;
-    height?: string;
-    maxWidth?: string;
-    aspectRatio?: string;
-    objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
-    borderRadius?: string;
-    boxShadow?: string;
-    align?: 'left' | 'center' | 'right';
-    caption?: string;
-}
 
 interface ImageRendererProps {
     component: ComponentData;
@@ -37,35 +22,55 @@ interface ImageRendererProps {
 export const ImageRenderer: React.FC<ImageRendererProps> = ({
     component,
 }) => {
-    const props = (component.props || {}) as ImageProps;
+    const props = (component.props || {}) as StyleableProps;
 
+    const src = props.src as string;
+    const alt = (props.alt as string) || '';
+    const srcset = props.srcset as string;
+    const sizes = props.sizes as string;
+    const caption = props.caption as string;
+    const align = props.align as string;
+    const objectFit = (props.objectFit as string) || 'cover';
+    const aspectRatio = props.aspectRatio as string;
+
+    // Build styles from shared control groups (same as marketing blocks)
+    const sharedStyles = buildStyles(props, ['size', 'box', 'spacing', 'position']);
+
+    // Build caption-specific styles
+    const captionStyle = buildElementStyles(props, 'caption');
+
+    // Figure styles (wrapper)
     const figureStyle: React.CSSProperties = {
-        maxWidth: props.maxWidth || '100%',
-        width: props.width || '100%',
-        margin: 0,
+        ...sharedStyles,
         display: 'block',
+        maxWidth: sharedStyles.maxWidth || '100%',
+        width: sharedStyles.width || '100%',
+        // Reset margin if not set
+        margin: (!sharedStyles.marginTop && !sharedStyles.marginRight && 
+                 !sharedStyles.marginBottom && !sharedStyles.marginLeft) ? 0 : undefined,
     };
 
     // Handle alignment
-    if (props.align === 'center') {
+    if (align === 'center') {
         figureStyle.marginLeft = 'auto';
         figureStyle.marginRight = 'auto';
-    } else if (props.align === 'right') {
+    } else if (align === 'right') {
         figureStyle.marginLeft = 'auto';
     }
 
+    // Image styles
     const imgStyle: React.CSSProperties = {
         width: '100%',
-        height: props.height || 'auto',
-        aspectRatio: props.aspectRatio || undefined,
-        objectFit: props.objectFit || 'cover',
-        borderRadius: props.borderRadius || undefined,
-        boxShadow: props.boxShadow || undefined,
+        height: sharedStyles.height || 'auto',
+        aspectRatio: aspectRatio || sharedStyles.aspectRatio || undefined,
+        objectFit: objectFit as React.CSSProperties['objectFit'],
+        borderRadius: sharedStyles.borderRadius || undefined,
+        boxShadow: sharedStyles.boxShadow || undefined,
         display: 'block',
     };
 
     // Show placeholder if no image src
-    if (!props.src) {
+    if (!src) {
         return (
             <figure
                 className={styles.image}
@@ -86,16 +91,16 @@ export const ImageRenderer: React.FC<ImageRendererProps> = ({
             data-component-id={component.id}
         >
             <img
-                src={props.src}
-                alt={props.alt || ''}
-                srcSet={props.srcset || undefined}
-                sizes={props.sizes || undefined}
+                src={src}
+                alt={alt}
+                srcSet={srcset || undefined}
+                sizes={sizes || undefined}
                 style={imgStyle}
                 loading="lazy"
             />
-            {props.caption && (
-                <figcaption className={styles.imageCaption}>
-                    {props.caption}
+            {caption && (
+                <figcaption className={styles.imageCaption} style={captionStyle}>
+                    {caption}
                 </figcaption>
             )}
         </figure>

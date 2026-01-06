@@ -10,24 +10,9 @@
 import React from 'react';
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
+import { buildStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
 import styles from '../organisms.module.css';
-
-interface SectionProps {
-    width?: 'full' | 'boxed';
-    minHeight?: string;
-    verticalAlign?: 'start' | 'center' | 'end' | 'stretch';
-    horizontalAlign?: 'start' | 'center' | 'end' | 'stretch';
-    gap?: string;
-    backgroundColor?: string;
-    backgroundImage?: string;
-    paddingTop?: string;
-    paddingBottom?: string;
-    paddingLeft?: string;
-    paddingRight?: string;
-    marginTop?: string;
-    marginBottom?: string;
-}
 
 interface SectionRendererProps {
     component: ComponentData;
@@ -43,6 +28,8 @@ const mapAlignToFlex = (align?: string): string => {
         case 'center': return 'center';
         case 'end': return 'flex-end';
         case 'stretch': return 'stretch';
+        case 'between': return 'space-between';
+        case 'around': return 'space-around';
         default: return 'center';
     }
 };
@@ -54,28 +41,34 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     component,
     context,
 }) => {
-    const props = (component.props || {}) as SectionProps;
+    const props = (component.props || {}) as StyleableProps;
     const children = component.children || [];
+
+    // Build styles from shared control groups (same as marketing blocks)
+    const sharedStyles = buildStyles(props, ['layout', 'box', 'size', 'spacing', 'position']);
+
+    // Section-specific props (legacy support)
+    const verticalAlign = props.verticalAlign as string;
+    const horizontalAlign = props.horizontalAlign as string;
 
     // Build section styles
     const style: React.CSSProperties = {
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        minHeight: props.minHeight || undefined,
-        justifyContent: mapAlignToFlex(props.verticalAlign),
-        alignItems: mapAlignToFlex(props.horizontalAlign),
-        gap: props.gap || undefined,
-        backgroundColor: props.backgroundColor || undefined,
-        backgroundImage: props.backgroundImage || undefined,
-        backgroundSize: props.backgroundImage ? 'cover' : undefined,
-        backgroundPosition: props.backgroundImage ? 'center' : undefined,
-        paddingTop: props.paddingTop || '60px',
-        paddingBottom: props.paddingBottom || '60px',
-        paddingLeft: props.paddingLeft || '20px',
-        paddingRight: props.paddingRight || '20px',
-        marginTop: props.marginTop || undefined,
-        marginBottom: props.marginBottom || undefined,
+        ...sharedStyles,
+        // Layout defaults
+        display: sharedStyles.display || 'flex',
+        flexDirection: sharedStyles.flexDirection || (props.direction as string) || 'column',
+        justifyContent: sharedStyles.justifyContent || mapAlignToFlex(verticalAlign),
+        alignItems: sharedStyles.alignItems || mapAlignToFlex(horizontalAlign),
+        gap: sharedStyles.gap || (props.gap as string) || undefined,
+        flexWrap: sharedStyles.flexWrap || 'nowrap',
+        // Size defaults
+        width: sharedStyles.width || '100%',
+        minHeight: sharedStyles.minHeight || (props.minHeight as string) || undefined,
+        // Spacing defaults
+        paddingTop: sharedStyles.paddingTop || '60px',
+        paddingRight: sharedStyles.paddingRight || '20px',
+        paddingBottom: sharedStyles.paddingBottom || '60px',
+        paddingLeft: sharedStyles.paddingLeft || '20px',
     };
 
     return (
