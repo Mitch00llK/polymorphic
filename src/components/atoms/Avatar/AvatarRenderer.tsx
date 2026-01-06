@@ -7,10 +7,10 @@
 
 import React from 'react';
 
-import type { ComponentData } from '../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
+import type { ComponentData } from '../../../types/components';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
 
-import styles from './renderers.module.css';
+import styles from '../atoms.module.css';
 
 interface AvatarRendererProps {
     component: ComponentData;
@@ -61,3 +61,4 @@ export const AvatarRenderer: React.FC<AvatarRendererProps> = ({
 };
 
 export default AvatarRenderer;
+

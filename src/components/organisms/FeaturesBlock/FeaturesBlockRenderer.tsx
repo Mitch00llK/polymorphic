@@ -9,9 +9,9 @@
 
 import React from 'react';
 import { Zap, Shield, Rocket, Star, Heart, Globe } from 'lucide-react';
-import type { ComponentData } from '../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
-import styles from './blocks.module.css';
+import type { ComponentData } from '../../../types/components';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import styles from '../blocks.module.css';
 
 interface Feature {
     icon: string;
@@ -89,3 +89,4 @@ export const FeaturesBlockRenderer: React.FC<FeaturesBlockRendererProps> = ({
 };
 
 export default FeaturesBlockRenderer;
+

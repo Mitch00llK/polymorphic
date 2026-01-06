@@ -8,9 +8,9 @@
  */
 
 import React from 'react';
-import type { ComponentData } from '../../types/components';
-import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
-import styles from './blocks.module.css';
+import type { ComponentData } from '../../../types/components';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../../utils/styleBuilder';
+import styles from '../blocks.module.css';
 
 interface HeroBlockRendererProps {
     component: ComponentData;
@@ -76,3 +76,4 @@ export const HeroBlockRenderer: React.FC<HeroBlockRendererProps> = ({
 };
 
 export default HeroBlockRenderer;
+

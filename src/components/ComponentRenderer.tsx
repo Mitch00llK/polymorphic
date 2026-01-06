@@ -1,60 +1,69 @@
 /**
  * Component Renderer Index
  *
+ * Central registry for all component renderers.
+ *
  * @package Polymorphic
  * @since   1.0.0
  */
 
 import React from 'react';
-import type { ComponentData } from '../../types/components';
+import type { ComponentData } from '../types/components';
 
-// Layout components
-import { SectionRenderer } from './SectionRenderer';
-import { ContainerRenderer } from './ContainerRenderer';
+// Atoms
+import {
+    HeadingRenderer,
+    TextRenderer,
+    ButtonRenderer,
+    ImageRenderer,
+    BadgeRenderer,
+    AvatarRenderer,
+    SeparatorRenderer,
+} from './atoms';
 
-// Content components
-import { HeadingRenderer } from './HeadingRenderer';
-import { TextRenderer } from './TextRenderer';
-import { ImageRenderer } from './ImageRenderer';
-import { ButtonRenderer } from './ButtonRenderer';
+// Molecules
+import {
+    CardRenderer,
+    AlertRenderer,
+    AccordionRenderer,
+    TabsRenderer,
+} from './molecules';
 
-// UI components (shadcn-style)
-import { CardRenderer } from './CardRenderer';
-import { AccordionRenderer } from './AccordionRenderer';
-import { TabsRenderer } from './TabsRenderer';
-import { AlertRenderer } from './AlertRenderer';
-import { BadgeRenderer } from './BadgeRenderer';
-import { AvatarRenderer } from './AvatarRenderer';
-import { SeparatorRenderer } from './SeparatorRenderer';
-
-// Marketing blocks
-import { HeroBlockRenderer } from './HeroBlockRenderer';
-import { FeaturesBlockRenderer } from './FeaturesBlockRenderer';
-import { PricingBlockRenderer } from './PricingBlockRenderer';
-import { FaqBlockRenderer } from './FaqBlockRenderer';
-import { CtaBlockRenderer } from './CtaBlockRenderer';
+// Organisms
+import {
+    SectionRenderer,
+    ContainerRenderer,
+    HeroBlockRenderer,
+    FeaturesBlockRenderer,
+    PricingBlockRenderer,
+    FaqBlockRenderer,
+    CtaBlockRenderer,
+} from './organisms';
 
 /**
  * Component renderer map.
  */
 const renderers: Record<string, React.FC<{ component: ComponentData; context: 'editor' | 'preview' }>> = {
-    // Layout
+    // Layout (Organisms)
     section: SectionRenderer,
     container: ContainerRenderer,
-    // Content
+
+    // Content (Atoms)
     heading: HeadingRenderer,
     text: TextRenderer,
     image: ImageRenderer,
     button: ButtonRenderer,
-    // UI Components
+    badge: BadgeRenderer,
+    avatar: AvatarRenderer,
+    separator: SeparatorRenderer,
+
+    // UI Components (Molecules)
     card: CardRenderer,
     accordion: AccordionRenderer,
     tabs: TabsRenderer,
     alert: AlertRenderer,
-    badge: BadgeRenderer,
-    avatar: AvatarRenderer,
-    separator: SeparatorRenderer,
-    // Marketing Blocks
+
+    // Marketing Blocks (Organisms)
     heroBlock: HeroBlockRenderer,
     featuresBlock: FeaturesBlockRenderer,
     pricingBlock: PricingBlockRenderer,
@@ -107,3 +116,4 @@ export const renderChildren = (
 };
 
 export default ComponentRenderer;
+

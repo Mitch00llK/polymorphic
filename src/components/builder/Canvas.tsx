@@ -16,7 +16,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Trash2, Copy, GripVertical } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
-import { ComponentRenderer } from '../renderers/ComponentRenderer';
+import { ComponentRenderer } from '../ComponentRenderer';
 import type { ComponentData } from '../../types/components';
 
 import styles from './Canvas.module.css';

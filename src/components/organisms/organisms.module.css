@@ -1,0 +1,87 @@
+/**
+ * Organisms Styles
+ *
+ * Styles for organism components (complex, standalone sections).
+ * Uses generic class names following BEM methodology.
+ *
+ * @package Polymorphic
+ * @since   1.0.0
+ */
+
+/* ===========================
+   Section
+=========================== */
+
+.section {
+    position: relative;
+    width: 100%;
+}
+
+.emptySection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    padding: 2rem;
+    border: 2px dashed var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    color: var(--polymorphic-color-gray-400);
+    font-size: var(--polymorphic-font-size-sm);
+    background-color: var(--polymorphic-color-gray-50);
+}
+
+/* Droppable target state */
+.isDropTarget {
+    outline: 2px dashed var(--polymorphic-color-primary);
+    outline-offset: -2px;
+    background-color: var(--polymorphic-color-primary-light) !important;
+}
+
+/* ===========================
+   Container
+=========================== */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.container--narrow {
+    max-width: 768px;
+}
+
+.container--wide {
+    max-width: 1400px;
+}
+
+.container--full {
+    max-width: 100%;
+}
+
+.emptyContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    padding: 1.5rem;
+    border: 2px dashed var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    color: var(--polymorphic-color-gray-400);
+    font-size: var(--polymorphic-font-size-sm);
+    background-color: var(--polymorphic-color-gray-50);
+}
+
+/* ===========================
+   Drop Zone
+=========================== */
+
+.dropZone {
+    padding: 2rem;
+    border: 2px dashed var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-md);
+    text-align: center;
+    color: var(--polymorphic-color-gray-400);
+    font-size: var(--polymorphic-font-size-sm);
+    background-color: var(--polymorphic-color-gray-50);
+}
+
