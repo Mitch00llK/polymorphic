@@ -134,6 +134,42 @@ abstract class Component_Base {
     }
 
     /**
+     * Merge props with defaults (alias for parse_props).
+     *
+     * @since 1.0.0
+     *
+     * @param array $props Raw properties.
+     * @return array Merged properties.
+     */
+    protected function merge_defaults( array $props ): array {
+        return $this->parse_props( $props );
+    }
+
+    /**
+     * Build HTML attributes string from array.
+     *
+     * @since 1.0.0
+     *
+     * @param array $attributes Attribute key-value pairs.
+     * @return string HTML attributes string.
+     */
+    protected function build_attributes( array $attributes ): string {
+        $html = [];
+
+        foreach ( $attributes as $key => $value ) {
+            if ( is_bool( $value ) ) {
+                if ( $value ) {
+                    $html[] = esc_attr( $key );
+                }
+            } elseif ( null !== $value && '' !== $value ) {
+                $html[] = sprintf( '%s="%s"', esc_attr( $key ), esc_attr( $value ) );
+            }
+        }
+
+        return implode( ' ', $html );
+    }
+
+    /**
      * Render children components.
      *
      * @since 1.0.0
