@@ -9,6 +9,7 @@
  */
 
 import type { ComponentData } from '../types/components';
+import { getBaseCSS } from './cssRegistry';
 
 /**
  * CSS property mapping from props to CSS.
@@ -176,6 +177,29 @@ function extractComponentCSS(component: ComponentData): string {
 }
 
 /**
+ * Extracts unique component types from the tree.
+ */
+function extractComponentTypes(components: ComponentData[]): Set<string> {
+    const types = new Set<string>();
+
+    function traverse(component: ComponentData) {
+        types.add(component.type);
+
+        if (component.children) {
+            for (const child of component.children) {
+                traverse(child);
+            }
+        }
+    }
+
+    for (const component of components) {
+        traverse(component);
+    }
+
+    return types;
+}
+
+/**
  * Recursively extracts CSS from all components.
  */
 function extractAllCSS(components: ComponentData[]): Map<string, string> {
@@ -204,23 +228,34 @@ function extractAllCSS(components: ComponentData[]): Map<string, string> {
 
 /**
  * Generates a complete CSS stylesheet from components.
+ * Includes base CSS for component types and custom prop CSS.
  */
 export function generateStylesheet(components: ComponentData[]): string {
+    // Get unique component types
+    const types = extractComponentTypes(components);
+    types.add('_base'); // Always include base styles
+
+    // Get base CSS for these types
+    const baseCSS = getBaseCSS(types);
+
+    // Get custom prop CSS
     const cssMap = extractAllCSS(components);
-    
-    if (cssMap.size === 0) return '';
+    const customCSS = Array.from(cssMap.values()).join('\n\n');
 
-    const header = `/**
- * Polymorphic Generated Styles
- * Generated: ${new Date().toISOString()}
- * Components: ${cssMap.size}
- */
+    // Combine base and custom CSS
+    const parts: string[] = [];
 
-`;
+    if (baseCSS) {
+        parts.push('/* Base Styles */\n' + baseCSS);
+    }
 
-    const rules = Array.from(cssMap.values()).join('\n\n');
-    
-    return header + rules;
+    if (customCSS) {
+        parts.push('/* Custom Styles */\n' + customCSS);
+    }
+
+    if (parts.length === 0) return '';
+
+    return parts.join('\n\n');
 }
 
 /**
@@ -278,4 +313,5 @@ export function generateStyles(components: ComponentData[]): {
 }
 
 export default generateStylesheet;
+
 
