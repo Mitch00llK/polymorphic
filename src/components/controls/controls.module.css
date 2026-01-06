@@ -214,3 +214,248 @@
     border-color: var(--polymorphic-color-primary);
     box-shadow: 0 0 0 2px var(--polymorphic-color-primary-light);
 }
+
+/* ===========================
+   Typography Control
+=========================== */
+
+.typographyControl {
+    display: flex;
+    flex-direction: column;
+    gap: var(--polymorphic-spacing-3);
+}
+
+.selectFull {
+    flex: 1;
+    padding: 6px 8px;
+    font-size: var(--polymorphic-font-size-xs);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+    cursor: pointer;
+}
+
+.selectFull:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+}
+
+.controlRowDouble {
+    display: flex;
+    gap: var(--polymorphic-spacing-2);
+}
+
+.controlHalf {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.controlLabelSmall {
+    font-size: 10px;
+    font-weight: var(--polymorphic-font-weight-medium);
+    color: var(--polymorphic-color-gray-500);
+    text-transform: uppercase;
+}
+
+.colorInputGroup {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+}
+
+.colorPicker {
+    width: 32px;
+    height: 28px;
+    padding: 2px;
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+    cursor: pointer;
+}
+
+.colorPicker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.colorPicker::-webkit-color-swatch {
+    border: none;
+    border-radius: 2px;
+}
+
+.colorText {
+    flex: 1;
+    padding: 4px 8px;
+    font-size: var(--polymorphic-font-size-xs);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+    font-family: monospace;
+}
+
+.colorText:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+}
+
+/* ===========================
+   Box Style Control
+=========================== */
+
+.boxStyleControl {
+    display: flex;
+    flex-direction: column;
+    gap: var(--polymorphic-spacing-3);
+}
+
+.inputFull {
+    flex: 1;
+    padding: 6px 8px;
+    font-size: var(--polymorphic-font-size-xs);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+}
+
+.inputFull:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+}
+
+.rangeGroup {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-2);
+    flex: 1;
+}
+
+.rangeInput {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--polymorphic-color-gray-200);
+    cursor: pointer;
+    -webkit-appearance: none;
+}
+
+.rangeInput::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--polymorphic-color-primary);
+    cursor: pointer;
+}
+
+.rangeValue {
+    min-width: 36px;
+    font-size: var(--polymorphic-font-size-xs);
+    color: var(--polymorphic-color-gray-600);
+    text-align: right;
+}
+
+.colorInputSmall {
+    display: flex;
+}
+
+.colorPickerSmall {
+    width: 100%;
+    height: 28px;
+    padding: 2px;
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+    cursor: pointer;
+}
+
+.colorPickerSmall::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.colorPickerSmall::-webkit-color-swatch {
+    border: none;
+    border-radius: 2px;
+}
+
+.radiusGroup {
+    display: flex;
+    align-items: center;
+    gap: var(--polymorphic-spacing-2);
+    flex: 1;
+}
+
+.radiusInputs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    flex: 1;
+}
+
+.radiusInput {
+    width: 100%;
+    padding: 4px;
+    font-size: 10px;
+    text-align: center;
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+}
+
+.radiusInput:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+}
+
+/* ===========================
+   Size Control
+=========================== */
+
+.sizeControl {
+    display: flex;
+    flex-direction: column;
+    gap: var(--polymorphic-spacing-3);
+}
+
+/* ===========================
+   Position Control
+=========================== */
+
+.positionControl {
+    display: flex;
+    flex-direction: column;
+    gap: var(--polymorphic-spacing-3);
+}
+
+.positionGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--polymorphic-spacing-2);
+}
+
+.positionInputWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.positionLabel {
+    font-size: 10px;
+    font-weight: var(--polymorphic-font-weight-medium);
+    color: var(--polymorphic-color-gray-500);
+    text-transform: uppercase;
+}
+
+.positionInput {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: var(--polymorphic-font-size-xs);
+    border: 1px solid var(--polymorphic-border-color);
+    border-radius: var(--polymorphic-border-radius-sm);
+    background: var(--polymorphic-color-white);
+}
+
+.positionInput:focus {
+    outline: none;
+    border-color: var(--polymorphic-color-primary);
+}

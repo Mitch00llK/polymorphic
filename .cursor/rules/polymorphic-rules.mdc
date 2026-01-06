@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+---
+Always refferences the following files when building:
+
+00-project-overview.md
+01-architecture.md
+02-coding-standards.md
+03-component-library.md
+04-database-schema.md
+05-api-reference.md
+06-security.md
+07-roadmap.md
+08-licensing.md
+09-marketing.md
+10-component-standards.md
