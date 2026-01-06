@@ -2,6 +2,7 @@
  * Container Renderer
  *
  * A width-constrained layout container for centering content.
+ * Supports all PropertyPanel controls: layout, boxStyle, size, spacing.
  *
  * @package Polymorphic
  * @since   1.0.0
@@ -21,17 +22,55 @@ interface PaddingObject {
 }
 
 interface ContainerProps {
-    maxWidth?: string;
-    width?: 'full' | 'auto' | string;
-    alignment?: 'left' | 'center' | 'right';
-    direction?: 'row' | 'column';
-    wrap?: 'wrap' | 'nowrap';
-    justifyContent?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly';
-    alignItems?: 'start' | 'center' | 'end' | 'stretch' | 'baseline';
+    // Layout (PropertyPanel)
+    display?: string;
+    flexDirection?: string;
+    justifyContent?: string;
+    alignItems?: string;
     gap?: string;
+    flexWrap?: string;
+    // Legacy layout props (from templates)
+    direction?: string;
+    wrap?: string;
+    alignment?: string;
+    
+    // Box Style
     backgroundColor?: string;
-    padding?: PaddingObject | string;
+    backgroundImage?: string;
+    backgroundSize?: string;
+    backgroundPosition?: string;
+    backgroundRepeat?: string;
+    borderWidth?: string;
+    borderStyle?: string;
+    borderColor?: string;
     borderRadius?: string;
+    borderRadiusTopLeft?: string;
+    borderRadiusTopRight?: string;
+    borderRadiusBottomRight?: string;
+    borderRadiusBottomLeft?: string;
+    boxShadow?: string;
+    opacity?: string;
+    
+    // Size
+    width?: string;
+    height?: string;
+    minWidth?: string;
+    maxWidth?: string;
+    minHeight?: string;
+    maxHeight?: string;
+    overflow?: string;
+    
+    // Spacing (PropertyPanel format)
+    paddingTop?: string;
+    paddingRight?: string;
+    paddingBottom?: string;
+    paddingLeft?: string;
+    marginTop?: string;
+    marginRight?: string;
+    marginBottom?: string;
+    marginLeft?: string;
+    // Legacy spacing (template format)
+    padding?: PaddingObject | string;
 }
 
 interface ContainerRendererProps {
@@ -40,7 +79,7 @@ interface ContainerRendererProps {
 }
 
 /**
- * Maps justify/align values to CSS flexbox properties.
+ * Maps align values to CSS flexbox.
  */
 const mapJustifyContent = (value?: string): string => {
     switch (value) {
@@ -50,7 +89,7 @@ const mapJustifyContent = (value?: string): string => {
         case 'between': return 'space-between';
         case 'around': return 'space-around';
         case 'evenly': return 'space-evenly';
-        default: return 'flex-start';
+        default: return value || 'flex-start';
     }
 };
 
@@ -61,7 +100,7 @@ const mapAlignItems = (value?: string): string => {
         case 'end': return 'flex-end';
         case 'stretch': return 'stretch';
         case 'baseline': return 'baseline';
-        default: return 'stretch';
+        default: return value || 'stretch';
     }
 };
 
@@ -75,9 +114,18 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
     const props = (component.props || {}) as ContainerProps;
     const children = component.children || [];
 
-    // Handle padding (can be object or string)
+    // Handle padding - support both PropertyPanel format and legacy template format
     let paddingStyles: React.CSSProperties = {};
-    if (props.padding) {
+    if (props.paddingTop || props.paddingRight || props.paddingBottom || props.paddingLeft) {
+        // PropertyPanel format
+        paddingStyles = {
+            paddingTop: props.paddingTop || undefined,
+            paddingRight: props.paddingRight || undefined,
+            paddingBottom: props.paddingBottom || undefined,
+            paddingLeft: props.paddingLeft || undefined,
+        };
+    } else if (props.padding) {
+        // Legacy template format
         if (typeof props.padding === 'object') {
             paddingStyles = {
                 paddingTop: props.padding.top || undefined,
@@ -102,36 +150,89 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
         widthValue = '100%';
     }
 
-    // Handle alignment (container centering)
+    // Handle alignment (container centering) - legacy support
     let marginStyles: React.CSSProperties = {};
-    switch (props.alignment) {
-        case 'left':
-            marginStyles = { marginRight: 'auto' };
-            break;
-        case 'right':
-            marginStyles = { marginLeft: 'auto' };
-            break;
-        case 'center':
-        default:
-            marginStyles = { marginLeft: 'auto', marginRight: 'auto' };
-            break;
+    if (!props.marginLeft && !props.marginRight) {
+        switch (props.alignment) {
+            case 'left':
+                marginStyles = { marginRight: 'auto' };
+                break;
+            case 'right':
+                marginStyles = { marginLeft: 'auto' };
+                break;
+            case 'center':
+            default:
+                marginStyles = { marginLeft: 'auto', marginRight: 'auto' };
+                break;
+        }
+    }
+
+    // Handle border radius (individual corners or single value)
+    let borderRadiusValue: string | undefined;
+    if (props.borderRadiusTopLeft || props.borderRadiusTopRight || 
+        props.borderRadiusBottomRight || props.borderRadiusBottomLeft) {
+        borderRadiusValue = [
+            props.borderRadiusTopLeft || '0',
+            props.borderRadiusTopRight || '0',
+            props.borderRadiusBottomRight || '0',
+            props.borderRadiusBottomLeft || '0',
+        ].join(' ');
+    } else {
+        borderRadiusValue = props.borderRadius || undefined;
     }
 
     // Build container styles
     const style: React.CSSProperties = {
-        display: 'flex',
-        flexDirection: props.direction || 'column',
-        flexWrap: props.wrap || 'nowrap',
+        // Layout
+        display: props.display || 'flex',
+        flexDirection: (props.flexDirection || props.direction || 'column') as React.CSSProperties['flexDirection'],
+        flexWrap: (props.flexWrap || props.wrap || 'nowrap') as React.CSSProperties['flexWrap'],
         justifyContent: mapJustifyContent(props.justifyContent),
         alignItems: mapAlignItems(props.alignItems),
         gap: props.gap || undefined,
-        maxWidth: props.maxWidth || '1200px',
+        
+        // Size
         width: widthValue,
+        height: props.height || undefined,
+        minWidth: props.minWidth || undefined,
+        maxWidth: props.maxWidth || '1200px',
+        minHeight: props.minHeight || undefined,
+        maxHeight: props.maxHeight || undefined,
+        overflow: props.overflow as React.CSSProperties['overflow'] || undefined,
+        
+        // Box Style - Background
         backgroundColor: props.backgroundColor || undefined,
-        borderRadius: props.borderRadius || undefined,
+        backgroundSize: props.backgroundSize || undefined,
+        backgroundPosition: props.backgroundPosition || undefined,
+        backgroundRepeat: props.backgroundRepeat || undefined,
+        
+        // Box Style - Border
+        borderWidth: props.borderWidth || undefined,
+        borderStyle: props.borderStyle as React.CSSProperties['borderStyle'] || (props.borderWidth ? 'solid' : undefined),
+        borderColor: props.borderColor || undefined,
+        borderRadius: borderRadiusValue,
+        
+        // Box Style - Effects
+        boxShadow: props.boxShadow || undefined,
+        opacity: props.opacity ? parseFloat(props.opacity) : undefined,
+        
+        // Spacing
         ...paddingStyles,
+        marginTop: props.marginTop || undefined,
+        marginBottom: props.marginBottom || undefined,
         ...marginStyles,
     };
+
+    // Handle background image
+    if (props.backgroundImage) {
+        if (props.backgroundImage.startsWith('linear-gradient') || 
+            props.backgroundImage.startsWith('radial-gradient') ||
+            props.backgroundImage.startsWith('url(')) {
+            style.backgroundImage = props.backgroundImage;
+        } else {
+            style.backgroundImage = `url(${props.backgroundImage})`;
+        }
+    }
 
     return (
         <div
