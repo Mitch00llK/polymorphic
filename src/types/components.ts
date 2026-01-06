@@ -22,7 +22,13 @@ export type ComponentType =
     | 'alert'
     | 'badge'
     | 'avatar'
-    | 'separator';
+    | 'separator'
+    // Marketing Blocks
+    | 'heroBlock'
+    | 'featuresBlock'
+    | 'pricingBlock'
+    | 'faqBlock'
+    | 'ctaBlock';
 
 /**
  * Available breakpoints.

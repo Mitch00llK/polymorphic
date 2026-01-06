@@ -1,0 +1,532 @@
+/**
+ * Marketing Block Styles
+ *
+ * CSS for Hero, Features, Pricing, FAQ, and CTA blocks.
+ */
+
+/* ===========================
+   Hero Block
+=========================== */
+
+.heroBlock {
+    padding: 5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.heroBlock--left {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.heroBlock--center {
+    align-items: center;
+    text-align: center;
+}
+
+.heroBlock--right {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.heroContent {
+    max-width: 800px;
+}
+
+.heroTitle {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 1.5rem;
+}
+
+.heroSubtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    margin: 0 0 2rem;
+    line-height: 1.6;
+}
+
+.heroButtons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: inherit;
+}
+
+.heroPrimaryBtn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.875rem 2rem;
+    background: white;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.heroPrimaryBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.heroSecondaryBtn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.875rem 2rem;
+    background: transparent;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.heroSecondaryBtn:hover {
+    border-color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.heroImage img {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* ===========================
+   Features Block
+=========================== */
+
+.featuresBlock {
+    padding: 5rem 1.5rem;
+    background: #f9fafb;
+}
+
+.featuresHeader {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 3rem;
+}
+
+.featuresTitle {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    color: #111827;
+}
+
+.featuresSubtitle {
+    font-size: 1.125rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.featuresGrid {
+    display: grid;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.featureCard {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.featureCard:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.featureIcon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.featureTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    color: #111827;
+}
+
+.featureDescription {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ===========================
+   Pricing Block
+=========================== */
+
+.pricingBlock {
+    padding: 5rem 1.5rem;
+    background: white;
+}
+
+.pricingHeader {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 3rem;
+}
+
+.pricingTitle {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    color: #111827;
+}
+
+.pricingSubtitle {
+    font-size: 1.125rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.pricingGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.pricingCard {
+    position: relative;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.pricingCardFeatured {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 1px #6366f1, 0 8px 24px rgba(99, 102, 241, 0.2);
+}
+
+.pricingBadge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #6366f1;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+}
+
+.pricingName {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: #111827;
+}
+
+.pricingDescription {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0.5rem 0 1.5rem;
+}
+
+.pricingPrice {
+    margin-bottom: 1.5rem;
+}
+
+.pricingAmount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.pricingPeriod {
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+.pricingFeatures {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem;
+    flex: 1;
+}
+
+.pricingFeatures li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.pricingFeatures li svg {
+    color: #22c55e;
+    flex-shrink: 0;
+}
+
+.pricingBtn {
+    display: block;
+    text-align: center;
+    padding: 0.75rem 1.5rem;
+    background: white;
+    color: #6366f1;
+    border: 2px solid #6366f1;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.pricingBtn:hover {
+    background: #6366f1;
+    color: white;
+}
+
+.pricingBtnPrimary {
+    display: block;
+    text-align: center;
+    padding: 0.75rem 1.5rem;
+    background: #6366f1;
+    color: white;
+    border: 2px solid #6366f1;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.pricingBtnPrimary:hover {
+    background: #4f46e5;
+    border-color: #4f46e5;
+}
+
+/* ===========================
+   FAQ Block
+=========================== */
+
+.faqBlock {
+    padding: 5rem 1.5rem;
+    background: #f9fafb;
+}
+
+.faqHeader {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 3rem;
+}
+
+.faqTitle {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    color: #111827;
+}
+
+.faqSubtitle {
+    font-size: 1.125rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.faqAccordion {
+    max-width: 700px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.faqItem {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.faqItem:last-child {
+    border-bottom: none;
+}
+
+.faqTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #111827;
+    background: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.faqTrigger:hover {
+    background: #f9fafb;
+}
+
+.faqChevron {
+    transition: transform 0.2s;
+    color: #6b7280;
+}
+
+.faqTrigger[data-state="open"] .faqChevron {
+    transform: rotate(180deg);
+}
+
+.faqContent {
+    overflow: hidden;
+}
+
+.faqContent[data-state="closed"] {
+    animation: faqSlideUp 0.2s ease-out;
+}
+
+.faqContent[data-state="open"] {
+    animation: faqSlideDown 0.2s ease-out;
+}
+
+.faqAnswer {
+    padding: 0 1.5rem 1.25rem;
+    font-size: 0.9375rem;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+@keyframes faqSlideDown {
+    from {
+        height: 0;
+    }
+
+    to {
+        height: var(--radix-accordion-content-height);
+    }
+}
+
+@keyframes faqSlideUp {
+    from {
+        height: var(--radix-accordion-content-height);
+    }
+
+    to {
+        height: 0;
+    }
+}
+
+/* ===========================
+   CTA Block
+=========================== */
+
+.ctaBlock {
+    padding: 5rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    text-align: center;
+}
+
+.ctaBlock--dark {
+    background: #111827;
+}
+
+.ctaBlock--light {
+    background: #f9fafb;
+}
+
+.ctaBlock--light .ctaTitle,
+.ctaBlock--light .ctaDescription {
+    color: #111827;
+}
+
+.ctaBlock--light .ctaButton {
+    background: #6366f1;
+    color: white;
+}
+
+.ctaContent {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.ctaTitle {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    color: white;
+}
+
+.ctaDescription {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 2rem;
+    line-height: 1.6;
+}
+
+.ctaButton {
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem 2.5rem;
+    background: white;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 1.125rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ctaButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width: 768px) {
+    .heroTitle {
+        font-size: 2rem;
+    }
+
+    .heroSubtitle {
+        font-size: 1rem;
+    }
+
+    .heroButtons {
+        flex-direction: column;
+    }
+
+    .featuresTitle,
+    .pricingTitle,
+    .faqTitle,
+    .ctaTitle {
+        font-size: 1.75rem;
+    }
+
+    .pricingGrid {
+        grid-template-columns: 1fr;
+    }
+}

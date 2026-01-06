@@ -27,6 +27,13 @@ import { BadgeRenderer } from './BadgeRenderer';
 import { AvatarRenderer } from './AvatarRenderer';
 import { SeparatorRenderer } from './SeparatorRenderer';
 
+// Marketing blocks
+import { HeroBlockRenderer } from './HeroBlockRenderer';
+import { FeaturesBlockRenderer } from './FeaturesBlockRenderer';
+import { PricingBlockRenderer } from './PricingBlockRenderer';
+import { FaqBlockRenderer } from './FaqBlockRenderer';
+import { CtaBlockRenderer } from './CtaBlockRenderer';
+
 /**
  * Component renderer map.
  */
@@ -47,6 +54,12 @@ const renderers: Record<string, React.FC<{ component: ComponentData; context: 'e
     badge: BadgeRenderer,
     avatar: AvatarRenderer,
     separator: SeparatorRenderer,
+    // Marketing Blocks
+    heroBlock: HeroBlockRenderer,
+    featuresBlock: FeaturesBlockRenderer,
+    pricingBlock: PricingBlockRenderer,
+    faqBlock: FaqBlockRenderer,
+    ctaBlock: CtaBlockRenderer,
 };
 
 /**

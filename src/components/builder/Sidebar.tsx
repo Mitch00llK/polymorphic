@@ -23,6 +23,12 @@ import {
     Tag,
     User,
     Minus,
+    // Block icons
+    Star,
+    Grid3X3,
+    DollarSign,
+    HelpCircle,
+    Megaphone,
 } from 'lucide-react';
 
 import { useBuilderStore } from '../../store/builderStore';
@@ -37,7 +43,7 @@ interface ComponentDefinition {
     type: ComponentType;
     label: string;
     icon: React.ReactNode;
-    category: 'layout' | 'content' | 'media' | 'actions' | 'ui';
+    category: 'layout' | 'content' | 'media' | 'actions' | 'ui' | 'blocks';
 }
 
 /**
@@ -62,6 +68,12 @@ const COMPONENTS: ComponentDefinition[] = [
     { type: 'badge', label: 'Badge', icon: <Tag size={20} />, category: 'ui' },
     { type: 'avatar', label: 'Avatar', icon: <User size={20} />, category: 'ui' },
     { type: 'separator', label: 'Separator', icon: <Minus size={20} />, category: 'ui' },
+    // Marketing Blocks
+    { type: 'heroBlock', label: 'Hero', icon: <Star size={20} />, category: 'blocks' },
+    { type: 'featuresBlock', label: 'Features', icon: <Grid3X3 size={20} />, category: 'blocks' },
+    { type: 'pricingBlock', label: 'Pricing', icon: <DollarSign size={20} />, category: 'blocks' },
+    { type: 'faqBlock', label: 'FAQ', icon: <HelpCircle size={20} />, category: 'blocks' },
+    { type: 'ctaBlock', label: 'CTA', icon: <Megaphone size={20} />, category: 'blocks' },
 ];
 
 /**
@@ -129,6 +141,7 @@ export const Sidebar: React.FC = () => {
         media: 'Media',
         actions: 'Actions',
         ui: 'UI Components',
+        blocks: 'Marketing Blocks',
     };
 
     return (

@@ -1,0 +1,74 @@
+/**
+ * FAQ Block Renderer
+ *
+ * A FAQ section with title and accordion items.
+ *
+ * @package Polymorphic
+ * @since   1.0.0
+ */
+
+import React from 'react';
+import * as AccordionPrimitive from '@radix-ui/react-accordion';
+import { ChevronDown } from 'lucide-react';
+import type { ComponentData } from '../../types/components';
+import styles from './blocks.module.css';
+
+interface FaqItem {
+    question: string;
+    answer: string;
+}
+
+interface FaqBlockRendererProps {
+    component: ComponentData;
+    context?: 'editor' | 'frontend';
+}
+
+export const FaqBlockRenderer: React.FC<FaqBlockRendererProps> = ({
+    component,
+}) => {
+    const props = component.props || {};
+
+    const title = (props.title as string) || 'Frequently Asked Questions';
+    const subtitle = (props.subtitle as string) || 'Find answers to common questions';
+
+    const items = (props.items as FaqItem[]) || [
+        { question: 'How do I get started?', answer: 'Simply sign up for an account and start building your first page using our drag-and-drop editor.' },
+        { question: 'Can I use my own domain?', answer: 'Yes! You can connect your custom domain to any plan. Pro and Enterprise plans include free SSL certificates.' },
+        { question: 'Is there a free trial?', answer: 'We offer a 14-day free trial on all plans. No credit card required to get started.' },
+        { question: 'How do I cancel my subscription?', answer: 'You can cancel your subscription at any time from your account settings. Your access continues until the end of your billing period.' },
+    ];
+
+    return (
+        <section className={styles.faqBlock} data-component-id={component.id}>
+            <div className={styles.faqHeader}>
+                <h2 className={styles.faqTitle}>{title}</h2>
+                <p className={styles.faqSubtitle}>{subtitle}</p>
+            </div>
+            <AccordionPrimitive.Root
+                type="single"
+                collapsible
+                className={styles.faqAccordion}
+            >
+                {items.map((item, index) => (
+                    <AccordionPrimitive.Item
+                        key={index}
+                        value={`item-${index}`}
+                        className={styles.faqItem}
+                    >
+                        <AccordionPrimitive.Header>
+                            <AccordionPrimitive.Trigger className={styles.faqTrigger}>
+                                <span>{item.question}</span>
+                                <ChevronDown className={styles.faqChevron} size={20} />
+                            </AccordionPrimitive.Trigger>
+                        </AccordionPrimitive.Header>
+                        <AccordionPrimitive.Content className={styles.faqContent}>
+                            <div className={styles.faqAnswer}>{item.answer}</div>
+                        </AccordionPrimitive.Content>
+                    </AccordionPrimitive.Item>
+                ))}
+            </AccordionPrimitive.Root>
+        </section>
+    );
+};
+
+export default FaqBlockRenderer;

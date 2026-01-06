@@ -144,6 +144,13 @@ final class Plugin {
             'badge'     => \Polymorphic\Components\Badge\Badge::class,
             'avatar'    => \Polymorphic\Components\Avatar\Avatar::class,
             'separator' => \Polymorphic\Components\Separator\Separator::class,
+
+            // Marketing Blocks.
+            'heroBlock'     => \Polymorphic\Components\HeroBlock\HeroBlock::class,
+            'featuresBlock' => \Polymorphic\Components\FeaturesBlock\FeaturesBlock::class,
+            'pricingBlock'  => \Polymorphic\Components\PricingBlock\PricingBlock::class,
+            'faqBlock'      => \Polymorphic\Components\FaqBlock\FaqBlock::class,
+            'ctaBlock'      => \Polymorphic\Components\CtaBlock\CtaBlock::class,
         ];
 
         /**

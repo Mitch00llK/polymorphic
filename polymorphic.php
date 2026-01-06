@@ -106,6 +106,12 @@ if ( file_exists( POLYMORPHIC_PATH . 'vendor/autoload.php' ) ) {
     require_once POLYMORPHIC_PATH . 'includes/Components/Badge/class-badge.php';
     require_once POLYMORPHIC_PATH . 'includes/Components/Avatar/class-avatar.php';
     require_once POLYMORPHIC_PATH . 'includes/Components/Separator/class-separator.php';
+    // Marketing Blocks
+    require_once POLYMORPHIC_PATH . 'includes/Components/HeroBlock/class-heroblock.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/FeaturesBlock/class-featuresblock.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/PricingBlock/class-pricingblock.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/FaqBlock/class-faqblock.php';
+    require_once POLYMORPHIC_PATH . 'includes/Components/CtaBlock/class-ctablock.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/AdminMenu/class-admin-menu.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/Assets/class-assets.php';
     require_once POLYMORPHIC_PATH . 'includes/Admin/EditorIntegration/class-editor-integration.php';
