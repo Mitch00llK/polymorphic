@@ -10,7 +10,7 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 import type { ComponentData } from '../../types/components';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 import styles from './blocks.module.css';
 
 interface PricingPlan {
@@ -73,21 +73,22 @@ export const PricingBlockRenderer: React.FC<PricingBlockRendererProps> = ({
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['layout', 'typography', 'box', 'spacing']);
 
+    // Build element-specific styles
+    const sectionTitleStyle = buildElementStyles(props, 'sectionTitle');
+    const sectionSubtitleStyle = buildElementStyles(props, 'sectionSubtitle');
+    const planNameStyle = buildElementStyles(props, 'planName');
+    const planPriceStyle = buildElementStyles(props, 'planPrice');
+    const planDescriptionStyle = buildElementStyles(props, 'planDescription');
+
     const blockStyle: React.CSSProperties = {
         ...sharedStyles,
-    };
-
-    // Typography styles for title/subtitle
-    const textStyle: React.CSSProperties = {
-        fontFamily: sharedStyles.fontFamily,
-        color: sharedStyles.color,
     };
 
     return (
         <section className={styles.pricingBlock} style={blockStyle} data-component-id={component.id}>
             <div className={styles.pricingHeader}>
-                <h2 className={styles.pricingTitle} style={textStyle}>{title}</h2>
-                <p className={styles.pricingSubtitle} style={{ color: sharedStyles.color }}>{subtitle}</p>
+                <h2 className={styles.pricingTitle} style={sectionTitleStyle}>{title}</h2>
+                <p className={styles.pricingSubtitle} style={sectionSubtitleStyle}>{subtitle}</p>
             </div>
             <div className={styles.pricingGrid}>
                 {plans.map((plan, index) => (
@@ -96,9 +97,9 @@ export const PricingBlockRenderer: React.FC<PricingBlockRendererProps> = ({
                         className={`${styles.pricingCard} ${plan.featured ? styles.pricingCardFeatured : ''}`}
                     >
                         {plan.featured && <span className={styles.pricingBadge}>Most Popular</span>}
-                        <h3 className={styles.pricingName}>{plan.name}</h3>
-                        <p className={styles.pricingDescription}>{plan.description}</p>
-                        <div className={styles.pricingPrice}>
+                        <h3 className={styles.pricingName} style={planNameStyle}>{plan.name}</h3>
+                        <p className={styles.pricingDescription} style={planDescriptionStyle}>{plan.description}</p>
+                        <div className={styles.pricingPrice} style={planPriceStyle}>
                             <span className={styles.pricingAmount}>{plan.price}</span>
                             <span className={styles.pricingPeriod}>{plan.period}</span>
                         </div>

@@ -10,7 +10,7 @@
 import React from 'react';
 import { Zap, Shield, Rocket, Star, Heart, Globe } from 'lucide-react';
 import type { ComponentData } from '../../types/components';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 import styles from './blocks.module.css';
 
 interface Feature {
@@ -51,21 +51,21 @@ export const FeaturesBlockRenderer: React.FC<FeaturesBlockRendererProps> = ({
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['layout', 'typography', 'box', 'spacing']);
 
+    // Build element-specific styles
+    const sectionTitleStyle = buildElementStyles(props, 'sectionTitle');
+    const sectionSubtitleStyle = buildElementStyles(props, 'sectionSubtitle');
+    const featureTitleStyle = buildElementStyles(props, 'featureTitle');
+    const featureDescriptionStyle = buildElementStyles(props, 'featureDescription');
+
     const blockStyle: React.CSSProperties = {
         ...sharedStyles,
-    };
-
-    // Typography styles for title/subtitle
-    const textStyle: React.CSSProperties = {
-        fontFamily: sharedStyles.fontFamily,
-        color: sharedStyles.color,
     };
 
     return (
         <section className={styles.featuresBlock} style={blockStyle} data-component-id={component.id}>
             <div className={styles.featuresHeader}>
-                <h2 className={styles.featuresTitle} style={textStyle}>{title}</h2>
-                <p className={styles.featuresSubtitle} style={{ color: sharedStyles.color }}>{subtitle}</p>
+                <h2 className={styles.featuresTitle} style={sectionTitleStyle}>{title}</h2>
+                <p className={styles.featuresSubtitle} style={sectionSubtitleStyle}>{subtitle}</p>
             </div>
             <div
                 className={styles.featuresGrid}
@@ -78,8 +78,8 @@ export const FeaturesBlockRenderer: React.FC<FeaturesBlockRendererProps> = ({
                             <div className={styles.featureIcon}>
                                 <IconComponent size={24} />
                             </div>
-                            <h3 className={styles.featureTitle}>{feature.title}</h3>
-                            <p className={styles.featureDescription}>{feature.description}</p>
+                            <h3 className={styles.featureTitle} style={featureTitleStyle}>{feature.title}</h3>
+                            <p className={styles.featureDescription} style={featureDescriptionStyle}>{feature.description}</p>
                         </div>
                     );
                 })}

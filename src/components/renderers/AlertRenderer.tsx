@@ -9,7 +9,7 @@ import React from 'react';
 import { AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 
 import type { ComponentData } from '../../types/components';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -40,6 +40,10 @@ export const AlertRenderer: React.FC<AlertRendererProps> = ({
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
 
+    // Build element-specific styles
+    const titleStyle = buildElementStyles(props, 'title');
+    const descriptionStyle = buildElementStyles(props, 'description');
+
     const alertClasses = [
         styles.alert,
         styles[`alert--${variant}`],
@@ -58,8 +62,8 @@ export const AlertRenderer: React.FC<AlertRendererProps> = ({
         >
             <Icon className={styles.alertIcon} size={16} />
             <div className={styles.alertContent}>
-                {title && <h5 className={styles.alertTitle}>{title}</h5>}
-                {description && <p className={styles.alertDescription}>{description}</p>}
+                {title && <h5 className={styles.alertTitle} style={titleStyle}>{title}</h5>}
+                {description && <p className={styles.alertDescription} style={descriptionStyle}>{description}</p>}
             </div>
         </div>
     );

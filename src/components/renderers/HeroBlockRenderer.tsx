@@ -9,7 +9,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../types/components';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 import styles from './blocks.module.css';
 
 interface HeroBlockRendererProps {
@@ -35,6 +35,12 @@ export const HeroBlockRenderer: React.FC<HeroBlockRendererProps> = ({
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['layout', 'typography', 'box', 'size', 'spacing']);
 
+    // Build element-specific styles
+    const heroTitleStyle = buildElementStyles(props, 'heroTitle');
+    const heroSubtitleStyle = buildElementStyles(props, 'heroSubtitle');
+    const primaryButtonStyle = buildElementStyles(props, 'primaryButton');
+    const secondaryButtonStyle = buildElementStyles(props, 'secondaryButton');
+
     const heroClasses = [
         styles.heroBlock,
         styles[`heroBlock--${alignment}`],
@@ -44,23 +50,17 @@ export const HeroBlockRenderer: React.FC<HeroBlockRendererProps> = ({
         ...sharedStyles,
     };
 
-    // Typography styles for title/subtitle
-    const titleStyle: React.CSSProperties = {
-        fontFamily: sharedStyles.fontFamily,
-        color: sharedStyles.color,
-    };
-
     return (
         <section className={heroClasses} style={heroStyle} data-component-id={component.id}>
             <div className={styles.heroContent}>
-                <h1 className={styles.heroTitle} style={titleStyle}>{title}</h1>
-                <p className={styles.heroSubtitle} style={{ color: sharedStyles.color }}>{subtitle}</p>
+                <h1 className={styles.heroTitle} style={heroTitleStyle}>{title}</h1>
+                <p className={styles.heroSubtitle} style={heroSubtitleStyle}>{subtitle}</p>
                 <div className={styles.heroButtons}>
-                    <a href={primaryButtonUrl} className={styles.heroPrimaryBtn}>
+                    <a href={primaryButtonUrl} className={styles.heroPrimaryBtn} style={primaryButtonStyle}>
                         {primaryButtonText}
                     </a>
                     {showSecondaryButton && (
-                        <a href={secondaryButtonUrl} className={styles.heroSecondaryBtn}>
+                        <a href={secondaryButtonUrl} className={styles.heroSecondaryBtn} style={secondaryButtonStyle}>
                             {secondaryButtonText}
                         </a>
                     )}

@@ -11,7 +11,7 @@ import React from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { ChevronDown } from 'lucide-react';
 import type { ComponentData } from '../../types/components';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 import styles from './blocks.module.css';
 
 interface FaqItem {
@@ -42,21 +42,21 @@ export const FaqBlockRenderer: React.FC<FaqBlockRendererProps> = ({
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['layout', 'typography', 'box', 'spacing']);
 
+    // Build element-specific styles
+    const sectionTitleStyle = buildElementStyles(props, 'sectionTitle');
+    const sectionSubtitleStyle = buildElementStyles(props, 'sectionSubtitle');
+    const questionStyle = buildElementStyles(props, 'question');
+    const answerStyle = buildElementStyles(props, 'answer');
+
     const blockStyle: React.CSSProperties = {
         ...sharedStyles,
-    };
-
-    // Typography styles for title/subtitle
-    const textStyle: React.CSSProperties = {
-        fontFamily: sharedStyles.fontFamily,
-        color: sharedStyles.color,
     };
 
     return (
         <section className={styles.faqBlock} style={blockStyle} data-component-id={component.id}>
             <div className={styles.faqHeader}>
-                <h2 className={styles.faqTitle} style={textStyle}>{title}</h2>
-                <p className={styles.faqSubtitle} style={{ color: sharedStyles.color }}>{subtitle}</p>
+                <h2 className={styles.faqTitle} style={sectionTitleStyle}>{title}</h2>
+                <p className={styles.faqSubtitle} style={sectionSubtitleStyle}>{subtitle}</p>
             </div>
             <AccordionPrimitive.Root
                 type="single"
@@ -70,13 +70,13 @@ export const FaqBlockRenderer: React.FC<FaqBlockRendererProps> = ({
                         className={styles.faqItem}
                     >
                         <AccordionPrimitive.Header>
-                            <AccordionPrimitive.Trigger className={styles.faqTrigger}>
+                            <AccordionPrimitive.Trigger className={styles.faqTrigger} style={questionStyle}>
                                 <span>{item.question}</span>
                                 <ChevronDown className={styles.faqChevron} size={20} />
                             </AccordionPrimitive.Trigger>
                         </AccordionPrimitive.Header>
                         <AccordionPrimitive.Content className={styles.faqContent}>
-                            <div className={styles.faqAnswer}>{item.answer}</div>
+                            <div className={styles.faqAnswer} style={answerStyle}>{item.answer}</div>
                         </AccordionPrimitive.Content>
                     </AccordionPrimitive.Item>
                 ))}

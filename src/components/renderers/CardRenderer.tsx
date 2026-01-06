@@ -9,7 +9,7 @@ import React from 'react';
 
 import type { ComponentData } from '../../types/components';
 import { ComponentRenderer } from './ComponentRenderer';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -33,6 +33,11 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['box', 'size', 'spacing', 'position']);
 
+    // Build element-specific styles
+    const titleStyle = buildElementStyles(props, 'title');
+    const descriptionStyle = buildElementStyles(props, 'description');
+    const footerStyle = buildElementStyles(props, 'footer');
+
     const cardClasses = [
         styles.card,
         variant !== 'default' && styles[`card--${variant}`],
@@ -46,9 +51,9 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
         <div className={cardClasses} style={cardStyle} data-component-id={component.id}>
             {title && (
                 <div className={styles.cardHeader}>
-                    <h3 className={styles.cardTitle}>{title}</h3>
+                    <h3 className={styles.cardTitle} style={titleStyle}>{title}</h3>
                     {description && (
-                        <p className={styles.cardDescription}>{description}</p>
+                        <p className={styles.cardDescription} style={descriptionStyle}>{description}</p>
                     )}
                 </div>
             )}
@@ -68,7 +73,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
                 )}
             </div>
             {footer && (
-                <div className={styles.cardFooter}>
+                <div className={styles.cardFooter} style={footerStyle}>
                     <p>{footer}</p>
                 </div>
             )}

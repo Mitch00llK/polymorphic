@@ -8,7 +8,7 @@
 import React from 'react';
 
 import type { ComponentData } from '../../types/components';
-import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
+import { buildStyles, buildElementStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -30,6 +30,9 @@ export const AvatarRenderer: React.FC<AvatarRendererProps> = ({
     // Build styles from shared control groups
     const sharedStyles = buildStyles(props, ['size', 'box', 'spacing', 'position']);
 
+    // Build fallback-specific styles
+    const fallbackStyle = buildElementStyles(props, 'fallback');
+
     const avatarClasses = [
         styles.avatar,
         styles[`avatar--${size}`],
@@ -49,7 +52,7 @@ export const AvatarRenderer: React.FC<AvatarRendererProps> = ({
                     style={{ objectFit: sharedStyles.objectFit }}
                 />
             ) : (
-                <span className={styles.avatarFallback}>
+                <span className={styles.avatarFallback} style={fallbackStyle}>
                     {fallback.slice(0, 2).toUpperCase()}
                 </span>
             )}
