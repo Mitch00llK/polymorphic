@@ -10,6 +10,7 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 import styles from './blocks.module.css';
 
 interface PricingPlan {
@@ -31,7 +32,7 @@ interface PricingBlockRendererProps {
 export const PricingBlockRenderer: React.FC<PricingBlockRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
     const title = (props.title as string) || 'Simple, Transparent Pricing';
     const subtitle = (props.subtitle as string) || 'Choose the plan that works for you';
@@ -69,11 +70,24 @@ export const PricingBlockRenderer: React.FC<PricingBlockRendererProps> = ({
         },
     ];
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['layout', 'typography', 'box', 'spacing']);
+
+    const blockStyle: React.CSSProperties = {
+        ...sharedStyles,
+    };
+
+    // Typography styles for title/subtitle
+    const textStyle: React.CSSProperties = {
+        fontFamily: sharedStyles.fontFamily,
+        color: sharedStyles.color,
+    };
+
     return (
-        <section className={styles.pricingBlock} data-component-id={component.id}>
+        <section className={styles.pricingBlock} style={blockStyle} data-component-id={component.id}>
             <div className={styles.pricingHeader}>
-                <h2 className={styles.pricingTitle}>{title}</h2>
-                <p className={styles.pricingSubtitle}>{subtitle}</p>
+                <h2 className={styles.pricingTitle} style={textStyle}>{title}</h2>
+                <p className={styles.pricingSubtitle} style={{ color: sharedStyles.color }}>{subtitle}</p>
             </div>
             <div className={styles.pricingGrid}>
                 {plans.map((plan, index) => (

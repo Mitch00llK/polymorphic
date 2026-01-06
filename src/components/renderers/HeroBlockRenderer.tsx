@@ -9,6 +9,7 @@
 
 import React from 'react';
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 import styles from './blocks.module.css';
 
 interface HeroBlockRendererProps {
@@ -19,7 +20,7 @@ interface HeroBlockRendererProps {
 export const HeroBlockRenderer: React.FC<HeroBlockRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
     const title = (props.title as string) || 'Build something amazing';
     const subtitle = (props.subtitle as string) || 'Create beautiful, responsive websites with our intuitive page builder.';
@@ -31,16 +32,29 @@ export const HeroBlockRenderer: React.FC<HeroBlockRendererProps> = ({
     const alignment = (props.alignment as string) || 'center';
     const showSecondaryButton = props.showSecondaryButton !== false;
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['layout', 'typography', 'box', 'size', 'spacing']);
+
     const heroClasses = [
         styles.heroBlock,
         styles[`heroBlock--${alignment}`],
     ].filter(Boolean).join(' ');
 
+    const heroStyle: React.CSSProperties = {
+        ...sharedStyles,
+    };
+
+    // Typography styles for title/subtitle
+    const titleStyle: React.CSSProperties = {
+        fontFamily: sharedStyles.fontFamily,
+        color: sharedStyles.color,
+    };
+
     return (
-        <section className={heroClasses} data-component-id={component.id}>
+        <section className={heroClasses} style={heroStyle} data-component-id={component.id}>
             <div className={styles.heroContent}>
-                <h1 className={styles.heroTitle}>{title}</h1>
-                <p className={styles.heroSubtitle}>{subtitle}</p>
+                <h1 className={styles.heroTitle} style={titleStyle}>{title}</h1>
+                <p className={styles.heroSubtitle} style={{ color: sharedStyles.color }}>{subtitle}</p>
                 <div className={styles.heroButtons}>
                     <a href={primaryButtonUrl} className={styles.heroPrimaryBtn}>
                         {primaryButtonText}

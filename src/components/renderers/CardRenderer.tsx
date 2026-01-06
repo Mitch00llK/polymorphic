@@ -9,6 +9,7 @@ import React from 'react';
 
 import type { ComponentData } from '../../types/components';
 import { ComponentRenderer } from './ComponentRenderer';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -21,7 +22,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
     component,
     context = 'frontend',
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
     const children = component.children || [];
 
     const variant = (props.variant as string) || 'default';
@@ -29,15 +30,16 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
     const description = (props.description as string) || '';
     const footer = (props.footer as string) || '';
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['box', 'size', 'spacing', 'position']);
+
     const cardClasses = [
         styles.card,
         variant !== 'default' && styles[`card--${variant}`],
     ].filter(Boolean).join(' ');
 
     const cardStyle: React.CSSProperties = {
-        ...(props.backgroundColor && { backgroundColor: props.backgroundColor as string }),
-        ...(props.borderRadius && { borderRadius: props.borderRadius as string }),
-        ...(props.padding && { padding: props.padding as string }),
+        ...sharedStyles,
     };
 
     return (

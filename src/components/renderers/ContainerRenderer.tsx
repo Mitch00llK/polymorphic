@@ -9,6 +9,7 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import type { ComponentData } from '../../types/components';
 import { renderChildren } from './ComponentRenderer';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -24,7 +25,7 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
     component,
     context,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
     const { setNodeRef, isOver } = useDroppable({
         id: `drop-${component.id}`,
@@ -35,23 +36,16 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
         },
     });
 
-    const style: React.CSSProperties = {
-        maxWidth: props.maxWidth || undefined,
-        backgroundColor: props.backgroundColor || undefined,
-        paddingTop: props.paddingTop || undefined,
-        paddingBottom: props.paddingBottom || undefined,
-        paddingLeft: props.paddingLeft || '1rem',
-        paddingRight: props.paddingRight || '1rem',
-        textAlign: (props.textAlign as React.CSSProperties['textAlign']) || undefined,
-    };
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['layout', 'box', 'size', 'spacing']);
 
-    if (props.display === 'flex') {
-        style.display = 'flex';
-        style.flexDirection = props.flexDirection || 'column';
-        style.justifyContent = props.justifyContent || 'flex-start';
-        style.alignItems = props.alignItems || 'stretch';
-        style.gap = props.gap || undefined;
-    }
+    // Component-specific styles with defaults
+    const style: React.CSSProperties = {
+        ...sharedStyles,
+        // Default horizontal padding if not set
+        paddingLeft: sharedStyles.paddingLeft || '1rem',
+        paddingRight: sharedStyles.paddingRight || '1rem',
+    };
 
     const classNames = [
         styles.container,

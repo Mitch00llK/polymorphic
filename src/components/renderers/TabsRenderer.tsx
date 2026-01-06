@@ -11,6 +11,7 @@ import React from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -28,7 +29,7 @@ interface TabsRendererProps {
 export const TabsRenderer: React.FC<TabsRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
     const tabs = (props.tabs as TabItem[]) || [
         { id: 'tab1', label: 'Tab 1', content: 'Content for Tab 1' },
@@ -37,10 +38,18 @@ export const TabsRenderer: React.FC<TabsRendererProps> = ({
     ];
     const defaultTab = (props.defaultTab as string) || tabs[0]?.id;
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['typography', 'box', 'spacing', 'position']);
+
+    const tabsStyle: React.CSSProperties = {
+        ...sharedStyles,
+    };
+
     return (
         <TabsPrimitive.Root
             defaultValue={defaultTab}
             className={styles.tabs}
+            style={tabsStyle}
             data-component-id={component.id}
         >
             <TabsPrimitive.List className={styles.tabsList}>

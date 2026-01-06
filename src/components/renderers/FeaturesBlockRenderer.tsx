@@ -10,6 +10,7 @@
 import React from 'react';
 import { Zap, Shield, Rocket, Star, Heart, Globe } from 'lucide-react';
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 import styles from './blocks.module.css';
 
 interface Feature {
@@ -35,7 +36,7 @@ const iconMap: Record<string, React.FC<{ size?: number }>> = {
 export const FeaturesBlockRenderer: React.FC<FeaturesBlockRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
     const title = (props.title as string) || 'Why Choose Us';
     const subtitle = (props.subtitle as string) || 'Everything you need to build amazing websites';
@@ -47,11 +48,24 @@ export const FeaturesBlockRenderer: React.FC<FeaturesBlockRendererProps> = ({
         { icon: 'rocket', title: 'Easy to Use', description: 'Intuitive drag-and-drop interface' },
     ];
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['layout', 'typography', 'box', 'spacing']);
+
+    const blockStyle: React.CSSProperties = {
+        ...sharedStyles,
+    };
+
+    // Typography styles for title/subtitle
+    const textStyle: React.CSSProperties = {
+        fontFamily: sharedStyles.fontFamily,
+        color: sharedStyles.color,
+    };
+
     return (
-        <section className={styles.featuresBlock} data-component-id={component.id}>
+        <section className={styles.featuresBlock} style={blockStyle} data-component-id={component.id}>
             <div className={styles.featuresHeader}>
-                <h2 className={styles.featuresTitle}>{title}</h2>
-                <p className={styles.featuresSubtitle}>{subtitle}</p>
+                <h2 className={styles.featuresTitle} style={textStyle}>{title}</h2>
+                <p className={styles.featuresSubtitle} style={{ color: sharedStyles.color }}>{subtitle}</p>
             </div>
             <div
                 className={styles.featuresGrid}

@@ -9,6 +9,7 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import type { ComponentData } from '../../types/components';
 import { renderChildren } from './ComponentRenderer';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 
 import styles from './renderers.module.css';
 
@@ -24,7 +25,7 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     component,
     context,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
     const { setNodeRef, isOver } = useDroppable({
         id: `drop-${component.id}`,
@@ -35,14 +36,18 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
         },
     });
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['layout', 'box', 'size', 'spacing']);
+
+    // Component-specific styles with defaults
     const style: React.CSSProperties = {
-        backgroundColor: props.backgroundColor || undefined,
-        backgroundImage: props.backgroundImage ? `url(${props.backgroundImage})` : undefined,
-        backgroundSize: props.backgroundSize || 'cover',
-        backgroundPosition: props.backgroundPosition || 'center',
-        paddingTop: props.paddingTop || '4rem',
-        paddingBottom: props.paddingBottom || '4rem',
-        minHeight: props.minHeight || undefined,
+        ...sharedStyles,
+        // Default padding if not set
+        paddingTop: sharedStyles.paddingTop || '4rem',
+        paddingBottom: sharedStyles.paddingBottom || '4rem',
+        // Background position default
+        backgroundPosition: sharedStyles.backgroundPosition || 'center',
+        backgroundSize: sharedStyles.backgroundSize || 'cover',
     };
 
     const classNames = [

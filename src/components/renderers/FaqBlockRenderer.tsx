@@ -11,6 +11,7 @@ import React from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { ChevronDown } from 'lucide-react';
 import type { ComponentData } from '../../types/components';
+import { buildStyles, type StyleableProps } from '../../utils/styleBuilder';
 import styles from './blocks.module.css';
 
 interface FaqItem {
@@ -26,7 +27,7 @@ interface FaqBlockRendererProps {
 export const FaqBlockRenderer: React.FC<FaqBlockRendererProps> = ({
     component,
 }) => {
-    const props = component.props || {};
+    const props = component.props as StyleableProps || {};
 
     const title = (props.title as string) || 'Frequently Asked Questions';
     const subtitle = (props.subtitle as string) || 'Find answers to common questions';
@@ -38,11 +39,24 @@ export const FaqBlockRenderer: React.FC<FaqBlockRendererProps> = ({
         { question: 'How do I cancel my subscription?', answer: 'You can cancel your subscription at any time from your account settings. Your access continues until the end of your billing period.' },
     ];
 
+    // Build styles from shared control groups
+    const sharedStyles = buildStyles(props, ['layout', 'typography', 'box', 'spacing']);
+
+    const blockStyle: React.CSSProperties = {
+        ...sharedStyles,
+    };
+
+    // Typography styles for title/subtitle
+    const textStyle: React.CSSProperties = {
+        fontFamily: sharedStyles.fontFamily,
+        color: sharedStyles.color,
+    };
+
     return (
-        <section className={styles.faqBlock} data-component-id={component.id}>
+        <section className={styles.faqBlock} style={blockStyle} data-component-id={component.id}>
             <div className={styles.faqHeader}>
-                <h2 className={styles.faqTitle}>{title}</h2>
-                <p className={styles.faqSubtitle}>{subtitle}</p>
+                <h2 className={styles.faqTitle} style={textStyle}>{title}</h2>
+                <p className={styles.faqSubtitle} style={{ color: sharedStyles.color }}>{subtitle}</p>
             </div>
             <AccordionPrimitive.Root
                 type="single"
