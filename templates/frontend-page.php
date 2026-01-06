@@ -219,5 +219,57 @@ if ( ! $post ) {
 </main>
 
 <?php wp_footer(); ?>
+
+<script>
+/* Polymorphic UI Components - Vanilla JS */
+(function() {
+    'use strict';
+    
+    /* Accordion functionality */
+    document.querySelectorAll('.accordion__trigger').forEach(function(trigger) {
+        trigger.addEventListener('click', function() {
+            var isExpanded = this.getAttribute('aria-expanded') === 'true';
+            var content = document.getElementById(this.getAttribute('aria-controls'));
+            
+            /* For single-mode accordion, close others in same accordion */
+            var accordion = this.closest('.accordion');
+            if (accordion && accordion.dataset.type === 'single') {
+                accordion.querySelectorAll('.accordion__trigger').forEach(function(t) {
+                    if (t !== trigger) {
+                        t.setAttribute('aria-expanded', 'false');
+                        var c = document.getElementById(t.getAttribute('aria-controls'));
+                        if (c) c.hidden = true;
+                    }
+                });
+            }
+            
+            /* Toggle current item */
+            this.setAttribute('aria-expanded', !isExpanded);
+            if (content) content.hidden = isExpanded;
+        });
+    });
+    
+    /* Tabs functionality */
+    document.querySelectorAll('.tabs__trigger').forEach(function(trigger) {
+        trigger.addEventListener('click', function() {
+            var tabs = this.closest('.tabs');
+            var panelId = this.getAttribute('aria-controls');
+            
+            /* Deactivate all tabs */
+            tabs.querySelectorAll('.tabs__trigger').forEach(function(t) {
+                t.setAttribute('aria-selected', 'false');
+            });
+            tabs.querySelectorAll('.tabs__content').forEach(function(p) {
+                p.hidden = true;
+            });
+            
+            /* Activate clicked tab */
+            this.setAttribute('aria-selected', 'true');
+            var panel = document.getElementById(panelId);
+            if (panel) panel.hidden = false;
+        });
+    });
+})();
+</script>
 </body>
 </html>
