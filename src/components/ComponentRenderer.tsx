@@ -11,6 +11,7 @@
 import React from 'react';
 import type { ComponentData } from '../types/components';
 import { SelectableElement } from './builder/SelectableElement';
+import { PHPComponentWrapper } from './PHPComponentWrapper';
 
 // Atoms
 import {
@@ -115,7 +116,24 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
 }) => {
     const Renderer = renderers[component.type];
 
+    // Use PHPComponentWrapper for third-party components without React renderers
     if (!Renderer) {
+        // Check if it's a third-party component (contains slash like 'test/counter')
+        if (component.type.includes('/')) {
+            if (context === 'editor') {
+                return (
+                    <SelectableElement
+                        componentId={component.id}
+                        componentType={component.type}
+                        context={context}
+                    >
+                        <PHPComponentWrapper component={component} context={context} />
+                    </SelectableElement>
+                );
+            }
+            return <PHPComponentWrapper component={component} context={context} />;
+        }
+
         return (
             <div className="component-unknown">
                 Unknown component type: {component.type}

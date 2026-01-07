@@ -7,8 +7,9 @@
  * @since   1.0.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDraggable } from '@dnd-kit/core';
+import { componentRegistry, ComponentRegistration } from '../../services/componentRegistry';
 import { CSS } from '@dnd-kit/utilities';
 import {
     Type,
@@ -39,6 +40,7 @@ import {
     Quote,
     BarChart3,
     LayoutGrid,
+    Hash,
     // View toggle
     Component,
 } from 'lucide-react';
@@ -58,6 +60,7 @@ interface ComponentDefinition {
     label: string;
     icon: React.ReactNode;
     category: 'layout' | 'content' | 'media' | 'actions' | 'ui' | 'blocks';
+    isThirdParty?: boolean;
 }
 
 /**
@@ -260,10 +263,55 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggle 
     const [showTemplates, setShowTemplates] = useState(false);
     const [viewMode, setViewMode] = useState<ViewMode>('components');
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+    const [thirdPartyComponents, setThirdPartyComponents] = useState<ComponentDefinition[]>([]);
     const { addComponent, components, selectedId, selectComponent } = useBuilderStore();
 
+    // Map icon string to React component
+    const getIconFromString = (iconName: string): React.ReactNode => {
+        const iconMap: Record<string, React.ReactNode> = {
+            hash: <Hash size={20} />,
+            star: <Star size={20} />,
+            box: <Box size={20} />,
+            image: <Image size={20} />,
+            type: <Type size={20} />,
+            layout: <Layout size={20} />,
+            layers: <Layers size={20} />,
+            grid3x3: <Grid3X3 size={20} />,
+            quote: <Quote size={20} />,
+            barchart3: <BarChart3 size={20} />,
+            layoutgrid: <LayoutGrid size={20} />,
+        };
+        return iconMap[iconName.toLowerCase()] || <Box size={20} />;
+    };
+
+    // Fetch third-party components from API
+    useEffect(() => {
+        const fetchThirdParty = async () => {
+            try {
+                const registry = await componentRegistry.fetchRegistry();
+                const thirdParty = registry.filter((c: ComponentRegistration) => c.source !== 'core');
+                const mapped: ComponentDefinition[] = thirdParty.map((c: ComponentRegistration) => ({
+                    type: c.type as ComponentType,
+                    label: c.label,
+                    icon: getIconFromString(c.icon),
+                    category: c.category as ComponentDefinition['category'],
+                    isThirdParty: true,
+                }));
+                setThirdPartyComponents(mapped);
+
+                // Pre-load assets for third-party components
+                for (const comp of thirdParty) {
+                    await componentRegistry.loadCSS(comp);
+                }
+            } catch (error) {
+                console.error('Failed to fetch third-party components:', error);
+            }
+        };
+        fetchThirdParty();
+    }, []);
+
     // Auto-expand containers when switching to layers view
-    React.useEffect(() => {
+    useEffect(() => {
         if (viewMode === 'layers') {
             const containerTypes = ['section', 'container'];
             const findContainerIds = (comps: ComponentData[]): string[] => {
@@ -295,7 +343,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggle 
         addComponent(type);
     };
 
-    const groupedComponents = COMPONENTS.reduce((acc, comp) => {
+    // Merge static and third-party components
+    const allComponents = [...COMPONENTS, ...thirdPartyComponents];
+
+    const groupedComponents = allComponents.reduce((acc, comp) => {
         if (!acc[comp.category]) acc[comp.category] = [];
         acc[comp.category].push(comp);
         return acc;
