@@ -19,10 +19,24 @@ import {
     ElementStyleControl,
 } from '../controls';
 import type { SpacingValue, FlexLayoutValue, TypographyValue, BoxStyleValue, SizeValue, PositionValue, ElementStyleValue } from '../controls';
-import type { ComponentType } from '../../types/components';
+import type { ComponentType, ComponentData } from '../../types/components';
 import { getComponentControls, controlGroupLabels, type ControlGroupType } from '../../config/controlGroups';
 
 import styles from './PropertyPanel.module.css';
+
+/**
+ * Helper to find component by ID in tree.
+ */
+const findComponentById = (components: ComponentData[], id: string): ComponentData | null => {
+    for (const comp of components) {
+        if (comp.id === id) return comp;
+        if (comp.children) {
+            const found = findComponentById(comp.children, id);
+            if (found) return found;
+        }
+    }
+    return null;
+};
 
 /**
  * Control group with collapsible header.
@@ -276,18 +290,32 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ isCollapsed = fals
     }
 
     const handlePropChange = (key: string, value: unknown) => {
+        // Get fresh state from store to avoid stale closure issues
+        const currentComponent = useBuilderStore.getState().components
+            ? findComponentById(useBuilderStore.getState().components, selectedId)
+            : null;
+
+        if (!currentComponent) return;
+
         updateComponent(selectedId, {
             props: {
-                ...selectedComponent.props,
+                ...currentComponent.props,
                 [key]: value,
             },
         });
     };
 
     const handleMultiPropChange = (updates: Record<string, unknown>) => {
+        // Get fresh state from store to avoid stale closure issues
+        const currentComponent = useBuilderStore.getState().components
+            ? findComponentById(useBuilderStore.getState().components, selectedId)
+            : null;
+
+        if (!currentComponent) return;
+
         updateComponent(selectedId, {
             props: {
-                ...selectedComponent.props,
+                ...currentComponent.props,
                 ...updates,
             },
         });
