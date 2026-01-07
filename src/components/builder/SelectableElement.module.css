@@ -2,12 +2,17 @@
  * Selectable Element Styles
  *
  * Visual selection frame and drag handles for builder elements.
+ * Important: This wrapper must not interfere with flex layouts.
  */
 
 .selectableElement {
     position: relative;
     cursor: pointer;
     transition: outline 0.15s ease, opacity 0.15s ease;
+    /* Allow flex items to size properly when inside flex containers */
+    flex-shrink: 0;
+    /* Ensure the wrapper takes full size of its content */
+    min-width: 0;
 }
 
 /* Hover state - subtle outline */

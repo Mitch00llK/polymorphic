@@ -156,9 +156,10 @@ registerComponentCSS('container', `
     gap: var(--poly-gap);
     flex-wrap: var(--poly-flex-wrap, nowrap);
     width: var(--poly-width, 100%);
-    max-width: var(--poly-max-width, 1200px);
-    margin-left: var(--poly-margin-left, auto);
-    margin-right: var(--poly-margin-right, auto);
+    max-width: var(--poly-max-width);
+    min-width: var(--poly-min-width);
+    margin-left: var(--poly-margin-left);
+    margin-right: var(--poly-margin-right);
     margin-top: var(--poly-margin-top);
     margin-bottom: var(--poly-margin-bottom);
     padding: var(--poly-padding);
@@ -170,6 +171,8 @@ registerComponentCSS('container', `
     border-radius: var(--poly-border-radius);
     box-shadow: var(--poly-box-shadow);
     transition: box-shadow 0.2s ease;
+    /* Support percentage widths in flex contexts */
+    box-sizing: border-box;
 }
 .poly-container--drop-target {
     box-shadow: inset 0 0 0 3px #6366f1;
