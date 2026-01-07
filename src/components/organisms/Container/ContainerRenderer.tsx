@@ -107,14 +107,17 @@ const mapAlignItems = (value?: string): string => {
 
 /**
  * Renders a Container layout component.
- * Uses store selector to ensure instant updates when props change.
+ * Uses store selector in editor mode for instant updates.
  */
 export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
     component,
     context,
 }) => {
-    // Subscribe to this specific component's data from store for instant updates
+    // In editor mode, subscribe to store for instant updates
+    // In preview/frontend mode, use component prop directly
     const liveComponent = useBuilderStore((state) => {
+        if (context !== 'editor') return null; // Don't use store for frontend
+
         const findById = (comps: ComponentData[], id: string): ComponentData | null => {
             for (const c of comps) {
                 if (c.id === id) return c;
@@ -128,8 +131,8 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
         return findById(state.components, component.id);
     });
 
-    // Use live data from store if available, fallback to prop
-    const currentComponent = liveComponent || component;
+    // Use live data from store in editor, otherwise use prop
+    const currentComponent = (context === 'editor' && liveComponent) ? liveComponent : component;
     const props = (currentComponent.props || {}) as ContainerProps;
     const children = currentComponent.children || [];
 
