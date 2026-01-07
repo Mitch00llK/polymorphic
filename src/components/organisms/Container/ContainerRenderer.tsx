@@ -8,9 +8,10 @@
  * @since   1.0.0
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { ComponentData } from '../../../types/components';
 import { ComponentRenderer } from '../../ComponentRenderer';
+import { useBuilderStore } from '../../../store/builderStore';
 
 import styles from '../organisms.module.css';
 
@@ -33,7 +34,7 @@ interface ContainerProps {
     direction?: string;
     wrap?: string;
     alignment?: string;
-    
+
     // Box Style
     backgroundColor?: string;
     backgroundImage?: string;
@@ -50,7 +51,7 @@ interface ContainerProps {
     borderRadiusBottomLeft?: string;
     boxShadow?: string;
     opacity?: string;
-    
+
     // Size
     width?: string;
     height?: string;
@@ -59,7 +60,7 @@ interface ContainerProps {
     minHeight?: string;
     maxHeight?: string;
     overflow?: string;
-    
+
     // Spacing (PropertyPanel format)
     paddingTop?: string;
     paddingRight?: string;
@@ -106,13 +107,31 @@ const mapAlignItems = (value?: string): string => {
 
 /**
  * Renders a Container layout component.
+ * Uses store selector to ensure instant updates when props change.
  */
 export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
     component,
     context,
 }) => {
-    const props = (component.props || {}) as ContainerProps;
-    const children = component.children || [];
+    // Subscribe to this specific component's data from store for instant updates
+    const liveComponent = useBuilderStore((state) => {
+        const findById = (comps: ComponentData[], id: string): ComponentData | null => {
+            for (const c of comps) {
+                if (c.id === id) return c;
+                if (c.children) {
+                    const found = findById(c.children, id);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+        return findById(state.components, component.id);
+    });
+
+    // Use live data from store if available, fallback to prop
+    const currentComponent = liveComponent || component;
+    const props = (currentComponent.props || {}) as ContainerProps;
+    const children = currentComponent.children || [];
 
     // Handle padding - support both PropertyPanel format and legacy template format
     let paddingStyles: React.CSSProperties = {};
@@ -169,7 +188,7 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
 
     // Handle border radius (individual corners or single value)
     let borderRadiusValue: string | undefined;
-    if (props.borderRadiusTopLeft || props.borderRadiusTopRight || 
+    if (props.borderRadiusTopLeft || props.borderRadiusTopRight ||
         props.borderRadiusBottomRight || props.borderRadiusBottomLeft) {
         borderRadiusValue = [
             props.borderRadiusTopLeft || '0',
@@ -190,7 +209,7 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
         justifyContent: mapJustifyContent(props.justifyContent),
         alignItems: mapAlignItems(props.alignItems),
         gap: props.gap || undefined,
-        
+
         // Size
         width: widthValue,
         height: props.height || undefined,
@@ -199,23 +218,23 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
         minHeight: props.minHeight || undefined,
         maxHeight: props.maxHeight || undefined,
         overflow: props.overflow as React.CSSProperties['overflow'] || undefined,
-        
+
         // Box Style - Background
         backgroundColor: props.backgroundColor || undefined,
         backgroundSize: props.backgroundSize || undefined,
         backgroundPosition: props.backgroundPosition || undefined,
         backgroundRepeat: props.backgroundRepeat || undefined,
-        
+
         // Box Style - Border
         borderWidth: props.borderWidth || undefined,
         borderStyle: props.borderStyle as React.CSSProperties['borderStyle'] || (props.borderWidth ? 'solid' : undefined),
         borderColor: props.borderColor || undefined,
         borderRadius: borderRadiusValue,
-        
+
         // Box Style - Effects
         boxShadow: props.boxShadow || undefined,
         opacity: props.opacity ? parseFloat(props.opacity) : undefined,
-        
+
         // Spacing
         ...paddingStyles,
         marginTop: props.marginTop || undefined,
@@ -225,7 +244,7 @@ export const ContainerRenderer: React.FC<ContainerRendererProps> = ({
 
     // Handle background image
     if (props.backgroundImage) {
-        if (props.backgroundImage.startsWith('linear-gradient') || 
+        if (props.backgroundImage.startsWith('linear-gradient') ||
             props.backgroundImage.startsWith('radial-gradient') ||
             props.backgroundImage.startsWith('url(')) {
             style.backgroundImage = props.backgroundImage;
