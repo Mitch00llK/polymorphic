@@ -141,6 +141,9 @@ final class Plugin {
         $blocks_controller->register_routes();
 
         // Component registry API routes.
+        if ( ! class_exists( 'Polymorphic\Api\Component_Registry_Controller' ) ) {
+            require_once POLYMORPHIC_PATH . 'includes/Api/ComponentRegistryController/class-component-registry-controller.php';
+        }
         $component_registry_controller = new Component_Registry_Controller( $this->component_registry );
         $component_registry_controller->register_routes();
     }
