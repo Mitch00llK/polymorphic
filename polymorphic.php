@@ -85,6 +85,10 @@ if ( version_compare( PHP_VERSION, POLYMORPHIC_MIN_PHP, '<' ) ) {
  */
 if ( file_exists( POLYMORPHIC_PATH . 'vendor/autoload.php' ) ) {
     require_once POLYMORPHIC_PATH . 'vendor/autoload.php';
+
+    // Non-class files must be loaded manually.
+    require_once POLYMORPHIC_PATH . 'includes/functions-components.php';
+    require_once POLYMORPHIC_PATH . 'includes/Test/test-component.php';
 } else {
     // Fallback: manually require core classes if composer autoload missing.
     require_once POLYMORPHIC_PATH . 'includes/Core/Activator/class-activator.php';
