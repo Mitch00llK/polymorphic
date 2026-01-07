@@ -75,6 +75,12 @@ class ComponentRegistryService {
         this.fetchPromise = apiFetch<ComponentsResponse>({
             path: '/polymorphic/v1/components',
         }).then((response) => {
+            // Validate response structure
+            if (!response || !Array.isArray(response.components)) {
+                console.error('Invalid component API response:', response);
+                return [];
+            }
+
             response.components.forEach((component) => {
                 this.cache.set(component.type, component);
             });
