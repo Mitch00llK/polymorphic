@@ -14,6 +14,7 @@ use Polymorphic\Admin\Editor_Integration;
 use Polymorphic\Api\Rest_Controller;
 use Polymorphic\Api\Global_Settings_Controller;
 use Polymorphic\Api\Global_Blocks_Controller;
+use Polymorphic\Api\Component_Registry_Controller;
 use Polymorphic\Components\Component_Registry;
 use Polymorphic\Frontend\Renderer;
 use Polymorphic\Frontend\Assets\Frontend_Assets;
@@ -138,6 +139,10 @@ final class Plugin {
         // Global blocks API routes.
         $blocks_controller = new Global_Blocks_Controller();
         $blocks_controller->register_routes();
+
+        // Component registry API routes.
+        $component_registry_controller = new Component_Registry_Controller( $this->component_registry );
+        $component_registry_controller->register_routes();
     }
 
     /**

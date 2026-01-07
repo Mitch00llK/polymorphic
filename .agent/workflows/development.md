@@ -77,3 +77,5 @@ npm run build
 - Follow Airbnb JavaScript Style Guide for JS/React
 - Use ESLint and Prettier for formatting
 - Run `npm run lint:fix` before committing
+
+refference files in the docs directory
